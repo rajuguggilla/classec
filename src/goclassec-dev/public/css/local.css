@@ -1,0 +1,31 @@
+body{
+   font-family: 'Roboto', sans-serif;
+}
+.navbar-custom {
+    -webkit-box-shadow: 0 6px 4px -4px #999;
+    -moz-box-shadow: 0 6px 4px -4px #999;
+    box-shadow: 0 6px 4px -4px #999;
+    background-color: #3c3c3c;
+}
+
+.jumbotron {
+    -webkit-box-shadow: 0 4px 2px -2px #999;
+    -moz-box-shadow: 0 4px 2px -2px #999;
+    box-shadow: 0 4px 2px -2px #999;
+}
+.jumbotron {
+    background-color: #d0e9c6;
+    padding-bottom: 3px;
+    padding-top: 39px;
+}
+
+.jumbotron P {
+    font-size: 15px;
+    font-weight: 300;
+}
+
+md-card.md-default-theme, md-card {
+    color: rgba(0,0,0,0.87);
+    background-color: rgba(255, 205, 64, 0.38);
+    border-radius: 2px;
+}
