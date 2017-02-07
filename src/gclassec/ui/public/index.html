@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel='stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='/bower_components/responsive-nav/responsive-nav.css' />
+    <link rel='stylesheet' href='/bower_components/angular-material/angular-material.css' />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body ng-app="goclassec">
+<div layout="column" ng-controller="menuctrl">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Side Panel" ng-click="openSideNavPanel()">
+                <md-tooltip>Side Panel</md-tooltip>
+                <md-icon class="md-default-theme" class="material-icons">&#xE5D2;</md-icon>
+            </md-button>
+            <md-button class="md-icon-button" aria-label="Icon">
+                <md-icon md-svg-icon="fb.svg"></md-icon>
+            </md-button>
+            <h2>
+                <span>CLASSEC</span>
+            </h2>
+            <span flex></span>
+            <!--md-button class="md-icon-button" aria-label="User">
+                <md-tooltip>User</md-tooltip>
+                <img src="user.png" style="width:24px;height:24px;"/>
+            </md-button>
+            <md-button class="md-icon-button" aria-label="Messages">
+                <md-tooltip>Messages</md-tooltip>
+                <img src="messages.png" style="width:24px;height:24px;"/>
+            </md-button-->
+        </div>
+    </md-toolbar>
+    <md-content>
+        <div ng-view=""></div>
+    </md-content>
+</div>
+
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2"
+                md-component-id="left">
+        <md-toolbar layout="row">
+            <div class="md-toolbar-tools">
+                <h2>
+                    <span>CLASSEC Menu</span>
+                </h2>
+                <span flex></span>
+                <md-button class="md-icon-button" aria-label="Close Side Panel" ng-click="closeSideNavPanel()">
+                    <md-tooltip>Close Side Panel</md-tooltip>
+                    <md-icon class="md-default-theme" class="material-icons">&#xE5CD;</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-content layout-padding="">
+            <md-list>
+                <md-subheader class="md-no-sticky">Favorites</md-subheader>
+                <md-list-item>
+                    <md-icon class="md-default-theme" class="material-icons">&#xE0C9;</md-icon>
+                    <p><a href="#!/compute">Compute</a></p>
+                    <div class="md-secondary">2</div>
+                </md-list-item>
+                <md-list-item>
+                    <md-icon class="md-default-theme" class="material-icons">&#xE878;</md-icon>
+                    <p>Events</p>
+                    <md-icon class="md-secondary">2</md-icon>
+                </md-list-item>
+                <md-list-item>
+                    <md-icon class="md-default-theme" class="material-icons">&#xE251;</md-icon>
+                    <p>Photos</p>
+                    <md-icon class="md-secondary">2</md-icon>
+                </md-list-item>
+                <md-divider></md-divider>
+                <md-subheader class="md-no-sticky">Pages</md-subheader>
+                <md-list-item>
+                    <md-icon class="md-default-theme" class="material-icons">&#xE7F9;</md-icon>
+                    <p>Pages Feed</p>
+                    <div class="md-secondary">2</div>
+                </md-list-item>
+                <md-list-item>
+                    <md-icon class="md-default-theme" class="material-icons">&#xE1BC;</md-icon>
+                    <p>Like Pages</p>
+                    <div class="md-secondary">20+</div>
+                </md-list-item>
+            </md-list>
+        </md-content>
+    </md-sidenav>
+
+
+
+
+
+<div class="footer">
+    <div class="container">
+        <!--p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team and Firebase</p-->
+    </div>
+</div>
+
+</body>
+<link rel='stylesheet' href='css/local.css'/>
+<script src="scripts/angular/angular.js"></script>
+<script src="scripts/angular-route/angular-route.js"></script>
+<script src="scripts/angular-resource/angular-resource.js"></script>
+<script src="scripts/angular-animate/angular-animate.js"></script>
+<script src="scripts/angular-sanitize/angular-sanitize.js"></script>
+<script src="scripts/angular-bootstrap/ui-bootstrap.js"></script>
+<script src="scripts/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="scripts/angular-utils-pagination/dirPagination.js"></script>
+<script src="/bower_components/angular-aria/angular-aria.js"></script>
+<script src="/bower_components/angular-material/angular-material.js"></script>
+<script src="/bower_components/jquery/dist/jquery.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+
+<script src="js\app.js"></script>
+<script src="js\controller\menuctrl.js"></script>
+<script src="js\controller\config.js"></script>
+<script src="js\controller\dbctrl.js"></script>
+<script src="js\controller\computectrl.js"></script>
+<script src="js\routes.js"></script>
+
+
+</html>
