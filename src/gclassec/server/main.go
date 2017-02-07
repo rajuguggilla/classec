@@ -16,6 +16,7 @@ import (
     "gclassec/controllers/confcontroller"
     "gclassec/controllers/vmwarecontroller"
     "gclassec/controllers/hoscontroller"
+    "gclassec/dao/hosinsert"
 )
 
 func main() {
@@ -30,16 +31,19 @@ func main() {
 
     openstackinsert.InsertInstances()
     azureinsert.AzureInsert()
+    hosinsert.InsertHOSInstances()
 
     mx.NotFoundHandler = http.HandlerFunc(validation.ValidateWrongURL)
 
     // Get a instance resource
-    mx.HandleFunc("/hos/computedetails",hc.GetComputeDetails).Methods("GET")
-    mx.HandleFunc("/hos/flavorsdetails",hc.GetFlavorsDetails).Methods("GET")
-    mx.HandleFunc("/hos/cpu_utilization/{id}",hc.CpuUtilDetails).Methods("GET")
-	//mux.HandleFunc("/hos/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
-	//mux.HandleFunc("/hos/ceilometerdetails",GetCeilometerDetails).Methods("GET")
-    mx.HandleFunc("/hos/index",hc.Index).Methods("GET")
+    mx.HandleFunc("/goclienthos/computedetails",hc.GetComputeDetails).Methods("GET")
+    mx.HandleFunc("/goclienthos/flavorsdetails",hc.GetFlavorsDetails).Methods("GET")
+    mx.HandleFunc("/goclienthos/cpu_utilization/{id}",hc.CpuUtilDetails).Methods("GET")
+	//mux.HandleFunc("/goclienthos/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
+	//mux.HandleFunc("/goclienthos/ceilometerdetails",GetCeilometerDetails).Methods("GET")
+    mx.HandleFunc("/goclienthos/index",hc.Index).Methods("GET")
+
+    mx.HandleFunc("/goclienthos/instanceDetails",hc.Compute).Methods("GET")
 
     mx.HandleFunc("/dbaas/list", uc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
 

@@ -64,7 +64,7 @@ var LINK string = (strings.Join(b,""))
 		Send().
 		ExpectStatus(404)
 
-	//hos/cpu_utilization[/hos/cpu_utilization/{id}].......................
+	//goclienthos/cpu_utilization[/goclienthos/cpu_utilization/{id}].......................
 	frisby.Create("Display the hos cpu_utilization").
 		Get(LINK+"/hos/cpu_utilization/8d874af2-5cb8-49a4-90f6-378a0a2633bc").
 		Send().
