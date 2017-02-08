@@ -51,6 +51,8 @@ type AuthOpts struct {
 
 	// Token is required for Toekn auth
 	Token string
+
+	Controller string
 }
 
 func (s *AuthOpts) GetAuthType() (string, error) {

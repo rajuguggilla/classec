@@ -18,7 +18,7 @@ package goclientcompute
 import (
 	"fmt"
 	"time"
-	"git.openstack.org/openstack/golang-client.git/openstack"
+	"gclassec/goclientopenstack/openstack"
 	"encoding/json"
 	"net/http"
 	"gclassec/goclientopenstack/flavor"
@@ -35,6 +35,9 @@ type Configuration struct {
     ProjectName   string
     Container   string
     ImageRegion string
+	Controller string
+
+
 }
 
 func Compute() []compute.DetailResponse {
@@ -61,6 +64,7 @@ func Compute() []compute.DetailResponse {
 		ProjectName: config.ProjectName,
 		Username:    config.Username,
 		Password:    config.Password,
+		Controller:	config.Controller,
 	}
 	auth, err := openstack.DoAuthRequest(creds)
 	if err != nil {
@@ -73,6 +77,7 @@ func Compute() []compute.DetailResponse {
 	fmt.Println(auth)
 	// Find the endpoint for the Nova Compute service.
 	url, err := auth.GetEndpoint("compute", "")
+	url = strings.Replace(url,"compute", creds.Controller ,1)
 	if url == "" || err != nil {
 		panic("EndPoint Not Found.")
 		panic(err)
