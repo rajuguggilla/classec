@@ -79,11 +79,12 @@ func AzureInsert() {
 	for _, element := range *ls.Value {
 		//println(element.Name,element.ID,element.Status,element.Progress)
 		//user :=	azurestruct.AzureInstances{VmName:element.NextLink}
-	rgroup:=*(element.AvailabilitySet.ID)
-	resourcegroupname := strings.Split(rgroup, "/")
+		rgroup:=*(element.AvailabilitySet.ID)
+		resourcegroupname := strings.Split(rgroup, "/")
 		//drggroup= resourcegroupname[4]
-	user := azurestruct.AzureInstances{VmName:*element.Name, Type:*element.Type, Location:*element.Location,VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState,ResourcegroupName:resourcegroupname[4]}
-	db.Create(&user)
+		user := azurestruct.AzureInstances{VmName:*element.Name, Type:*element.Type, Location:*element.Location,VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState,ResourcegroupName:resourcegroupname[4]}
+		db.Create(&user)
+		db.Model(&user).Updates(&user)
 	}
 	//Get dynamic details (i.e. Percent CPU Utilization)
 	// of Azure Virtual Machine

@@ -42,6 +42,7 @@ func InsertInstances(){
 		user:=openstackInstance.Instances{Name:element.Name,InstanceID:element.ID,Status:element.Status,RAM:element.Flavor.RAM,VCPU:element.Flavor.VCPU,Flavor:element.Flavor.Name,Storage:element.Flavor.Disk,AvailabilityZone:element.Availability_zone,CreationTime:element.Created,
 		FlavorID:element.Flavor.FlavorID,IPAddress:element.IPV4,KeyPairName:element.Key_name,ImageName:element.Image.ID}
 		db.Create(&user)
+		db.Model(&user).Updates(&user)
 	}
 
 }
