@@ -14,7 +14,7 @@ import (
     "gclassec/controllers/azurecontroller"
     "os"
     "gclassec/controllers/confcontroller"
-    "gclassec/controllers/vmwarecontroller"
+    //"gclassec/controllers/vmwarecontroller"
     "gclassec/controllers/hoscontroller"
     "gclassec/dao/hosinsert"
 )
@@ -26,7 +26,7 @@ func main() {
     op := openstackcontroller.NewUserController()
     ac := azurecontroller.NewUserController()
     uc1 := confcontroller.NewUserController()
-    vc := vmwarecontroller.NewUserController()
+    //vc := vmwarecontroller.NewUserController()
     hc := hoscontroller.NewUserController()
 
     openstackinsert.InsertInstances()
@@ -59,7 +59,7 @@ func main() {
 
     mx.HandleFunc("/dbaas/azureDetail/percentCPU/{resourceGroup}/{name}", ac.GetDynamicAzureDetails).Methods("GET")
 
-    mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
+    //mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
 
     mx.HandleFunc("/selectProvider", uc1.SelectProvider)
 

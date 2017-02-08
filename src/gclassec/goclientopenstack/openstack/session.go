@@ -27,7 +27,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"fmt"
-	"gclassec/goClientCompute/util"
+	"gclassec/goclientopenstack/util"
 )
 
 var Debug = new(bool)
