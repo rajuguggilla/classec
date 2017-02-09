@@ -6,7 +6,6 @@ import (
 	"log"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"fmt"
-	"github.com/Azure/azure-sdk-for-go/arm/compute"
 	"github.com/Azure/azure-sdk-for-go/arm/examples/helpers"
 	_ "github.com/go-sql-driver/mysql"
 	"strings"
@@ -15,6 +14,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"encoding/json"
 	"gclassec/readcredentials"
+	"gclassec/goclientazure"
 )
 
 type ls struct {
@@ -69,7 +69,7 @@ func AzureInsert() {
 		log.Fatalf("Error: %v", err)
 		return
 	}
-	ac := compute.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
+	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
 	ac.Authorizer = spt
 
 	ls, _ := ac.ListAll()

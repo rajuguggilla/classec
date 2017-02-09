@@ -14,7 +14,7 @@ import(
 	"log"
 	"github.com/Azure/azure-sdk-for-go/arm/examples/helpers"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/azure-sdk-for-go/arm/compute"
+	"gclassec/goclientazure"
 )
 type (
 
@@ -85,7 +85,7 @@ func   (uc UserController) GetDynamicAzureDetails(w http.ResponseWriter, r *http
 		return
 	}
 
-	dc := compute.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
+	dc := goclientazure.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
 	dc.Authorizer = spt
 
 	dlist, _ := dc.ListDynamic(name,resourceGrp)
