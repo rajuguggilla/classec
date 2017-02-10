@@ -124,7 +124,19 @@ func main() {
 
 	mx.HandleFunc("/providers/azure", uc1.ProviderAzure).Methods("POST")
 
-	http.Handle("/", mx)
+	mx.HandleFunc("/hos/updatecredentials",uc1.UpdateHosCredentials).Methods("POST")
+
+        mx.HandleFunc("/aws/updatecredentials",uc1.UpdateAwsCredentials).Methods("POST")
+
+        mx.HandleFunc("/openstack/updatecredentials",uc1.UpdateOsCredentials).Methods("POST")
+
+        //mx.HandleFunc("/vmware/updatecredentials",uc1.UpdateVmwareCredentials).Methods("POST")
+
+        mx.HandleFunc("/azure/updatecredentials",uc1.UpdateAzureCredentials).Methods("POST")
+
+
+
+        http.Handle("/", mx)
 
         // Fire up the server
         fmt.Println("Server is on Port 9009")
