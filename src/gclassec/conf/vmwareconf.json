@@ -1,0 +1,6 @@
+{
+    "EnvURL" : "https://110.110.110.140:443/sdk",
+	"EnvUserName" : "administrator@vsphere.local",
+	"EnvPassword" : "Vcenter#1234",
+	"EnvInsecure" : "true"
+}
