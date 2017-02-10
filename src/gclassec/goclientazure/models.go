@@ -144,7 +144,7 @@ const (
 
 // VirtualMachineSizeTypes enumerates the values for virtual machine size
 // types.
-type VirtualMachineSizeTypes string
+/*type VirtualMachineSizeTypes string
 
 const (
 	// BasicA0 specifies the basic a0 state for virtual machine size types.
@@ -331,7 +331,7 @@ const (
 	// StandardGS5 specifies the standard gs5 state for virtual machine size
 	// types.
 	StandardGS5 VirtualMachineSizeTypes = "Standard_GS5"
-)
+)*/
 
 // AdditionalUnattendContent is additional XML formatted information that can
 // be included in the Unattend.xml file, which is used by Windows Setup.
@@ -651,7 +651,7 @@ type Usage struct {
 }
 
 type DynamicUsage struct {
-	Data         *[]UsageData `json:"data,omitempty"`
+	Data         []UsageData `json:"data,omitempty"`
 	Id           *string    `json:"id,omitempty"`
 	Name         *UsageName `json:"name,omitempty"`
 	Type         *string    `json:"type,omitempty"`
@@ -660,7 +660,7 @@ type DynamicUsage struct {
 
 type UsageData struct {
 	TimeStamp    *date.Time   `json:"timeStamp,omitempty"`
-	Average      *float32     `json:"average,omitempty"`
+	Average      *float64     `json:"average,omitempty"`
 	Total        *float32     `json:"total,omitempty"`
 }
 
@@ -830,6 +830,26 @@ type VirtualMachineInstanceView struct {
 	Extensions           *[]VirtualMachineExtensionInstanceView `json:"extensions,omitempty"`
 	BootDiagnostics      *BootDiagnosticsInstanceView           `json:"bootDiagnostics,omitempty"`
 	Statuses             *[]InstanceViewStatus                  `json:"statuses,omitempty"`
+}
+
+type VirtualMachineStaticDynamic struct{
+	VmName *string 			`json:"vmname,omitempty"`
+	Type *string 			`json:"type,omitempty"`
+	Location *string 		`json:"location,omitempty"`
+	VmSize string           	`json:"vmsize,omitempty"`
+	Publisher *string 		`json:"publisher,omitempty"`
+	Offer *string 			`json:"offer,omitempty"`
+	SKU *string 			`json:"sku,omitempty"`
+	VmId *string			`json:"vmid,omitempty"`
+	AvailabilitySetName *string 	`json:"availabilityset,omitempty"`
+	Provisioningstate *string	`json:"provisioningstate,omitempty"`
+	ResourcegroupName string	`json:"resourcegroupname,omitempty"`
+	TimeStamp    *date.Time   	`json:"timeStamp,omitempty"`
+	Average      *float64     	`json:"average,omitempty"`
+	/*autorest.Response `json:"-"`
+	Value             *VirtualMachineListResult `json:"value,omitempty"`
+	NextLink          *string           `json:"nextLink,omitempty"`
+	DValue             ListDynamicUsagesResult `json:"dvalue,omitempty"`*/
 }
 
 // VirtualMachineListResult is the List Virtual Machine operation response.

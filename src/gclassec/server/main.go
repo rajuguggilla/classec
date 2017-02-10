@@ -16,7 +16,6 @@ import (
     "gclassec/controllers/confcontroller"
     //"gclassec/controllers/vmwarecontroller"
     "gclassec/controllers/hoscontroller"
-    "gclassec/dao/hosinsert"
     "time"
     "runtime"
     "strings"
@@ -24,6 +23,7 @@ import (
     "sync"
     "gclassec/Loggers"
     "log"
+    "gclassec/dao/hosinsert"
 )
 
 type Configuration struct {
@@ -109,6 +109,8 @@ func main() {
         mx.HandleFunc("/dbaas/azureDetail", ac.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
 
         mx.HandleFunc("/dbaas/azureDetail/percentCPU/{resourceGroup}/{name}", ac.GetDynamicAzureDetails).Methods("GET")
+
+        mx.HandleFunc("/dbaas/azureInstance", ac.GetAzureStaticDynamic).Methods("GET")
 
         //mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
 
