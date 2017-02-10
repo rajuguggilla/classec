@@ -22,6 +22,8 @@ import (
     "strings"
     "encoding/json"
     "sync"
+    "gclassec/Loggers"
+    //"log"
 )
 
 type Configuration struct {
@@ -30,6 +32,7 @@ type Configuration struct {
 }
 
 func main() {
+    Loggers.MyLogger()
     filename := "server/main.go"
     _, filePath, _, _ := runtime.Caller(0)
     fmt.Println("CurrentFilePath:==",filePath)
