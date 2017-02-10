@@ -23,7 +23,7 @@ import (
     "encoding/json"
     "sync"
     "gclassec/Loggers"
-    //"log"
+    "log"
 )
 
 type Configuration struct {
@@ -51,10 +51,10 @@ func main() {
     var wg sync.WaitGroup
     wg.Add(2)
 
-    fmt.Println("Starting Go Routines")
-    fmt.Println("Duration for Ticker : ",time.Duration(configuration.Interval) * configuration.Timespec)
-    fmt.Println("Interval : ", configuration.Interval)
-    fmt.Println("Timespec : ", configuration.Timespec)
+    log.Println("Starting Go Routines")
+    log.Println("Duration for Ticker : ",time.Duration(configuration.Interval) * configuration.Timespec)
+    log.Println("Interval : ", configuration.Interval)
+    log.Println("Timespec : ", configuration.Timespec)
 
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
