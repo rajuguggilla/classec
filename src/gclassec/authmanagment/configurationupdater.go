@@ -51,7 +51,7 @@ func AwsCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	//fmt.Println(bodyString)
-	filename := "credentialeditor/configurationupdater.go"
+	filename := "authmanagment/configurationupdater.go"
 	_, filePath, _, _ := runtime.Caller(0)
         fmt.Println("\nCurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/tempawscred.json", 1))
@@ -71,7 +71,7 @@ func AzureCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "credentialeditor/configurationupdater.go"
+	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         fmt.Println("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/tempazurecred.json", 1))
@@ -90,7 +90,7 @@ func OpenstackCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "credentialeditor/configurationupdater.go"
+	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         fmt.Println("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/temposcred.json", 1))
@@ -110,7 +110,7 @@ func VmwareCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "credentialeditor/configurationupdater.go"
+	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         fmt.Println("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/tempvmwarecred.json", 1))
@@ -131,7 +131,7 @@ func HosCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "credentialeditor/configurationupdater.go"
+	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         fmt.Println("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/temphoscred.json", 1))

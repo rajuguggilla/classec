@@ -40,6 +40,7 @@ var dbusername string = dbcredentials.Dbusername
 var dbpassword string = dbcredentials.Dbpassword
 var dbhostname string = dbcredentials.Dbhostname
 var dbport string = dbcredentials.Dbport
+
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))
@@ -85,6 +86,23 @@ func exit(err error) {
 func VmwareInsert(){
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+
+	fmt.Println("dbtype string =", dbcredentials.Dbtype)
+	fmt.Println(" dbname  string =", dbcredentials.Dbname)
+	fmt.Println(" dbusername string =", dbcredentials.Dbusername)
+	fmt.Println(" dbpassword string =", dbcredentials.Dbpassword)
+	fmt.Println(" dbhostname string =", dbcredentials.Dbhostname)
+	fmt.Println("dbport string = ",dbcredentials.Dbport)
+	fmt.Println(" EnvURL string = ",vmwarecreds.EnvURL)
+	fmt.Println(" EnvUserName  string =", vmwarecreds.EnvUserName)
+	fmt.Println(" EnvPassword string =", vmwarecreds.EnvPassword)
+	fmt.Println(" EnvInsecure string =", vmwarecreds.EnvInsecure)
+
+
+
+
+
 	var insecureFlag =  vmwarecontroller.ENVinsecureFlag/*flag.Bool("insecure", true, insecureDescription)*/
 	fmt.Println(*insecureFlag)
 
