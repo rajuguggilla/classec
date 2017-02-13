@@ -1,4 +1,4 @@
-package credentialeditor
+package authmanagment
 
 import(
 	"net/http"
