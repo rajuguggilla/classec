@@ -19,7 +19,8 @@ func MyFileWriter(data string, configFile string)(string){
 	for i:= range tempVariableString {
 		fmt.Printf("\nTempVariable %d:%s", i,tempVariableString[i])
 	}
-	f, err := os.Create(configFile)
+	//f, err := os.Create(configFile)
+	f,err := os.OpenFile(configFile, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("Error in creating File:==", err)
 		return("Failed")
