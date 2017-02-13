@@ -12,6 +12,8 @@ import (
 	"gclassec/confmanagement/readazureconf"
 	"gclassec/goclienthos/util"
 	"gclassec/goclienthos/ceilometer"
+//	"sid/goclassec/src/github.com/Azure/azure-sdk-for-go/arm/recoveryservices"
+	"gclassec/goclienthos/hos_all_compute_details"
 )
 
 type (
@@ -97,4 +99,13 @@ func (uc UserController) GetCeilometerDetails(w http.ResponseWriter, r *http.Req
 func (uc UserController) Index(w http.ResponseWriter, r *http.Request){
 
 	fmt.Fprintf(w, "Hi You Just tested Server ping.")
+}
+
+
+func (uc UserController) GetCompleteDetail(w http.ResponseWriter, r *http.Request){
+
+	fmt.Println("Hello.......")
+	res := hos_all_compute_details.ComputeWithCPU()
+	_ = json.NewEncoder(w).Encode(&res)
+
 }

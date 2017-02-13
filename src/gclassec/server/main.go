@@ -93,7 +93,9 @@ func main() {
         mx.HandleFunc("/goclienthos/computedetails",hc.GetComputeDetails).Methods("GET")
         mx.HandleFunc("/goclienthos/flavorsdetails",hc.GetFlavorsDetails).Methods("GET")
         mx.HandleFunc("/goclienthos/cpu_utilization/{id}",hc.CpuUtilDetails).Methods("GET")
-	//mux.HandleFunc("/goclienthos/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
+        mx.HandleFunc("/goclienthos/compute_with_cpu_utilization",hc.GetCompleteDetail).Methods("GET")
+
+        //mux.HandleFunc("/goclienthos/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
 	//mux.HandleFunc("/goclienthos/ceilometerdetails",GetCeilometerDetails).Methods("GET")
         mx.HandleFunc("/goclienthos/index",hc.Index).Methods("GET")
 
