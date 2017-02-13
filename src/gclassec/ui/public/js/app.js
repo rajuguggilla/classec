@@ -11,5 +11,6 @@ angular.module('goclassec', [
     'ngAria',
     'ngMaterial',
     'ui.bootstrap',
-    'angularUtils.directives.dirPagination'
+    'angularUtils.directives.dirPagination',
+    'chart.js'
 ]);

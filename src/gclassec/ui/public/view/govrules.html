@@ -1,0 +1,50 @@
+<md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+        <!--md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+            <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+        </md-button-->
+
+        <h2 flex md-truncate>Governance - Rules</h2>
+
+        <span flex></span>
+        <!--md-button class="md-icon-button test-tooltip" aria-label="Dashboard">
+            <md-tooltip md-direction="bottom">Dashboard</md-tooltip>
+            <md-icon md-svg-src="img/icons/ic_dashboard_white_24px.svg"
+                     style="width: 24px; height: 24px">
+            </md-icon>
+        </md-button>
+        <md-button class="md-icon-button test-tooltip" aria-label="Details">
+            <md-tooltip md-direction="left">Details</md-tooltip>
+            <a href="#!/compute">
+                <md-icon md-svg-src="img/icons/ic_details_white_24px.svg"
+                         style="width: 24px; height: 24px">
+                </md-icon></a>
+        </md-button-->
+    </div>
+</md-toolbar>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+        <th>Parameter</th>
+        <th>Threshold</th>
+        <th></th>
+        </thead>
+        <tr ng-repeat="param in configdata.data" ng-include="getTemplate(param)">
+        </tr>
+        <script type="text/ng-template" id="display">
+            <td>{{param.service_param}}<br><span style="font-size:8pt;">{{param.service_param_desc}}</span></td>
+            <td>{{param.service_threshold}}</td>
+            <td>
+                <md-button class="md-accent md-raised" ng-click="editparam(param)">Edit</md-button>
+            </td>
+        </script>
+        <script type="text/ng-template" id="edit">
+            <td><input type="text" ng-model="param.service_param" disabled/><br><span style="font-size:8pt;">{{param.service_param_desc}}</span></td>
+            <td><input type="text" ng-model="param.service_threshold"/></td>
+            <td>
+                <md-button class="md-primary md-raised" ng-click="saveparam(param)">Save</md-button>
+                <md-button class="md-primary md-raised" ng-click="reset()">Cancel</md-button>
+            </td>
+        </script>
+    </table>
+</div>

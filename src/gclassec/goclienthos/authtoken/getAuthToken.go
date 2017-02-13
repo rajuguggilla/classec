@@ -1,4 +1,4 @@
-package HOSAuthToken
+package authtoken
 
 import (
 	"strings"
@@ -86,10 +86,10 @@ type Configuration struct {
 
 func GetHOSAuthToken() (string, HOSAutToken){
 //func main(){
-	var filename string = "getHOSAuthToken.go"
+	var filename string = "goclienthos/authtoken/getAuthToken.go"
 	_, filePath, _, _ := runtime.Caller(0)
 	fmt.Println("CurrentFilePath:==",filePath)
-	absPath :=(strings.Replace(filePath, filename, "hosConfiguration.json", 1))
+	absPath :=(strings.Replace(filePath, filename, "/conf/hosconfiguration.json", 1))
 	//absPath :=(strings.Replace(filePath, filename, "openStackConfiguration.json", 1))
 	fmt.Println("HOSConfigurationFilePath:==",absPath)
 	file, _ := os.Open(absPath)

@@ -1,6 +1,153 @@
-<div class="jumbotron">
-    <div class="container">
-        <h3>Dashboard</h3>
-        <p></p>
+<md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+        <!--md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+            <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+        </md-button-->
+
+        <h2 flex md-truncate>Dashboard - Compute</h2>
+
+        <span flex></span>
+        <!--md-button class="md-icon-button test-tooltip" aria-label="Dashboard">
+            <md-tooltip md-direction="bottom">Dashboard</md-tooltip>
+            <md-icon md-svg-src="img/icons/ic_dashboard_white_24px.svg"
+                     style="width: 24px; height: 24px">
+            </md-icon>
+        </md-button-->
+        <md-button class="md-icon-button test-tooltip" aria-label="Details">
+            <md-tooltip md-direction="left">Details</md-tooltip>
+            <a href="#!/compute">
+            <md-icon md-svg-src="img/icons/ic_details_white_24px.svg"
+                     style="width: 24px; height: 24px">
+            </md-icon></a>
+        </md-button>
     </div>
-</div>
+</md-toolbar>
+<md-content layout-padding>
+    <!--div id="rounded">
+        <ul>
+            <li>{{ db.data[0][0].Param_value }} instances are in "stopped". While this doesn't attract any billing, volumes and Elastic IP of Stopped instance are billed.</li>
+        </ul></div-->
+    <div ng-show="loading">
+        <img src="../img/spinner.gif" height="50" width="50" />
+    </div>
+    <div class="container" ng-show="!loading">
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <a class="dashboard-stat dashboard-stat-v2 blue" href="#">
+                    <div class="visual">
+                        <i class="fa fa-gears"></i>
+                    </div>
+                    <div class="img"><img src="../img/Compute_AmazonEC2.png" height="67" width="48" /></div>
+                    <div class="details">
+                        <div class="number">
+                            <span data-counter="counterup" data-value={{ db.data[0][1].Param_value }}>{{ db.data[0][1].Param_value }}</span></div>
+                        <div class="desc"> {{ db.data[0][1].Param_name }} </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <a class="dashboard-stat dashboard-stat-v2 red" href="#">
+                    <div class="visual">
+                        <i class="fa fa-bar-chart-o"></i>
+                    </div>
+                    <div class="img"><img src="../img/Compute_AmazonEC2.png" height="67" width="48" /></div>
+                    <div class="details">
+                        <div class="number">
+                            <span data-counter="counterup" data-value={{ db.data[0][2].Param_value }}>{{ db.data[0][2].Param_value | currency : "$" : 0 }}</span> </div>
+                        <div class="desc"> {{ db.data[0][2].Param_name }} </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <a class="dashboard-stat dashboard-stat-v2 green" href="#">
+                    <div class="visual">
+                        <i class="fa fa-hand-stop-o"></i>
+                    </div>
+                    <div class="img"><img src="../img/Compute_AmazonEC2.png" height="67" width="48" /></div>
+                    <div class="details">
+                        <div class="number">
+                            <span data-counter="counterup" data-value={{ db.data[0][0].Param_value }}>{{ db.data[0][0].Param_value }}</span>
+                        </div>
+                        <div class="desc"> {{ db.data[0][0].Param_name }} </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <a class="dashboard-stat dashboard-stat-v2 purple" href="#">
+                    <div class="visual">
+                        <i class="fa fa-cloud"></i>
+                    </div>
+                    <div class="img"><img src="../img/Storage-Content-Delivery_AmazonEBS.png" height="67" width="48" /></div>
+                    <div class="details">
+                        <div class="number">
+                            <span data-counter="counterup" data-value={{ db.data[0][3].Param_value }}>{{ db.data[0][3].Param_value }}</span> </div>
+                        <div class="desc"> {{ db.data[0][3].Param_name }} </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="container" ng-show="!loading">
+        <div class="row">
+            <div class="col-xs-6 col-sm-4">
+                <md-whiteframe class="md-whiteframe-2dp light"  layout layout-align="center center">
+                    <span>
+                <div class="portlet">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="icon-bar-chart font-dark hide"></i>
+                            <span class="caption-subject font-dark bold uppercase">Instance State</span>
+                            <span class="caption-helper">Distribution by Instance State</span>
+                        </div>
+                    </div>
+                    <canvas id="doughnut" class="chart chart-doughnut"
+                            chart-data="data" chart-labels="labels">
+                    </canvas>
+                </div>
+                    </span>
+                </md-whiteframe>
+            </div>
+            <div class="col-xs-6 col-sm-4">
+                <md-whiteframe class="md-whiteframe-2dp light"  layout layout-align="center center">
+                    <span>
+                <div class="portlet">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="icon-bar-chart font-dark hide"></i>
+                            <span class="caption-subject font-dark bold uppercase">EC2 Cost</span>
+                            <span class="caption-helper">Statewise Cost distribution</span>
+                        </div>
+                    </div>
+                    <!--canvas id="polar-area" class="chart chart-polar-area"
+                            chart-data="data1" chart-labels="labels1" chart-options="options">
+                    </canvas-->
+                    <canvas id="doughnut1" class="chart chart-doughnut"
+                            chart-data="data1" chart-labels="labels1" chart-colors="[red, blue, green]">
+                    </canvas>
+                </div>
+                    </span>
+                </md-whiteframe>
+            </div>
+            <div class="col-xs-6 col-sm-4">
+                <md-whiteframe class="md-whiteframe-2dp light"  layout layout-align="center center">
+                    <span>
+                     <div class="portlet">
+                        <div class="portlet-title">
+                        <div class="caption">
+                            <i class="icon-bar-chart font-dark hide"></i>
+                            <span class="caption-subject font-dark bold uppercase">Volumes State</span>
+                            <span class="caption-helper">Attached Vs Unattached</span>
+                        </div>
+                    </div>
+                    <canvas id="pie" class="chart chart-pie"
+                            chart-data="data2" chart-labels="labels2" chart-options="options">
+                    </canvas>
+                    </div>
+                    </span>
+                </md-whiteframe>
+
+            </div>
+        </div>
+    </div>
+
+</md-content>

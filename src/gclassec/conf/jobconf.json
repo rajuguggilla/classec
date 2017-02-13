@@ -1,5 +1,5 @@
 {
-  "Interval":30,
+  "Interval":300,
   "Timespec":1000000000,
   "_comment":"Timespec value is 'Second'"
 }

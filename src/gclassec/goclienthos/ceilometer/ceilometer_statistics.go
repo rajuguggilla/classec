@@ -1,34 +1,33 @@
-package HOS_API_Function
+package ceilometer
 
 import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
-	"gclassec/goclienthos/HOSAuthToken"
+	"gclassec/goclienthos/authtoken"
 )
 
-func GetCpuUtilDetails(id string) string {
+func GetCpuUtilStatistics() string {
 
 	//fmt.Println("This to get Nothing")
-	//var auth,_ = HOSAuthToken.GetHOSAuthToken()
+	//var auth,_ = authtoken.GetHOSAuthToken()
 	//fmt.Println("Auth Token in Compute.go:=====\n", auth)
 	var meteringEndpoint string
-	var auth, hosConfig = HOSAuthToken.GetHOSAuthToken()
+	var auth, hosConfig = authtoken.GetHOSAuthToken()
 	fmt.Println("HOS AuthToken:=====\n", auth)
 	fmt.Println("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {
 		if hosConfig.Access.ServiceCatalog[i].EndpointType =="metering"{
 			//for j:= 0; j< len(hosConfig.Access.ServiceCatalog[i].Endpoints); j++ {
 			meteringEndpoint = hosConfig.Access.ServiceCatalog[i].Endpoints[0].PublicURL
-			fmt.Println("ComputeeNDpOINT:====",meteringEndpoint)
+			fmt.Println("MeetringEndPoint:====",meteringEndpoint)
 			//https://120.120.120.4:8777/
 					//}
 			}
 		}
 
-	var reqURL string =  meteringEndpoint + "v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
-
-	//var reqURL string =  "https://120.120.120.4:8777/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
+	var reqURL string =  meteringEndpoint + "v2/meters/cpu_util?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value=01171fa0-8d7a-4c16-870c-011ee2732bd9&q.value=2016-12-12T13%3A10%3A00&limit=10"
+	//var reqURL string =  "https://120.120.120.4:8777/v2/meters/cpu_util?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value=01171fa0-8d7a-4c16-870c-011ee2732bd9&q.value=2016-12-12T13%3A10%3A00&limit=10"
 
 
 	req, _ := http.NewRequest("GET", reqURL, nil)

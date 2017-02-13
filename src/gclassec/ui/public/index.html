@@ -3,15 +3,15 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>CLASSEC</title>
     <link rel='stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.min.css' />
     <link rel='stylesheet' href='/bower_components/responsive-nav/responsive-nav.css' />
     <link rel='stylesheet' href='/bower_components/angular-material/angular-material.css' />
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body ng-app="goclassec">
-<div layout="column" ng-controller="menuctrl">
+<body ng-app="goclassec" ng-controller="menuctrl" layout="row">
+<div layout="column" flex>
     <md-toolbar>
         <div class="md-toolbar-tools">
             <md-button class="md-icon-button" aria-label="Side Panel" ng-click="openSideNavPanel()">
@@ -19,25 +19,49 @@
                 <md-icon class="md-default-theme" class="material-icons">&#xE5D2;</md-icon>
             </md-button>
             <md-button class="md-icon-button" aria-label="Icon">
-                <md-icon md-svg-icon="fb.svg"></md-icon>
-            </md-button>
+                <!--md-icon md-svg-icon="img/icons/ic_assessment_white_24px.svg"></md-icon-->
+                <img src="img/claseclogowhite.png" height="33" width="32"/></md-button>
             <h2>
                 <span>CLASSEC</span>
             </h2>
             <span flex></span>
-            <!--md-button class="md-icon-button" aria-label="User">
-                <md-tooltip>User</md-tooltip>
-                <img src="user.png" style="width:24px;height:24px;"/>
+            <md-button class="md-icon-button test-tooltip" aria-label="Compute">
+                <md-tooltip md-direction="bottom">Compute</md-tooltip>
+                <a href="#!/dashboard">
+                <md-icon md-svg-src="img/icons/ic_computer_white_24px.svg"
+                         style="width: 24px; height: 24px">
+                </md-icon></a>
             </md-button>
-            <md-button class="md-icon-button" aria-label="Messages">
-                <md-tooltip>Messages</md-tooltip>
-                <img src="messages.png" style="width:24px;height:24px;"/>
-            </md-button-->
+            <md-button class="md-icon-button test-tooltip" aria-label="Governance">
+                <md-tooltip md-direction="bottom">Governance</md-tooltip>
+                <a href="#!/governance">
+                <md-icon md-svg-src="img/icons/ic_supervisor_account_white_24px.svg"
+                         style="width: 24px; height: 24px">
+                </md-icon></a>
+            </md-button>
+            <md-button class="md-icon-button test-tooltip" aria-label="Configuration">
+                <md-tooltip md-direction="bottom">Config</md-tooltip>
+                <a href="#!/config">
+                <md-icon md-svg-src="img/icons/ic_settings_white_24px.svg"
+                         style="width: 24px; height: 24px">
+                </md-icon></a>
+            </md-button>
+            <md-button class="md-icon-button test-tooltip" aria-label="Account">
+                <md-tooltip md-direction="bottom">Credentials</md-tooltip>
+                <md-icon md-svg-src="img/icons/ic_account_box_white_24px.svg"
+                         style="width: 24px; height: 24px">
+                </md-icon>
+            </md-button>
         </div>
     </md-toolbar>
-    <md-content>
-        <div ng-view=""></div>
+    <md-content layout="row" flex>
+        <div layout="column" flex ng-view=""></div>
     </md-content>
+    <div class="footer">
+        <div class="container">
+            <!--p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team and Firebase</p-->
+        </div>
+    </div>
 </div>
 
     <md-sidenav class="md-sidenav-left md-whiteframe-z2"
@@ -56,7 +80,7 @@
         </md-toolbar>
         <md-content layout-padding="">
             <md-list>
-                <md-subheader class="md-no-sticky">Favorites</md-subheader>
+                <md-subheader class="md-no-sticky">Cloud Services</md-subheader>
                 <md-list-item>
                     <md-icon class="md-default-theme" class="material-icons">&#xE0C9;</md-icon>
                     <p><a href="#!/compute">Compute</a></p>
@@ -73,15 +97,15 @@
                     <md-icon class="md-secondary">2</md-icon>
                 </md-list-item>
                 <md-divider></md-divider>
-                <md-subheader class="md-no-sticky">Pages</md-subheader>
+                <md-subheader class="md-no-sticky">Governance</md-subheader>
                 <md-list-item>
                     <md-icon class="md-default-theme" class="material-icons">&#xE7F9;</md-icon>
-                    <p>Pages Feed</p>
+                    <p>Create Instance</p>
                     <div class="md-secondary">2</div>
                 </md-list-item>
                 <md-list-item>
                     <md-icon class="md-default-theme" class="material-icons">&#xE1BC;</md-icon>
-                    <p>Like Pages</p>
+                    <p>Define Rules</p>
                     <div class="md-secondary">20+</div>
                 </md-list-item>
             </md-list>
@@ -89,17 +113,10 @@
     </md-sidenav>
 
 
-
-
-
-<div class="footer">
-    <div class="container">
-        <!--p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team and Firebase</p-->
-    </div>
-</div>
-
 </body>
-<link rel='stylesheet' href='css/local.css'/>
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/local.css">
+<link rel="stylesheet" href="css/font-awesome.css">
 <script src="scripts/angular/angular.js"></script>
 <script src="scripts/angular-route/angular-route.js"></script>
 <script src="scripts/angular-resource/angular-resource.js"></script>
@@ -108,6 +125,8 @@
 <script src="scripts/angular-bootstrap/ui-bootstrap.js"></script>
 <script src="scripts/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 <script src="scripts/angular-utils-pagination/dirPagination.js"></script>
+<script src="scripts/chart.js/dist/Chart.min.js"></script>
+<script src="scripts/angular-chart.js/dist/angular-chart.min.js"></script>
 <script src="/bower_components/angular-aria/angular-aria.js"></script>
 <script src="/bower_components/angular-material/angular-material.js"></script>
 <script src="/bower_components/jquery/dist/jquery.js"></script>
@@ -115,10 +134,13 @@
 
 
 <script src="js\app.js"></script>
+<script src="js\service\dashboard.js"></script>
 <script src="js\controller\menuctrl.js"></script>
 <script src="js\controller\config.js"></script>
 <script src="js\controller\dbctrl.js"></script>
 <script src="js\controller\computectrl.js"></script>
+<script src="js\controller\govrules.js"></script>
+<script src="js\controller\govctrl.js"></script>
 <script src="js\routes.js"></script>
 
 

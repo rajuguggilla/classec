@@ -1,39 +1,382 @@
-<div class="jumbotron">
-    <div class="container">
-        <h3>Configuration</h3>
-        <p>D3 Visualization for AWS Infrastructure relational Neo4J DB</p>
+<md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+        <!--md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+            <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+        </md-button-->
+
+        <h2 flex md-truncate>Configuration</h2>
+
+        <span flex></span>
+        <!--md-button class="md-icon-button test-tooltip" aria-label="Dashboard">
+            <md-tooltip md-direction="bottom">Dashboard</md-tooltip>
+            <md-icon md-svg-src="img/icons/ic_dashboard_white_24px.svg"
+                     style="width: 24px; height: 24px">
+            </md-icon>
+        </md-button>
+        <md-button class="md-icon-button test-tooltip" aria-label="Details">
+            <md-tooltip md-direction="left">Details</md-tooltip>
+            <a href="#!/compute">
+                <md-icon md-svg-src="img/icons/ic_details_white_24px.svg"
+                         style="width: 24px; height: 24px">
+                </md-icon></a>
+        </md-button-->
     </div>
-</div>
-<div class="container">
-    <div ng-cloak>
-        <md-content>
-            <md-tabs md-dynamic-height md-border-bottom>
-                <md-tab label="one">
-                    <md-content class="md-padding">
-                        <h1 class="md-display-2">AWS</h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue. Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies mi.</p>
-                    </md-content>
-                </md-tab>
-                <md-tab label="two">
-                    <md-content class="md-padding">
-                        <h1 class="md-display-2">AZURE</h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue. Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies mi. Aliquam erat volutpat. Nam placerat, tortor in ultrices porttitor, orci enim rutrum enim, vel tempor sapien arcu a tellus. Vivamus convallis sodales ante varius gravida. Curabitur a purus vel augue ultrices ultricies id a nisl. Nullam malesuada consequat diam, a facilisis tortor volutpat et. Sed urna dolor, aliquet vitae posuere vulputate, euismod ac lorem. Sed felis risus, pulvinar at interdum quis, vehicula sed odio. Phasellus in enim venenatis, iaculis tortor eu, bibendum ante. Donec ac tellus dictum neque volutpat blandit. Praesent efficitur faucibus risus, ac auctor purus porttitor vitae. Phasellus ornare dui nec orci posuere, nec luctus mauris semper.</p>
-                    </md-content>
-                </md-tab>
-                <md-tab label="three">
-                    <md-content class="md-padding">
-                        <h1 class="md-display-2">Openstack</h1>
-                        <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere molestie dictum. Morbi eget congue risus, quis rhoncus quam. Suspendisse vitae hendrerit erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
-                    </md-content>
-                </md-tab>
-                <md-tab label="four">
-                    <md-content class="md-padding">
-                        <h1 class="md-display-2">HOS</h1>
-                        <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere molestie dictum. Morbi eget congue risus, quis rhoncus quam. Suspendisse vitae hendrerit erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
-                    </md-content>
-                </md-tab>
-            </md-tabs>
-        </md-content>
-    </div>
-    ONETWOTHREE
+</md-toolbar>
+
+<div layout="column">
+    <md-grid-list
+            md-cols-xs="1" md-cols-sm="2" md-cols-md="4" md-cols-gt-md="6"
+            md-row-height-gt-md="1:11" md-row-height="1:4">
+
+        <md-grid-tile class="green">
+        </md-grid-tile>
+        <md-grid-tile class="red" md-colspan="4" md-colspan-sm="1" md-colspan-xs="1">
+            <div layout="column" flex>
+            <md-toolbar ng-class="aws">
+                <div class="md-toolbar-tools">
+                    <h2 flex md-truncate>Amazon Web Services</h2>
+                    <span flex></span>
+                    <md-switch class="md-primary" ng-model="aws" aria-label="aws" ng-true-value="'md-accent'" ng-false-value="''" >
+                    </md-switch>
+                </div>
+            </md-toolbar>
+            <md-whiteframe ng-model="aws" class="md-whiteframe-3dp dark">
+                <div layout="row" layout-padding>
+                    <md-input-container flex="50">
+                        <label>Access Key ID</label>
+                        <input required name="accessKeyID" ng-model="aws.accessKeyID">
+                        <div ng-messages="aws.accessKeyID.$error">
+                            <div ng-message="required">This is required.</div>
+                        </div>
+                    </md-input-container>
+
+                    <md-input-container flex="50">
+                        <label>Access Key Value</label>
+                        <!--<md-select name="type" ng-model="project.type" required>
+                            <md-option value="app">Application</md-option>
+                            <md-option value="web">Website</md-option>
+                        </md-select>-->
+                        <input type="password" required name="accessKeyValue" ng-model="aws.accessKeyValue">
+                        <div ng-messages="aws.accessKeyValue.$error">
+                            <div ng-message="required">This is required.</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <br>
+                <div layout="row" class="btn pull-right" layout-padding >
+                    
+                    <section layout="row"  layout-sm="column" layout-align="center center" layout-wrap >
+                    <!--<md-button class="md-primary md-hue-1">Primary Hue 1</md-button>
+                    <md-button class="md-warn md-raised md-hue-2">Warn Hue 2</md-button>
+                    <md-button class="md-accent">Accent</md-button>-->
+                    <md-button ng-click="uploadAws(aws)" class="md-accent md-raised md-hue-1 btn pull-right" >Submit</md-button>        
+                    </section>
+               
+                </div>
+                <!--<input type="submit" value="Submit">-->
+                <!--<div layout="row">
+                    <md-input-container flex="50">
+                        <input type="submit" value="Submit">
+                    </md-input-container>
+                </div>-->
+            </md-whiteframe>
+            <br>
+            <md-toolbar ng-class="azure">
+            <!--<md-toolbar class="md-accent">-->
+                <div class="md-toolbar-tools">
+                    <h2 flex md-truncate>Azure</h2>
+                    <!--<span flex></span>
+                    <md-switch ng-model="data.cb2" aria-label="Switch 2">
+                    </md-switch>-->
+                    <span flex></span>
+                    <md-switch class="md-primary" ng-model="azure" aria-label="azure" ng-true-value="'md-accent'" ng-false-value="''" >
+                    </md-switch>
+                </div>
+            </md-toolbar>
+            <md-whiteframe ng-model="azure" class="md-whiteframe-3dp dark">
+                 <div layout="row" layout-padding>
+                     <md-input-container flex="50">
+                         <label>Client ID</label>
+                         <input required name="clientID" ng-model="azure.clientID">
+                         <div ng-messages="azure.clientID.$error">
+                              <div ng-message="required">This is required.</div>
+                          </div>
+                      </md-input-container>
+                      <md-input-container flex="50">
+                          <label>Client Secret</label>
+                          <input type="password" required name="clientSecret" ng-model="azure.clientSecret">
+                          <div ng-messages="azure.clientSecret.$error">
+                               <div ng-message="required">This is required.</div>
+                          </div>
+                       </md-input-container>
+                  </div>
+                  <br>
+                  <div layout="row" layout-padding>
+                       <md-input-container flex="50">
+                           <label>Tenant ID</label>
+                           <input required name="tenantID" ng-model="azure.tenantID">
+                           <div ng-messages="azure.tenantID.$error">
+                               <div ng-message="required">This is required.</div>
+                           </div>
+                        </md-input-container>
+                        <md-input-container flex="50">
+                            <label>Subscription ID</label>
+                            <input required name="subscriptionID" ng-model="azure.subscriptionID">
+                            <div ng-messages="azure.subscriptionID.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+                  
+                </div>  
+                <br>
+                <div layout="row" class="btn pull-right" layout-padding >
+                        <section layout="row"  layout-sm="column" layout-align="center center" layout-wrap >
+                          <md-button ng-click="uploadAzure(azure)"class="md-accent md-raised md-hue-1 btn pull-right" >Submit</md-button>        
+                        </section>             
+                </div>
+             </md-whiteframe>
+             <br>
+             <md-toolbar ng-class="openstack">
+             <!--<md-toolbar class="md-accent">-->
+                    <div class="md-toolbar-tools">
+                        <h2 flex md-truncate>OpenStack</h2>
+                        <span flex></span>
+                        <md-switch class="md-primary" ng-model="openstack" aria-label="opensatck" ng-true-value="'md-accent'" ng-false-value="''" >
+                        </md-switch>
+                    </div>
+                </md-toolbar>
+                <md-whiteframe ng-model="openstack" class="md-whiteframe-3dp dark">
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>User Name</label>
+                            <input required name="osUserName" ng-model="openstack.osUserName">
+                            <div ng-messages="projectForm.clientName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Password</label>
+                            <input type="password" required name="osPassword" ng-model="openstack.osPassword">
+                            <div ng-messages="openstack.osPassword.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Project/Tenant ID</label>
+                            <input required name="osTenantID" ng-model="openstack.osTenantID">
+                            <div ng-messages="openstack.osTenantID.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Project/Tenant Name</label>
+                            <input required name="osTenantName" ng-model="openstack.osTenantName">
+                            <div ng-messages="openstack.osTenantName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                            </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Container Name</label>
+                            <input required name="osContainerName" ng-model="openstack.osContainerName">
+                            <div ng-messages="openstack.osContainerName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Region</label>
+                            <input required name="osImageRegion" ng-model="openstack.osImageRegion">
+                            <div ng-messages="openstack.osRegion.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                            </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Controller</label>
+                            <input required name="osHost" ng-model="openstack.osHost">
+                            <div ng-messages="openstack.osController.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Region</label>
+                            <input required name="osController" ng-model="openstack.osController">
+                            <div ng-messages="openstack.osRegion.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                            </md-input-container>
+                    </div>
+                    <!--<br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Identity Endpoint</label>
+                            <input required name="osIdentityEndpoint" ng-model="openstack.osIdentityEndpoint">
+                            <div ng-messages="openstack.osIdentityEndpoint.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+                   </div>-->
+                   <br>
+                   <div layout="row" class="btn pull-right" layout-padding >
+                        <section layout="row"  layout-sm="column" layout-align="center center" layout-wrap >
+                          <md-button ng-click="uploadOpenstack(openstack)" class="md-accent md-raised md-hue-1 btn pull-right" >Submit</md-button>        
+                        </section>             
+                    </div>
+                        
+                </md-whiteframe>
+                <br>
+                <md-toolbar ng-class="hos">
+                <!--<md-toolbar class="md-accent">-->
+                    <div class="md-toolbar-tools">
+                        <h2 flex md-truncate>Helion OS</h2>
+                        <span flex></span>
+                        <md-switch class="md-primary" ng-model="helion" aria-label="helion" ng-true-value="'md-accent'" ng-false-value="''" >
+                        </md-switch>
+                    </div>
+                </md-toolbar>
+                <md-whiteframe ng-model="helion" class="md-whiteframe-3dp dark">
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>User Name</label>
+                            <input required name="hosUserName" ng-model="helion.hosUserName">
+                            <div ng-messages="helion.hosUserName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Password</label>
+                            <input type="password" required name="hosPassword" ng-model="helion.hosPassword">
+                            <div ng-messages="helion.hosPassword.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Project/Tenant ID</label>
+                            <input required name="hosTenantID" ng-model="helion.hosTenantID">
+                            <div ng-messages="helion.hosTenantID.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Project/Tenant Name</label>
+                            <input required name="hosTenantName" ng-model="helion.hosTenantName">
+                            <div ng-messages="helion.hosTenantName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                            </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Container Name</label>
+                            <input required name="hosContainerName" ng-model="helion.hosContainerName">
+                            <div ng-messages="helion.hosContainerName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Region</label>
+                            <input required name="hosRegion" ng-model="helion.hosRegion">
+                            <div ng-messages="helion.hosRegion.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                            </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>Identity Endpoint</label>
+                            <input required name="hosIdentityEndpoint" ng-model="helion.hosIdentityEndpoint">
+                            <div ng-messages="helion.hosIdentityEndpoint.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+                   </div>
+                   <br>
+                   <div layout="row" class="btn pull-right" layout-padding >
+                        <section layout="row"  layout-sm="column" layout-align="center center" layout-wrap >
+                          <md-button ng-click="uploadHelion(helion)" class="md-accent md-raised md-hue-1 btn pull-right" >Submit</md-button>        
+                        </section>             
+                    </div>
+
+                </md-whiteframe>
+
+                <br>
+                <md-toolbar ng-class="vmware">
+                <!--<md-toolbar class="md-accent">-->
+                    <div class="md-toolbar-tools">
+                        <h2 flex md-truncate>vmware</h2>
+                        <span flex></span>
+                        <md-switch class="md-primary" ng-model="vmware" aria-label="vmware" ng-true-value="'md-accent'" ng-false-value="''" >
+                        </md-switch>
+                    </div>
+                </md-toolbar>
+                <md-whiteframe ng-model="vmware" class="md-whiteframe-3dp dark">
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>User Name</label>
+                            <input required name="UserName" ng-model="vmware.UserName">
+                            <div ng-messages="vmware.vwUserName.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Pasword</label>
+                            <input type="password" required name="vwPasword" ng-model="vmware.Pasword">
+                            <div ng-messages="vmware.Pasword.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" layout-padding>
+                        <md-input-container flex="50">
+                            <label>URL Endpoint </label>
+                            <input required name="envURL" ng-model="vmware.envURL">
+                            <div ng-messages="vmware.envURL.$error">
+                                <div ng-message="required">This is required.</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label>Insecure</label>
+                            <input required name="envInsecure" ng-model="vmware.envInsecure">
+                            <div ng-messages="vmware.envInsecure.$error">
+                                <!--<div ng-message="required">This is required.</div>-->
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <br>
+                    <div layout="row" class="btn pull-right" layout-padding >
+                        <section layout="row"  layout-sm="column" layout-align="center center" layout-wrap >
+                          <md-button ng-click="uploadVmware(vmware)" class="md-accent md-raised md-hue-1 btn pull-right" >Submit</md-button>        
+                        </section>             
+                    </div>
+
+                </md-whiteframe>
+            </div>
+        </md-grid-tile>
+        <md-grid-tile class="green">
+        </md-grid-tile>
+
+
+    </md-grid-list>
 </div>

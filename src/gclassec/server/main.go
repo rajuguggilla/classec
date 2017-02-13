@@ -116,7 +116,8 @@ func main() {
         mx.HandleFunc("/dbaas/azureInstance", ac.GetAzureStaticDynamic).Methods("GET")
 
         mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
-         mx.HandleFunc("/dbaas/vcenterDetail/static", vc.GetVcenterDetails).Methods("GET")
+
+        mx.HandleFunc("/dbaas/vcenterDetail/static", vc.GetVcenterDetails).Methods("GET")
 
         mx.HandleFunc("/selectProvider", uc1.SelectProvider)
 
@@ -136,20 +137,15 @@ func main() {
 
         mx.HandleFunc("/openstack/updatecredentials",uc1.UpdateOsCredentials).Methods("POST")
 
-        //mx.HandleFunc("/vmware/updatecredentials",uc1.UpdateVmwareCredentials).Methods("POST")
+        mx.HandleFunc("/vmware/updatecredentials",uc1.UpdateVmwareCredentials).Methods("POST")
 
         mx.HandleFunc("/azure/updatecredentials",uc1.UpdateAzureCredentials).Methods("POST")
 
-
-
         http.Handle("/", mx)
-
         // Fire up the server
         fmt.Println("Server is on Port 9009")
         fmt.Println("Listening .....")
-
-        fmt.Println(os.Getwd())
-
+        // fmt.Println(os.Getwd())
         http.ListenAndServe("0.0.0.0:9009", nil)
     }()
 

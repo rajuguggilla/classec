@@ -1,12 +1,36 @@
-<div class="jumbotron">
+<!--div class="jumbotron">
     <div class="container">
         <h3>Compute</h3>
         <p></p>
     </div>
-</div>
+</div-->
+<md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+	<md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+            <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+        </md-button>
 
-    <md-content>
-        <div class="container">
+        <h2 flex md-truncate>Compute</h2>
+
+        <span flex></span>
+        <md-button class="md-icon-button test-tooltip" aria-label="Dashboard">
+            <md-tooltip md-direction="bottom">Dashboard</md-tooltip>
+            <a href="#!/dashboard">
+            <md-icon md-svg-src="img/icons/ic_dashboard_white_24px.svg"
+                     style="width: 24px; height: 24px">
+            </md-icon></a>
+        </md-button>
+        <md-button class="md-icon-button test-tooltip" aria-label="Refresh">
+            <md-tooltip md-direction="left">Refresh</md-tooltip>
+            <md-icon md-svg-src="img/icons/ic_refresh_white_24px.svg"
+                    style="width: 24px; height: 24px">
+            </md-icon>
+        </md-button>
+    </div>
+</md-toolbar>
+
+    <md-content layout-padding layout-margin>
+
     <div ng-cloak>
             <a ng-init="tab1()"></a>
             <md-tabs md-dynamic-height md-border-bottom>
@@ -125,18 +149,201 @@
                             </dir-pagination-controls>
                     </md-content>
                 </md-tab>
-                <md-tab label="Helion">
+               <!-- <md-tab label="Helion">
                     <md-content class="md-padding">
                         <h1 class="md-display-2">Openstack</h1>
                         <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere molestie dictum. Morbi eget congue risus, quis rhoncus quam. Suspendisse vitae hendrerit erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
                     </md-content>
                 </md-tab>
-                <md-tab label="AWS">
+				-->
+				<md-tab label="Helion" ng-click="tab3()">
                     <md-content class="md-padding">
-                        <h1 class="md-display-2">HOS</h1>
-                        <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere molestie dictum. Morbi eget congue risus, quis rhoncus quam. Suspendisse vitae hendrerit erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
+                        <md-card md-theme="{{showDarkTheme ? 'dark-grey' : 'default'}}" md-theme-watch>
+                            <md-card-title>
+                                <md-card-title-text>
+                                    <!--span class="md-headline">Recommendations</span-->
+                                    <span class="md-subhead">Total Helion Compute Instances. {{ totalItems }}</span>
+                                </md-card-title-text>
+                            </md-card-title>
+                        </md-card>
+                        <div ng-show="loading">
+                            <!--img src="../img/spinner.gif" height="50" width="50" /-->
+                            <md-progress-circular md-mode="determinate"></md-progress-circular>
+                        </div>
+                        <div class="container" ng-show="!loading">
+                            <dir-pagination-controls
+                                    max-size="5"
+                                    direction-links="true"
+                                    boundary-links="true" >
+                            </dir-pagination-controls>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th><a href="" ng-click="order('Vm_Name')">Name</a></th>
+                                    <th><a href="" ng-click="order('FlavorName')">Flavor</a></th>
+                                    <!--th><a href="" ng-click="order('AvailabilityZone')">Availability Zone</a></th-->
+                                    <th><a href="" ng-click="order('Ram')">RAM</a></th>
+                                    <th><a href="" ng-click="order('Disk')">Storage</a></th>
+                                    <th><a href="" ng-click="order('Status')">Status</a></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" ng-model="search.Vm_Name" /></td>
+                                    <td><input type="text" ng-model="search.FlavorName" /></td>
+                                    <!--td><input type="text" ng-model="search.AvailabilityZone" /></td-->
+                                    <td><input type="text" ng-model="search.Ram" /></td>
+                                    <td><input type="text" ng-model="search.Disk" /></td>
+                                    <td><input type="text" ng-model="search.Status" /></td>
+                                </tr>
+                                <!--tr dir-paginate="ec2 in ec2s | orderBy:predicate:reverse | filter:search |itemsPerPage:50"-->
+                                <tr dir-paginate="osc in filteredosc = (oscs | filter:search | orderBy:predicate:reverse) |itemsPerPage:50">
+                                    <td>{{osc.Vm_Name}}{{ osc[0] }}</td>
+                                    <td>{{osc.FlavorName}}</td>
+                                    <!--td>{{osc.AvailabilityZone}}</td-->
+                                    <td>{{osc.Ram}}</td>
+                                    <td>{{osc.Disk}}</td>
+                                    <td>{{osc.Status}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls
+                                    max-size="5"
+                                    direction-links="true"
+                                    boundary-links="true" >
+                            </dir-pagination-controls>
+                    </md-content>
+                </md-tab>
+								
+                <md-tab label="AWS" ng-click="tab4()">
+                    <md-content class="md-padding">
+                        <md-card md-theme="{{showDarkTheme ? 'dark-grey' : 'default'}}" md-theme-watch>
+                            <md-card-title>
+                                <md-card-title-text>
+                                    <!--span class="md-subhead">Under utilization of EC2 instances is based on the Average & Max CPU Utilization.</span>
+                                    <span class="md-subhead">Cost incurred towards Under-utilized EC2 Instances : <b>{{gettotal(filtereduu) | currency}} of {{ totalundertuilized | currency}}</b></span-->
+                                    <ul>
+                                        <li>Under utilization of EC2 instances is based on the Average & Max CPU Utilization. <button type="button" class="btn btn-default btn-sm" ng-click="configtab()">Configure</button></li>
+                                        <li>Cost incurred towards Under-utilized EC2 Instances : <b>{{gettotal(filtereduu) | currency}} of {{ totalundertuilized | currency}}</b></li>
+                                    </ul>
+                                </md-card-title-text>
+                            </md-card-title>
+                        </md-card>
+                        <div ng-show="loading">
+                            <!--img src="../img/spinner.gif" height="50" width="50" /-->
+                            <md-progress-circular md-mode="determinate"></md-progress-circular>
+                        </div>
+                        <div class="container" ng-show="!loading">
+                            <dir-pagination-controls
+                                    max-size="5"
+                                    direction-links="true"
+                                    boundary-links="true" >
+                            </dir-pagination-controls>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th><a href="" ng-click="order('ec_id')">EC2 Id</a></th>
+                                    <!--th><a href="" ng-click="order('ec2_name')">EC2 Name</a></th-->
+                                    <th><a href="" ng-click="order('ec2_type')">EC2 Type</a></th>
+                                    <th><a href="" ng-click="order('ec2_state')">EC2 State</a></th>
+                                    <th><a href="" ng-click="order('ec2_env')">EC2 Env</a></th>
+                                    <th><a href="" ng-click="order('Ec2_platform')">EC2 Platform</a></th>
+                                    <th><a href="" ng-click="order('cost')">EC2 Cost</a></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" ng-model="search.ec_id" /></td>
+                                    <!--td><input type="text" ng-model="search.ec2_name" /></td-->
+                                    <td><input type="text" ng-model="search.ec2_type" /></td>
+                                    <td><input type="text" ng-model="search.ec2_state" /></td>
+                                    <td><input type="text" ng-model="search.ec2_env" /></td>
+                                    <td><input type="text" ng-model="search.Ec2_platform" /></td>
+                                    <td><input type="text" ng-model="search.cost" /></td>
+                                </tr>
+                                <tr dir-paginate="ec2 in filtereduu=(ec2s | orderBy:predicate:reverse | filter:search) |itemsPerPage:50">
+                                    <td>{{ec2.ec_id}}</td>
+                                    <!--td>{{ec2.ec2_name}}</td-->
+                                    <td>{{ec2.ec2_type}}</td>
+                                    <td>{{ec2.ec2_state}}</td>
+                                    <td>{{ec2.ec2_env}}</td>
+                                    <td>{{ec2.Ec2_platform}}</td>
+                                    <td>{{ec2.cost}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls
+                                    max-size="5"
+                                    direction-links="true"
+                                    boundary-links="true" >
+                            </dir-pagination-controls>
+                    </md-content>
+                </md-tab>
+				
+				<md-tab label="vmWare" ng-click="tab5()">
+                    <md-content class="md-padding">
+                        <md-card md-theme="{{showDarkTheme ? 'dark-grey' : 'default'}}" md-theme-watch>
+                            <md-card-title>
+                                <md-card-title-text>
+                                    <!--span class="md-headline">Recommendations</span-->
+                                    <span class="md-subhead">Total vmWare Compute Instances. {{ totalItems }}</span>
+                                </md-card-title-text>
+                            </md-card-title>
+                        </md-card>
+                        <div ng-show="loading">
+                            <!--img src="../img/spinner.gif" height="50" width="50" /-->
+                            <md-progress-circular md-mode="determinate"></md-progress-circular>
+                        </div>
+                        <div class="container" ng-show="!loading">
+                            <dir-pagination-controls
+                                    max-size="5"
+                                    direction-links="true"
+                                    boundary-links="true" >
+                            </dir-pagination-controls>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th><a href="" ng-click="order('Name')">Name</a></th>
+                                    <th><a href="" ng-click="order('GuestFullName')">Type</a></th>
+                                    <!--th><a href="" ng-click="order('AvailabilityZone')">Availability Zone</a></th-->
+                                    <th><a href="" ng-click="order('NumofCPU')">Number Of CPU</a></th>
+                                    <th><a href="" ng-click="order('MemorySizeMB')">RAM</a></th>
+                                    <th><a href="" ng-click="order('Uuid')">Instance ID</a></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" ng-model="search.Name" /></td>
+                                    <td><input type="text" ng-model="search.GuestFullName" /></td>
+                                    <!--td><input type="text" ng-model="search.AvailabilityZone" /></td-->
+                                    <td><input type="text" ng-model="search.NumofCPU" /></td>
+                                    <td><input type="text" ng-model="search.MemorySizeMB" /></td>
+                                    <td><input type="text" ng-model="search.Uuid" /></td>
+                                </tr>
+                                <!--tr dir-paginate="ec2 in ec2s | orderBy:predicate:reverse | filter:search |itemsPerPage:50"-->
+                                <tr dir-paginate="osc in filteredosc = (oscs | filter:search | orderBy:predicate:reverse) |itemsPerPage:50">
+                                    <td>{{osc.Name}}{{ osc[0] }}</td>
+                                    <td>{{osc.GuestFullName}}</td>
+                                    <!--td>{{osc.AvailabilityZone}}</td-->
+                                    <td>{{osc.NumofCPU}}</td>
+                                    <td>{{osc.MemorySizeMB}}</td>
+                                    <td>{{osc.Uuid}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <dir-pagination-controls
+                                    max-size="5"
+                                    direction-links="true"
+                                    boundary-links="true" >
+                            </dir-pagination-controls>
                     </md-content>
                 </md-tab>
             </md-tabs>
+				
+				
+            </md-tabs>
+			
+			
+			
         </div>
     </md-content>

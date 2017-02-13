@@ -9,7 +9,7 @@ import (
 	"strings"
 	"io/ioutil"
 	"bytes"
-	"gclassec/credentialEditor"
+	"gclassec/credentialeditor"
 )
 
 var redirectTarget string
@@ -214,30 +214,30 @@ func (uc UserController) ProviderAzure(w http.ResponseWriter, r *http.Request) {
 
 func (uc UserController) UpdateAwsCredentials(w http.ResponseWriter, r *http.Request){
 
-	credentialEditor.AwsCredentials(w, r)
+	credentialeditor.AwsCredentials(w, r)
 
 }
 
 func (uc UserController) UpdateAzureCredentials(w http.ResponseWriter, r *http.Request){
 
-	credentialEditor.AzureCredentials(w, r)
+	credentialeditor.AzureCredentials(w, r)
 
 }
 
 func (uc UserController) UpdateOsCredentials(w http.ResponseWriter, r *http.Request){
 
-	credentialEditor.OpenstackCredentials(w, r)
+	credentialeditor.OpenstackCredentials(w, r)
 
 }
 
 func (uc UserController) UpdateHosCredentials(w http.ResponseWriter, r *http.Request){
 
-	credentialEditor.HosCredentials(w, r)
+	credentialeditor.HosCredentials(w, r)
 
 }
 
 func (uc UserController) UpdateVmwareCredentials(w http.ResponseWriter, r *http.Request){
 
-	credentialEditor.VmwareCredentials(w, r)
+	credentialeditor.VmwareCredentials(w, r)
 
 }

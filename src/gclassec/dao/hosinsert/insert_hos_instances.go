@@ -3,10 +3,11 @@ package hosinsert
 import (
 	"strings"
 	"github.com/jinzhu/gorm"
-	"gclassec/goclienthos/HOS_API_Function"
+	"gclassec/goclienthos/compute"
 	"gclassec/confmanagement/readopenstackconf"
 	_ "github.com/go-sql-driver/mysql"
 	"gclassec/structs/hosstruct"
+
 )
 
 var dbcredentials = readopenstackconf.Configurtion()
@@ -23,7 +24,7 @@ var db,err  = gorm.Open(dbtype, c)
 
 func InsertHOSInstances(){
 	//println(examples.ComputeFunc())
-	computeDetails:= HOS_API_Function.Compute()
+	computeDetails:= compute.Compute()
 	//println(computeDetails)
 	//user := openstackInstance.Instances{}
 	//db.Delete(&user)

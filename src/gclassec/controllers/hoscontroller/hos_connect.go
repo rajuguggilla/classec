@@ -4,12 +4,14 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 	"fmt"
-	"gclassec/goclienthos/HOS_API_Function"
+	"gclassec/goclienthos/compute"
 	"encoding/json"
 	"strings"
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/hosstruct"
 	"gclassec/confmanagement/readazureconf"
+	"gclassec/goclienthos/util"
+	"gclassec/goclienthos/ceilometer"
 )
 
 type (
@@ -36,13 +38,13 @@ var db,err  = gorm.Open(dbtype, c)
 func (uc UserController) CpuUtilDetails(w http.ResponseWriter, r *http.Request){
         vars := mux.Vars(r)
         id := vars["id"]
-        res := HOS_API_Function.GetCpuUtilDetails(id)
+        res := util.GetCpuUtilDetails(id)
         fmt.Fprintf(w,res)
 
 }
 func (uc UserController) GetComputeDetails(w http.ResponseWriter, r *http.Request){
 
-	res := HOS_API_Function.Compute()
+	res := compute.Compute()
         _ = json.NewEncoder(w).Encode(&res)
 	//fmt.Fprintf(w,res)
 
@@ -72,21 +74,22 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 
 func (uc UserController) GetFlavorsDetails(w http.ResponseWriter, r *http.Request){
 
-	res := HOS_API_Function.Flavors()
+	res := compute.Flavors()
 	_ = json.NewEncoder(w).Encode(&res)
         //fmt.Fprintf(w,res)
 }
 
 func (uc UserController) GetCeilometerStatitics(w http.ResponseWriter, r *http.Request){
 
-	res := HOS_API_Function.GetCpuUtilStatistics()
+	res := ceilometer.GetCpuUtilStatistics()
         fmt.Fprintf(w,res)
 
 }
 
 func (uc UserController) GetCeilometerDetails(w http.ResponseWriter, r *http.Request){
 
-	res := HOS_API_Function.GetCeilometerDetail()
+	//res := compute.GetCeilometerDetail()
+	res := ceilometer.GetCeilometerDetail()
         fmt.Fprintf(w,res)
 
 }
