@@ -6,25 +6,26 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"gclassec/goclienthos/authtoken"
+	"gclassec/structs/hosstruct"
 )
 
-type FlavorsStruct struct{
-
-	FlavorID 	string 		`json:"id"`
-	FlavorName 	string		`json:"name"`
-	Ram		int32		`json:"ram"`
-	VCPUS		int32		`json:"vcpus"`
-	Disk		int32		`json:"disk"`
-	//Links 		SubLinks	`json:"links"`
-
-}
-type FlvRespStruct struct {
-	Flavors []FlavorsStruct		`json:"flavors"`
-}
+//type FlavorsStruct struct{
+//
+//	FlavorID 	string 		`json:"id"`
+//	FlavorName 	string		`json:"name"`
+//	Ram		int32		`json:"ram"`
+//	VCPUS		int32		`json:"vcpus"`
+//	Disk		int32		`json:"disk"`
+//	//Links 		SubLinks	`json:"links"`
+//
+//}
+//type FlvRespStruct struct {
+//	Flavors []FlavorsStruct		`json:"flavors"`
+//}
 
 
 //func Flavors() string {
-func Flavors() FlvRespStruct {
+func Flavors() hosstruct.FlvRespStruct {
 	//fmt.Println("This to get Nothing")
 	var computeEndpoint string
 	var auth, hosConfig = authtoken.GetHOSAuthToken()
@@ -56,7 +57,7 @@ func Flavors() FlvRespStruct {
 	respBodyInString:= string(respBody)
 	fmt.Println("\nrespBodyInString:==\n",respBodyInString)
 	//return respBodyInString
-	var jsonFlavorResponse FlvRespStruct
+	var jsonFlavorResponse hosstruct.FlvRespStruct
 	if err := json.Unmarshal(respBody, &jsonFlavorResponse); err != nil {
 		fmt.Println("Error in Unmarshing:==", err)
 	}

@@ -14,6 +14,7 @@ import (
 
 	"gclassec/goclienthos/authtoken"
 	"gclassec/goclienthos/compute"
+	"gclassec/structs/hosstruct"
 )
 
 
@@ -43,7 +44,7 @@ type CompleteServersResponse struct {
        //Launched_At           string `json:"OS-SRV-USG:launched_at"`
        //Hypervisor_Hostname           string `json:"OS-EXT-SRV-ATTR:hypervisor_hostname"`
        InstanceID             string `json:"id"`
-       Flavor                compute.FlavorsStruct `json:"flavor"`
+       Flavor                hosstruct.FlavorsStruct `json:"flavor"`
        Security_Groups       SubSecurityGroup `json:"security_groups"`
        //Terminated_At               string `json:"OS-SRV-USG:terminated_at"`
        Availability_Zone               string `json:"OS-EXT-AZ:availability_zone"`
@@ -147,7 +148,7 @@ func ComputeWithCPU() CompleteComputeResponse{
 
 
 
-	var FlavorsList compute.FlvRespStruct
+	var FlavorsList hosstruct.FlvRespStruct
 	FlavorsList = compute.Flavors()
 	//var jsonFlavorList FlvRespStruct
 	//if err := json.Unmarshal([]byte(FlavorsStringList), &jsonFlavorList); err != nil {
