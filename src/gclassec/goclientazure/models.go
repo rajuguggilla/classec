@@ -492,7 +492,7 @@ type ListUsagesResult struct {
 
 type ListDynamicUsagesResult struct {
 	autorest.Response `json:"-"`
-	Value             *[]DynamicUsage `json:"value,omitempty"`
+	Value             *[]DynamicUsage `json:"Value,omitempty"`
 	NextLink          *string  `json:"nextLink,omitempty"`
 }
 
@@ -651,7 +651,7 @@ type Usage struct {
 }
 
 type DynamicUsage struct {
-	Data         []UsageData `json:"data,omitempty"`
+	Data         []UsageData `json:"Data,omitempty"`
 	Id           *string    `json:"id,omitempty"`
 	Name         *UsageName `json:"name,omitempty"`
 	Type         *string    `json:"type,omitempty"`
@@ -659,9 +659,9 @@ type DynamicUsage struct {
 }
 
 type UsageData struct {
-	TimeStamp    *date.Time   `json:"timeStamp,omitempty"`
-	Average      *float64     `json:"average,omitempty"`
-	Total        *float32     `json:"total,omitempty"`
+	TimeStamp    *date.Time   `json:"TimeStamp,omitempty"`
+	Average      *float64     `json:"Average,omitempty"`
+	Total        *float32     `json:"Total,omitempty"`
 }
 
 // UsageName is the Usage Names.
@@ -833,19 +833,19 @@ type VirtualMachineInstanceView struct {
 }
 
 type VirtualMachineStaticDynamic struct{
-	VmName *string 			`json:"vmname,omitempty"`
-	Type *string 			`json:"type,omitempty"`
-	Location *string 		`json:"location,omitempty"`
-	VmSize string           	`json:"vmsize,omitempty"`
-	Publisher *string 		`json:"publisher,omitempty"`
-	Offer *string 			`json:"offer,omitempty"`
-	SKU *string 			`json:"sku,omitempty"`
-	VmId *string			`json:"vmid,omitempty"`
-	AvailabilitySetName *string 	`json:"availabilityset,omitempty"`
-	Provisioningstate *string	`json:"provisioningstate,omitempty"`
-	ResourcegroupName string	`json:"resourcegroupname,omitempty"`
-	TimeStamp    *date.Time   	`json:"timeStamp,omitempty"`
-	Average      *float64     	`json:"average,omitempty"`
+	VmName *string 			`json:"VmName,omitempty"`
+	Type *string 			`json:"Type,omitempty"`
+	Location *string 		`json:"Location,omitempty"`
+	VmSize string           	`json:"VmSize,omitempty"`
+	Publisher *string 		`json:"Publisher,omitempty"`
+	Offer *string 			`json:"Offer,omitempty"`
+	SKU *string 			`json:"SKU,omitempty"`
+	VmId *string			`json:"VmId,omitempty"`
+	AvailabilitySetName *string 	`json:"AvailabilitySetName,omitempty"`
+	Provisioningstate *string	`json:"Provisioningstate,omitempty"`
+	ResourcegroupName string	`json:"ResourcegroupName,omitempty"`
+	TimeStamp    *date.Time   	`json:"TimeStamp,omitempty"`
+	Average      *float64     	`json:"Average,omitempty"`
 	/*autorest.Response `json:"-"`
 	Value             *VirtualMachineListResult `json:"value,omitempty"`
 	NextLink          *string           `json:"nextLink,omitempty"`
