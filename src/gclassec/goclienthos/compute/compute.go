@@ -112,7 +112,7 @@ func Compute() hosstruct.ComputeResponse {
 	//return respBodyInString
 	var jsonComputeResponse hosstruct.ComputeResponse
 	if err := json.Unmarshal(respBody, &jsonComputeResponse); err != nil {
-		fmt.Println("Error in Unmarshing:==", err)
+		logger.Error("Error in Unmarshing:==", err)
 	}
 	logger.Info("Printing Initial jsonComputeResponse ")
 	logger.Info("%+v\n\n", jsonComputeResponse)
