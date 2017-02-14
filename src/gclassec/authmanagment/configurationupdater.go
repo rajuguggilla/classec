@@ -3,12 +3,17 @@ package authmanagment
 import(
 	"net/http"
 	"io/ioutil"
-	"bytes"
 	"fmt"
 	"runtime"
 	"strings"
 	"os"
+	"net/url"
 )
+
+type test_struct struct {
+    Test string
+}
+
 
 func MyFileWriter(data string, configFile string)(string){
 	fmt.Println("requestBody:==",data)
@@ -25,13 +30,18 @@ func MyFileWriter(data string, configFile string)(string){
 	f,err := os.OpenFile(configFile, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("Error in creating File:==", err)
-		return("Failed")
+		return("Failed: Error in creating file")
 	}
 	defer f.Close()
 	f.WriteString("{")
 	for i:=0; i<len(tempVariableString); i++ {
 		f.WriteString("\n\"")
-		temp := (strings.Replace(tempVariableString[i],"=",  "\":\"", 1))
+		u, err := url.Parse(tempVariableString[i])
+		if err != nil{
+			fmt.Println("Error in parsing:==", err)
+		return("Failed: Error in parsing request body " )
+		}
+		temp := (strings.Replace(u.Path,"=",  "\":\"", 1))
 		f.WriteString(temp)
 		if i==len(tempVariableString)-1 {
 			f.WriteString("\"")
@@ -40,7 +50,7 @@ func MyFileWriter(data string, configFile string)(string){
 		}
 	}
 	f.WriteString("\n}")
-	return "Ok Sucessfull"
+	return "Ok Sucessfull written in file"
 }
 
 
@@ -50,12 +60,13 @@ func AwsCredentials(w http.ResponseWriter, r *http.Request){
   		bodyBytes, _ = ioutil.ReadAll(r.Body)
 	}
 	// Restore the io.ReadCloser to its original state
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	//r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
-	//fmt.Println(bodyString)
+	fmt.Println("bodyString:==",bodyString)
+
 	filename := "authmanagment/configurationupdater.go"
-	_, filePath, _, _ := runtime.Caller(0)
+		_, filePath, _, _ := runtime.Caller(0)
         fmt.Println("\nCurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/awscred.json", 1))
         fmt.Println("\nABSPATH:==",ConfigFilePath)
@@ -70,7 +81,7 @@ func AzureCredentials(w http.ResponseWriter, r *http.Request){
   		bodyBytes, _ = ioutil.ReadAll(r.Body)
 	}
 	// Restore the io.ReadCloser to its original state
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	//r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
@@ -89,7 +100,7 @@ func OpenstackCredentials(w http.ResponseWriter, r *http.Request){
   		bodyBytes, _ = ioutil.ReadAll(r.Body)
 	}
 	// Restore the io.ReadCloser to its original state
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	//r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
@@ -109,7 +120,7 @@ func VmwareCredentials(w http.ResponseWriter, r *http.Request){
   		bodyBytes, _ = ioutil.ReadAll(r.Body)
 	}
 	// Restore the io.ReadCloser to its original state
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	//r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
@@ -130,7 +141,7 @@ func HosCredentials(w http.ResponseWriter, r *http.Request){
   		bodyBytes, _ = ioutil.ReadAll(r.Body)
 	}
 	// Restore the io.ReadCloser to its original state
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	//r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
