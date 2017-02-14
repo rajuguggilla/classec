@@ -80,9 +80,9 @@ func AzureCredentials(w http.ResponseWriter, r *http.Request){
 	fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        logger.Info("CurrentFilePath:==",filePath)
+        logger.Debug("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/azurecred.json", 1))
-        logger.Info("ABSPATH:==",ConfigFilePath)
+        logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }
@@ -99,9 +99,9 @@ func OpenstackCredentials(w http.ResponseWriter, r *http.Request){
 	logger.Info(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        logger.Info("CurrentFilePath:==",filePath)
+        logger.Debug("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
-        logger.Info("ABSPATH:==",ConfigFilePath)
+        logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }
@@ -119,9 +119,9 @@ func VmwareCredentials(w http.ResponseWriter, r *http.Request){
 	fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        logger.Info("CurrentFilePath:==",filePath)
+        logger.Debug("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/vmwareconf.json", 1))
-        logger.Info("ABSPATH:==",ConfigFilePath)
+        logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }
@@ -140,9 +140,9 @@ func HosCredentials(w http.ResponseWriter, r *http.Request){
 	fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        logger.Info("CurrentFilePath:==",filePath)
+        logger.Debug("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/hosconfiguration.json", 1))
-        logger.Info("ABSPATH:==",ConfigFilePath)
+        logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }

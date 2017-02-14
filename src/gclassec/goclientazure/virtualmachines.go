@@ -23,6 +23,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/validation"
 	"net/http"
+	"gclassec/structs/azurestruct"
 )
 
 // VirtualMachinesClient is the the Compute Management Client.
@@ -51,7 +52,7 @@ func NewVirtualMachinesClientWithBaseURI(baseURI string, subscriptionID string) 
 // resourceGroupName is the name of the resource group. vmName is the name of
 // the virtual machine. parameters is parameters supplied to the Capture
 // Virtual Machine operation.
-func (client VirtualMachinesClient) Capture(resourceGroupName string, vmName string, parameters VirtualMachineCaptureParameters, cancel <-chan struct{}) (result autorest.Response, err error) {
+func (client VirtualMachinesClient) Capture(resourceGroupName string, vmName string, parameters azurestruct.VirtualMachineCaptureParameters, cancel <-chan struct{}) (result autorest.Response, err error) {
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: parameters,
 			Constraints: []validation.Constraint{{Target: "parameters.VhdPrefix", Name: validation.Null, Rule: true, Chain: nil},
@@ -80,7 +81,7 @@ func (client VirtualMachinesClient) Capture(resourceGroupName string, vmName str
 }
 
 // CapturePreparer prepares the Capture request.
-func (client VirtualMachinesClient) CapturePreparer(resourceGroupName string, vmName string, parameters VirtualMachineCaptureParameters, cancel <-chan struct{}) (*http.Request, error) {
+func (client VirtualMachinesClient) CapturePreparer(resourceGroupName string, vmName string, parameters azurestruct.VirtualMachineCaptureParameters, cancel <-chan struct{}) (*http.Request, error) {
 	pathParameters := map[string]interface{}{
 		"resourceGroupName": autorest.Encode("path", resourceGroupName),
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
@@ -129,7 +130,7 @@ func (client VirtualMachinesClient) CaptureResponder(resp *http.Response) (resul
 // resourceGroupName is the name of the resource group. vmName is the name of
 // the virtual machine. parameters is parameters supplied to the Create Virtual
 // Machine operation.
-func (client VirtualMachinesClient) CreateOrUpdate(resourceGroupName string, vmName string, parameters VirtualMachine, cancel <-chan struct{}) (result autorest.Response, err error) {
+func (client VirtualMachinesClient) CreateOrUpdate(resourceGroupName string, vmName string, parameters azurestruct.VirtualMachine, cancel <-chan struct{}) (result autorest.Response, err error) {
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: parameters,
 			Constraints: []validation.Constraint{{Target: "parameters.VirtualMachineProperties", Name: validation.Null, Rule: false,
@@ -173,7 +174,7 @@ func (client VirtualMachinesClient) CreateOrUpdate(resourceGroupName string, vmN
 }
 
 // CreateOrUpdatePreparer prepares the CreateOrUpdate request.
-func (client VirtualMachinesClient) CreateOrUpdatePreparer(resourceGroupName string, vmName string, parameters VirtualMachine, cancel <-chan struct{}) (*http.Request, error) {
+func (client VirtualMachinesClient) CreateOrUpdatePreparer(resourceGroupName string, vmName string, parameters azurestruct.VirtualMachine, cancel <-chan struct{}) (*http.Request, error) {
 	pathParameters := map[string]interface{}{
 		"resourceGroupName": autorest.Encode("path", resourceGroupName),
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
@@ -353,7 +354,7 @@ func (client VirtualMachinesClient) DeleteResponder(resp *http.Response) (result
 //
 // resourceGroupName is the name of the resource group. vmName is the name of
 // the virtual machine.
-func (client VirtualMachinesClient) Generalize(resourceGroupName string, vmName string) (result OperationStatusResponse, err error) {
+func (client VirtualMachinesClient) Generalize(resourceGroupName string, vmName string) (result azurestruct.OperationStatusResponse, err error) {
 	req, err := client.GeneralizePreparer(resourceGroupName, vmName)
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "Generalize", nil, "Failure preparing request")
@@ -401,7 +402,7 @@ func (client VirtualMachinesClient) GeneralizeSender(req *http.Request) (*http.R
 
 // GeneralizeResponder handles the response to the Generalize request. The method always
 // closes the http.Response Body.
-func (client VirtualMachinesClient) GeneralizeResponder(resp *http.Response) (result OperationStatusResponse, err error) {
+func (client VirtualMachinesClient) GeneralizeResponder(resp *http.Response) (result azurestruct.OperationStatusResponse, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -418,7 +419,7 @@ func (client VirtualMachinesClient) GeneralizeResponder(resp *http.Response) (re
 // resourceGroupName is the name of the resource group. vmName is the name of
 // the virtual machine. expand is the expand expression to apply on the
 // operation.
-func (client VirtualMachinesClient) Get(resourceGroupName string, vmName string, expand InstanceViewTypes) (result VirtualMachine, err error) {
+func (client VirtualMachinesClient) Get(resourceGroupName string, vmName string, expand azurestruct.InstanceViewTypes) (result azurestruct.VirtualMachine, err error) {
 	req, err := client.GetPreparer(resourceGroupName, vmName, expand)
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "Get", nil, "Failure preparing request")
@@ -439,7 +440,7 @@ func (client VirtualMachinesClient) Get(resourceGroupName string, vmName string,
 }
 
 // GetPreparer prepares the Get request.
-func (client VirtualMachinesClient) GetPreparer(resourceGroupName string, vmName string, expand InstanceViewTypes) (*http.Request, error) {
+func (client VirtualMachinesClient) GetPreparer(resourceGroupName string, vmName string, expand azurestruct.InstanceViewTypes) (*http.Request, error) {
 	pathParameters := map[string]interface{}{
 		"resourceGroupName": autorest.Encode("path", resourceGroupName),
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
@@ -469,7 +470,7 @@ func (client VirtualMachinesClient) GetSender(req *http.Request) (*http.Response
 
 // GetResponder handles the response to the Get request. The method always
 // closes the http.Response Body.
-func (client VirtualMachinesClient) GetResponder(resp *http.Response) (result VirtualMachine, err error) {
+func (client VirtualMachinesClient) GetResponder(resp *http.Response) (result azurestruct.VirtualMachine, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -485,7 +486,7 @@ func (client VirtualMachinesClient) GetResponder(resp *http.Response) (result Vi
 // machines.
 //
 // resourceGroupName is the name of the resource group.
-func (client VirtualMachinesClient) List(resourceGroupName string) (result VirtualMachineListResult, err error) {
+func (client VirtualMachinesClient) List(resourceGroupName string) (result azurestruct.VirtualMachineListResult, err error) {
 	req, err := client.ListPreparer(resourceGroupName)
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "List", nil, "Failure preparing request")
@@ -532,7 +533,7 @@ func (client VirtualMachinesClient) ListSender(req *http.Request) (*http.Respons
 
 // ListResponder handles the response to the List request. The method always
 // closes the http.Response Body.
-func (client VirtualMachinesClient) ListResponder(resp *http.Response) (result VirtualMachineListResult, err error) {
+func (client VirtualMachinesClient) ListResponder(resp *http.Response) (result azurestruct.VirtualMachineListResult, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -544,7 +545,7 @@ func (client VirtualMachinesClient) ListResponder(resp *http.Response) (result V
 }
 
 // ListNextResults retrieves the next set of results, if any.
-func (client VirtualMachinesClient) ListNextResults(lastResults VirtualMachineListResult) (result VirtualMachineListResult, err error) {
+func (client VirtualMachinesClient) ListNextResults(lastResults azurestruct.VirtualMachineListResult) (result azurestruct.VirtualMachineListResult, err error) {
 	req, err := lastResults.VirtualMachineListResultPreparer()
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "List", nil, "Failure preparing next results request")
@@ -570,7 +571,7 @@ func (client VirtualMachinesClient) ListNextResults(lastResults VirtualMachineLi
 // ListAll lists all of the virtual machines in the specified subscription. Use
 // the nextLink property in the response to get the next page of virtual
 // machines.
-func (client VirtualMachinesClient) ListAll() (result VirtualMachineListResult, err error) {
+func (client VirtualMachinesClient) ListAll() (result azurestruct.VirtualMachineListResult, err error) {
 	req, err := client.ListAllPreparer()
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "ListAll", nil, "Failure preparing request")
@@ -616,7 +617,7 @@ func (client VirtualMachinesClient) ListAllSender(req *http.Request) (*http.Resp
 
 // ListAllResponder handles the response to the ListAll request. The method always
 // closes the http.Response Body.
-func (client VirtualMachinesClient) ListAllResponder(resp *http.Response) (result VirtualMachineListResult, err error) {
+func (client VirtualMachinesClient) ListAllResponder(resp *http.Response) (result azurestruct.VirtualMachineListResult, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -628,7 +629,7 @@ func (client VirtualMachinesClient) ListAllResponder(resp *http.Response) (resul
 }
 
 // ListAllNextResults retrieves the next set of results, if any.
-func (client VirtualMachinesClient) ListAllNextResults(lastResults VirtualMachineListResult) (result VirtualMachineListResult, err error) {
+func (client VirtualMachinesClient) ListAllNextResults(lastResults azurestruct.VirtualMachineListResult) (result azurestruct.VirtualMachineListResult, err error) {
 	req, err := lastResults.VirtualMachineListResultPreparer()
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "ListAll", nil, "Failure preparing next results request")
@@ -656,7 +657,7 @@ func (client VirtualMachinesClient) ListAllNextResults(lastResults VirtualMachin
 //
 // resourceGroupName is the name of the resource group. vmName is the name of
 // the virtual machine.
-func (client VirtualMachinesClient) ListAvailableSizes(resourceGroupName string, vmName string) (result VirtualMachineSizeListResult, err error) {
+func (client VirtualMachinesClient) ListAvailableSizes(resourceGroupName string, vmName string) (result azurestruct.VirtualMachineSizeListResult, err error) {
 	req, err := client.ListAvailableSizesPreparer(resourceGroupName, vmName)
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "ListAvailableSizes", nil, "Failure preparing request")
@@ -704,7 +705,7 @@ func (client VirtualMachinesClient) ListAvailableSizesSender(req *http.Request) 
 
 // ListAvailableSizesResponder handles the response to the ListAvailableSizes request. The method always
 // closes the http.Response Body.
-func (client VirtualMachinesClient) ListAvailableSizesResponder(resp *http.Response) (result VirtualMachineSizeListResult, err error) {
+func (client VirtualMachinesClient) ListAvailableSizesResponder(resp *http.Response) (result azurestruct.VirtualMachineSizeListResult, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
