@@ -2,10 +2,10 @@ package readazurecreds
 
 import (
 	"encoding/json"
-	"fmt"
 	"runtime"
 	"strings"
 	"os"
+	"gclassec/loggers"
 )
 
 type Configuration struct {
@@ -17,11 +17,12 @@ type Configuration struct {
 }
 
 func Configurtion() Configuration{
+	logger := Loggers.New()
 	filename := "readcredentials/readCredentials.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/azurecred.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/azurecred.json")
@@ -29,7 +30,7 @@ func Configurtion() Configuration{
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		logger.Error("error:", err)
 	}
 
 	return configuration

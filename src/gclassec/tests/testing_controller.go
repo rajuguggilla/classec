@@ -9,7 +9,7 @@ import (
 	"strings"
 	"github.com/verdverm/frisby"
 	"runtime"
-
+	"gclassec/loggers"
 	"github.com/bitly/go-simplejson"
 )
 type Configration struct {
@@ -32,21 +32,22 @@ type Configration struct {
 
 
 func main() {
+	logger := Loggers.New()
 	//file, _ :=  os.Open("C:\\Git\\goclassec\\src\\gclassec\\conf\\controllertesting.json")
 	filename := "tests/testing_controller.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/controllertesting.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 
 	decoder := json.NewDecoder(file)
 	configration := Configration{}
 	err := decoder.Decode(&configration)
 	if err != nil {
-		fmt.Println("error:", err)
+		logger.Error("error:", err)
 	}
-	fmt.Println(configration.Port)
+	logger.Debug(configration.Port)
 	Protocol := configration.Protocol
 	Host := configration.Host
 	PortVal := configration.Port
@@ -56,8 +57,8 @@ func main() {
 var b []string = []string{Protocol,"://",Host,":",PortVal}
 
 var URL string = (strings.Join(b,""))
-	println(URL)
-	fmt.Println("Frisby")
+	logger.Info(URL)
+	logger.Info("Frisby")
 	//connect to the server..................
 	frisby.Create("Connect to the server").
 		Get(URL+"/dbaas/list").

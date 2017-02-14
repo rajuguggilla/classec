@@ -9,6 +9,7 @@ import(
 	"gclassec/structs/openstackInstance"
 	"gclassec/confmanagement/readopenstackconf"
 
+	"gclassec/loggers"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -36,21 +37,24 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 
 	tx := db.Begin()
 	db.SingularTable(true)
-
+	logger := Loggers.New()
+	logger.Info("We are Fetching Static Data from Database.")
 	openstack_struct := []openstackInstance.Instances{}
 
 	err := db.Find(&openstack_struct).Error
 
 	if err != nil{
-
+		logger.Error("Getting Error: ", err)
 		tx.Rollback()
 	}
 
 	_ = json.NewEncoder(w).Encode(db.Find(&openstack_struct))
 
 		if err != nil {
+			logger.Error(err)
 			println(err)
 		}
 
 	tx.Commit()
+	logger.Info("Successful in Fetching Data from Database.")
 }

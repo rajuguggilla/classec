@@ -16,6 +16,7 @@ import(
 	"github.com/Azure/go-autorest/autorest/azure"
 	"gclassec/goclientazure"
 	"gclassec/readcredentials"
+	"gclassec/loggers"
 )
 type (
 
@@ -24,7 +25,7 @@ type (
 func NewUserController() *UserController {
     return &UserController{}
 }
-
+var logger = Loggers.New()
 
 var dbcredentials1 = readazureconf.Configurtion()
 var dbtype string = dbcredentials1.Dbtype
@@ -48,6 +49,12 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	os.Setenv("AZURE_TENANT_ID", azureCreds.TenantId)
 	println("------------AZURE CLIENT ID--------------")
 	println(azureCreds.ClientId)
+	logger.Debug("AZURE_CLIENT_ID", azureCreds.ClientId)
+	logger.Debug("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
+	logger.Debug("AZURE_SUBSCRIPTION_ID", azureCreds.SubscriptionId)
+	logger.Debug("AZURE_TENANT_ID", azureCreds.TenantId)
+	logger.Info("------------AZURE CLIENT ID--------------")
+	logger.Info(azureCreds.ClientId)
 	c := map[string]string{
 		"AZURE_CLIENT_ID":       os.Getenv("AZURE_CLIENT_ID"),
 		"AZURE_CLIENT_SECRET":   os.Getenv("AZURE_CLIENT_SECRET"),
@@ -55,11 +62,13 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
 		log.Fatalf("Error: %v", err)
+		logger.Error("Error: %v", err)
 		return
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
+		logger.Error("Error: %v", err)
 		return
 	}
 	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
@@ -79,11 +88,13 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 
 		dlist, _ := dc.ListDynamic(vmName, rsgroup)
 		fmt.Println(dlist)
+		logger.Info(dlist)
 		for _, element1 := range *dlist.Value {
 			obj = &goclientazure.VirtualMachineStaticDynamic{VmName:element.Name, Type:element.Type, Location:element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:element.VMID, Publisher:element.StorageProfile.ImageReference.Publisher, Offer:element.StorageProfile.ImageReference.Offer, SKU:element.StorageProfile.ImageReference.Sku, AvailabilitySetName:element.AvailabilitySet.ID, Provisioningstate:element.ProvisioningState, ResourcegroupName:rsgroup,TimeStamp:element1.Data[len(element1.Data)-2].TimeStamp,Average:element1.Data[len(element1.Data)-2].Average}
 		}
 	}
 	fmt.Println(obj)
+	logger.Info(obj)
 	_ = json.NewEncoder(w).Encode(&obj)
 }
 
@@ -97,16 +108,17 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 	err := db.Find(&azure_struct).Error
 
 	if err != nil{
-
+		logger.Error("Error: ",err)
 		tx.Rollback()
 	}
 
 	_ = json.NewEncoder(w).Encode(db.Find(&azure_struct))
 
 		if err != nil {
+			logger.Error("Error: ",err)
 			println(err)
 		}
-
+	logger.Info("Successful in GetAzureDetails.")
 	tx.Commit()
 }
 
@@ -124,11 +136,13 @@ func   (uc UserController) GetDynamicAzureDetails(w http.ResponseWriter, r *http
 		"AZURE_SUBSCRIPTION_ID": os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
+		logger.Error("Error: %v", err)
 		log.Fatalf("Error: %v", err)
 		return
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
+		logger.Error("Error: %v", err)
 		log.Fatalf("Error: %v", err)
 		return
 	}
@@ -137,7 +151,7 @@ func   (uc UserController) GetDynamicAzureDetails(w http.ResponseWriter, r *http
 	dc.Authorizer = spt
 
 	dlist, _ := dc.ListDynamic(name,resourceGrp)
-	fmt.Println(dlist)
+	logger.Info(dlist)
 
 	_ = json.NewEncoder(w).Encode(&dlist)
 
@@ -152,6 +166,7 @@ func checkEnvVar(envVars *map[string]string) error {
 		}
 	}
 	if len(missingVars) > 0 {
+		logger.Error("Missing environment variables %v", missingVars)
 		return fmt.Errorf("Missing environment variables %v", missingVars)
 	}
 	return nil

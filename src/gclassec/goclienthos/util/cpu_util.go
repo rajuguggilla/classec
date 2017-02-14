@@ -1,10 +1,10 @@
 package util
 
 import (
-	"fmt"
 	"net/http"
 	"io/ioutil"
 	"gclassec/goclienthos/authtoken"
+	"gclassec/loggers"
 )
 
 func GetCpuUtilDetails(id string) string {
@@ -12,15 +12,16 @@ func GetCpuUtilDetails(id string) string {
 	//fmt.Println("This to get Nothing")
 	//var auth,_ = authtoken.GetHOSAuthToken()
 	//fmt.Println("Auth Token in Compute.go:=====\n", auth)
+	logger := Loggers.New()
 	var meteringEndpoint string
 	var auth, hosConfig = authtoken.GetHOSAuthToken()
-	fmt.Println("HOS AuthToken:=====\n", auth)
-	fmt.Println("HOS Configuration:=====\n %+v", hosConfig)
+	logger.Debug("HOS AuthToken:=====\n", auth)
+	logger.Debug("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {
 		if hosConfig.Access.ServiceCatalog[i].EndpointType =="metering"{
 			//for j:= 0; j< len(hosConfig.Access.ServiceCatalog[i].Endpoints); j++ {
 			meteringEndpoint = hosConfig.Access.ServiceCatalog[i].Endpoints[0].PublicURL
-			fmt.Println("MeetringEndPoint:====",meteringEndpoint)
+			logger.Info("MeetringEndPoint:====",meteringEndpoint)
 			//https://120.120.120.4:8777/
 					//}
 			}
@@ -36,11 +37,11 @@ func GetCpuUtilDetails(id string) string {
 	req.Header.Add("content-type", "application/json")
 
 	res, _ := http.DefaultClient.Do(req)
-	fmt.Println("Status:======== ", res.Status)
+	logger.Info("Status:======== ", res.Status)
 	defer res.Body.Close()
 	respBody, _ := ioutil.ReadAll(res.Body)
 
-	fmt.Print("respBody:==\n",respBody)
+	logger.Info("respBody:==\n",respBody)
 	respBodyInString:= string(respBody)
 	//fmt.Println("\nrespBodyInString:==\n",respBodyInString)
 	return respBodyInString

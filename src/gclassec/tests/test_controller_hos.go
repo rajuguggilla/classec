@@ -7,6 +7,7 @@ import ("github.com/verdverm/frisby"
 	"runtime"
 	"fmt"
 	"github.com/bitly/go-simplejson"
+	"gclassec/loggers"
 )
 type Configration struct {
 	Protocol string		//`json:"protocol"`
@@ -14,21 +15,22 @@ type Configration struct {
 	PortValue  string	//`json:"portValue"`
 }
 func main() {
+	logger := Loggers.New()
 	//file, _ :=  os.Open("C:\\Git\\goclassec\\src\\gclassec\\conf\\controllertesting.json")
 	var filename string = "tests/test_controller_hos.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/hos_controller_test.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 
 	decoder := json.NewDecoder(file)
 	tempconfig := Configration{}
-	fmt.Println(tempconfig)
+	logger.Info(tempconfig)
 	err := decoder.Decode(&tempconfig)
 	if err != nil {
 		//fmt.Println("eror")
-		fmt.Println("error:", err)
+		logger.Error("error:", err)
 	}
 	//fmt.Println("tempconfig:=========")
 	//fmt.Printf("%+v",tempconfig)
@@ -39,7 +41,7 @@ var b []string = []string{Protocol,"://",Host,":",PortVal}
 
 var LINK string = (strings.Join(b,""))
 	println(LINK)
-	fmt.Println("Frisby")
+	logger.Info("Frisby")
 	//connect to the compute server of hos..................
 	frisby.Create("Connect to the hos server").
 		Get(LINK+"/hos/computedetails").

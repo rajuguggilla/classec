@@ -20,7 +20,7 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"text/tabwriter"
 	"github.com/vmware/govmomi/units"
-
+	"gclassec/loggers"
 	"github.com/vmware/govmomi/vim25/types"
 )
 
@@ -30,7 +30,7 @@ import (
 //	EnvPassword = "Vcenter#1234"
 //	EnvInsecure = "true"
 //)
-
+var logger = Loggers.New()
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
 var EnvUserName  string = vmwarecreds.EnvUserName
@@ -101,6 +101,7 @@ func ProcessOverride(u *url.URL) {
 }
 
 func exit(err error) {
+	logger.Error(os.Stderr, "Error: %s\n", err)
 	fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 	os.Exit(1)
 }
@@ -127,16 +128,17 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 	vmware_struct := []vmwarestructs.VmwareInstances{}
 	err := db.Find(&vmware_struct).Error
 	if err != nil {
-
+		logger.Error("Rolling Back. Error: ",err)
 		tx.Rollback()
 	}
 
 	_ = json.NewEncoder(w).Encode(db.Find(&vmware_struct))
 
 	if err != nil {
+		logger.Error("Error: ",err)
 		println(err)
 	}
-
+	logger.Info("Successful in GetVcenterDetails.")
 	tx.Commit()
 }
 
@@ -145,6 +147,7 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        defer cancel()
 //       var insecureFlag = flag.Bool("insecure", true, insecureDescription)
        fmt.Println(*ENVinsecureFlag)
+	logger.Debug(*ENVinsecureFlag)
        //fmt.Println("Inside Vcenter get details !!!!!!!!! 1")
 
        flag.Parse()
@@ -152,6 +155,7 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
   //     // Parse URL from string
        u, err := url.Parse(*ENVurlFlag)
        if err != nil {
+	       logger.Error("Error: ",err)
               exit(err)
        }
 
@@ -161,6 +165,7 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        // Connect and log in to ESX or vCenter
        c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
        if err != nil {
+	       logger.Error("Error: ",err)
               exit(err)
        }
 
@@ -169,6 +174,7 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        // Find one and only datacenter
        dc, err := f.DefaultDatacenter(ctx)
        if err != nil {
+	       logger.Error("Error: ",err)
               exit(err)
        }
 
@@ -178,6 +184,7 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        // Find virtual machines in datacenter
        vms, err := f.VirtualMachineList(ctx, "*")
        fmt.Println(vms)
+	logger.Info(vms)
 
        pc := property.DefaultCollector(c.Client)
 
@@ -190,26 +197,28 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        var vmt []mo.VirtualMachine
        err = pc.Retrieve(ctx, refv, []string{"summary"}, &vmt)
        if err != nil {
+	       logger.Error("Error: ",err)
               exit(err)
        }
 
        // Print summary
        tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
-       fmt.Println("Virtual machines found:", len(vmt))
-       fmt.Fprintf(w, "[")
+       logger.Info("Virtual machines found:", len(vmt))
+       logger.Info(w, "[")
        for _, vm := range vmt {
               //fmt.Fprintf(tw, "%s\n", vm.Name)
-              fmt.Println("VM Name : ", vm.Summary.Config.Name)
-              fmt.Println("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
-              fmt.Println("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
-              fmt.Println("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
+              logger.Info("VM Name : ", vm.Summary.Config.Name)
+              logger.Info("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
+              logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
+              logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
               //_ = json.NewEncoder(os.Stdout).Encode(&vm)
               output := DynamicValues{VMName:vm.Summary.Config.Name,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024)}
               _ = json.NewEncoder(w).Encode(output)
+	       logger.Info(",")
              fmt.Fprintf(w, ",")
        }
-
+	logger.Info("{}]")
       fmt.Fprintf(w, "{}]")
 
        tw.Flush()

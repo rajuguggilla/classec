@@ -2,10 +2,10 @@ package vmwareconf
 
 import (
 	"runtime"
-	"fmt"
 	"strings"
 	"os"
 	"encoding/json"
+	"gclassec/loggers"
 )
 
 type Vmware struct {
@@ -16,11 +16,12 @@ type Vmware struct {
 }
 
 func Configurtion() Vmware{
+	logger := Loggers.New()
 	filename := "confmanagement/vmwareconf/vmware_conf.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/vmwareconf.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/osazureconf.json")
@@ -28,9 +29,8 @@ func Configurtion() Vmware{
 	configuration := Vmware{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		logger.Error("Error:", err)
 	}
-
 	return configuration
 }
 

@@ -8,6 +8,7 @@ import (
 	"gclassec/goclientopenstack/util"
 	"net/url"
 	"fmt"
+	"gclassec/loggers"
 )
 type Service struct {
 	Session openstack.Session
@@ -38,6 +39,8 @@ type QueryParameters struct {
 
 }
 
+var logger = Loggers.New()
+
 type SortDirection string
 const (
 	// Desc specifies the sort direction to be descending.
@@ -57,6 +60,7 @@ func (flavorService Service) QueryFlavors(queryParameters *QueryParameters) ([]R
 	flavorContainer := flavorResponse{}
 	err := flavorService.queryFlavors(false /*includeDetails*/, &flavorContainer, queryParameters)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return nil, err
 	}
 
@@ -68,6 +72,7 @@ func (flavorService Service) QueryFlavorsDetail(queryParameters *QueryParameters
 	flavorDetailContainer := flavorDetailResponse{}
 	err := flavorService.queryFlavors(true /*includeDetails*/, &flavorDetailContainer, queryParameters)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return nil, err
 	}
 
@@ -82,31 +87,36 @@ func (flavorService Service) queryFlavors(includeDetails bool, flavorResponseCon
 	fmt.Println(urlPostFix)
 	reqURL, err := buildQueryURL(flavorService, queryParameters, urlPostFix)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return err
 	}
 
-	fmt.Println("RequestURL",reqURL)
+	logger.Info("RequestURL",reqURL)
 
 	var headers http.Header = http.Header{}
 	headers.Set("Accept", "application/json")
 	resp, err := flavorService.Session.Get(reqURL.String(), nil, &headers)
 	fmt.Println("********************",headers)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return err
 	}
 
 	err = util.CheckHTTPResponseStatusCode(resp)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return err
 	}
 
 	rbody, err := ioutil.ReadAll(resp.Body)
-	fmt.Println("response body printing.")
-	fmt.Println(rbody)
+	logger.Info("response body printing.")
+	logger.Info(rbody)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return errors.New("aaa")
 	}
 	if err = json.Unmarshal(rbody, &flavorResponseContainer); err != nil {
+		logger.Error("Error: ",err)
 		return err
 	}
 	return nil
@@ -115,6 +125,7 @@ func (flavorService Service) queryFlavors(includeDetails bool, flavorResponseCon
 func buildQueryURL(flavorService Service, queryParameters *QueryParameters, computePartialURL string) (*url.URL, error) {
 	reqURL, err := url.Parse(flavorService.URL)
 	if err != nil {
+		logger.Error("Error: ",err)
 		return nil, err
 	}
 

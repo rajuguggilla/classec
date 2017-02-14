@@ -3,7 +3,6 @@ package azureinsert
 
 import (
 	"os"
-	"log"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/arm/examples/helpers"
@@ -15,12 +14,14 @@ import (
 	"encoding/json"
 	"gclassec/readcredentials"
 	"gclassec/goclientazure"
+	"gclassec/loggers"
 )
 
 type ls struct {
 
 }
 
+var logger = Loggers.New()
 var dbcredentials = readazureconf.Configurtion()
 var dbtype string = dbcredentials.Dbtype
 var dbname  string = dbcredentials.Dbname
@@ -55,18 +56,20 @@ func AzureInsert() {
 	os.Setenv("AZURE_TENANT_ID", azureCreds.TenantId)
 	println("------------AZURE CLIENT ID--------------")
 	println(azureCreds.ClientId)
+	logger.Debug("------------AZURE CLIENT ID--------------")
+	logger.Debug(azureCreds.ClientId)
 	c := map[string]string{
 		"AZURE_CLIENT_ID":       os.Getenv("AZURE_CLIENT_ID"),
 		"AZURE_CLIENT_SECRET":   os.Getenv("AZURE_CLIENT_SECRET"),
 		"AZURE_SUBSCRIPTION_ID": os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
-		log.Fatalf("Error: %v", err)
+		logger.Error("Error: %v", err)
 		return
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		logger.Error("Error: %v", err)
 		return
 	}
 	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])

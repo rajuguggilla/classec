@@ -10,10 +10,11 @@ import (
 	"io/ioutil"
 	"bytes"
 	"gclassec/authmanagment"
+	"gclassec/loggers"
 )
 
 var redirectTarget string
-
+var logger = Loggers.New()
  const indexPage = `
   <h1>Select Provider</h1>
   <form method="post" action="/providers">
@@ -94,10 +95,10 @@ func (uc UserController) AzureCreds(w http.ResponseWriter, r *http.Request) {
 
 func (uc UserController) ProviderHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Fprintf(w, indexPage)
-	fmt.Println("--------In Provider Handler--------")
+	logger.Info("--------In Provider Handler--------")
 	provider := r.FormValue("provider")
-	fmt.Println("Provider : ")
-	fmt.Println(provider)
+	logger.Info("Provider : ")
+	logger.Info(provider)
 
 	if provider == "openstack"{
 		//setSession(provider, w)
@@ -114,7 +115,7 @@ func (uc UserController) ProviderHandler(w http.ResponseWriter, r *http.Request)
 func (uc UserController) ProviderOpenstack(w http.ResponseWriter, r *http.Request) {
 	//host := r.FormValue("host")
 
-	fmt.Printf("-------Response Body---------")
+	logger.Info("-------Response Body---------")
 
 	// Read the content
 	var bodyBytes []byte
@@ -125,7 +126,7 @@ func (uc UserController) ProviderOpenstack(w http.ResponseWriter, r *http.Reques
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
+	logger.Info(bodyString)
 
 	/*c := map[string]string{
 		"host":       r.FormValue("host"),
@@ -141,13 +142,14 @@ func (uc UserController) ProviderOpenstack(w http.ResponseWriter, r *http.Reques
 
 	filename := "controllers/confcontroller/userconf.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	f, err := os.Create(ConfigFilePath)
 
 	//f, err := os.OpenFile("C:/goclassec/src/gclassec/conf/dependencies.env", os.O_APPEND | os.O_WRONLY, 0600)
 	if err != nil {
+		logger.Error("Error: ", err)
 		panic(err)
 	}
 
@@ -186,17 +188,18 @@ func (uc UserController) ProviderAzure(w http.ResponseWriter, r *http.Request) {
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
+	logger.Info(bodyString)
 
 	filename := "controllers/confcontroller/userconf.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/azurecred.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	f, err := os.Create(ConfigFilePath)
 
 	//f, err := os.OpenFile("C:/goclassec/src/gclassec/conf/dependencies.env", os.O_APPEND | os.O_WRONLY, 0600)
 	if err != nil {
+		logger.Error("Error: ", err)
 		panic(err)
 	}
 

@@ -26,6 +26,7 @@ import (
 	"strings"
 	"runtime"
 	"os"
+	"gclassec/loggers"
 )
 type Configuration struct {
     Host    string
@@ -42,11 +43,12 @@ type Configuration struct {
 
 func Compute() []compute.DetailResponse {
 	//config := getConfig()
+	logger := Loggers.New()
 	filename := "goclientopenstack/compute.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Info("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Info("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 
 	//dir, _ := os.Getwd()
@@ -55,7 +57,7 @@ func Compute() []compute.DetailResponse {
 	config := Configuration{}
 	err := decoder.Decode(&config)
 	if err != nil {
-		fmt.Println("error:", err)
+		logger.Error("error:", err)
 	}
 
 	// Authenticate with a username, password, tenant id.
@@ -69,26 +71,26 @@ func Compute() []compute.DetailResponse {
 	auth, err := openstack.DoAuthRequest(creds)
 	if err != nil {
 		panicString := fmt.Sprint("There was an error authenticating:", err)
-		panic(panicString)
+		logger.Error(panicString)
 	}
 	if !auth.GetExpiration().After(time.Now()) {
-		panic("There was an error. The auth token has an invalid expiration.")
+		logger.Error("There was an error. The auth token has an invalid expiration.")
 	}
-	fmt.Println(auth)
+	logger.Debug("OpenStack: ",auth)
 	// Find the endpoint for the Nova Compute service.
 	url, err := auth.GetEndpoint("compute", "")
 	url = strings.Replace(url,"compute", creds.Controller ,1)
 	if url == "" || err != nil {
-		panic("EndPoint Not Found.")
-		panic(err)
+		logger.Error("EndPoint Not Found.")
+		logger.Error(err)
 	}
 	// Make a new client with these creds
 	sess, err := openstack.NewSession(nil, auth, nil)
 	if err != nil {
 		panicString := fmt.Sprint("Error creating new Session:", err)
-		panic(panicString)
+		logger.Error(panicString)
 	}
-	fmt.Println(url)
+	logger.Info(url)
 	computeService := compute.Service{
 		Session: *sess,
 		Client:  *http.DefaultClient,
@@ -97,30 +99,31 @@ func Compute() []compute.DetailResponse {
 	computeDetails, err := computeService.InstancesDetail()
 	if err != nil {
 		panicString := fmt.Sprint("Cannot access Compute:", err)
-		panic(panicString)
+		logger.Error(panicString)
 	}
-	fmt.Println("computedetails printing..")
-	fmt.Println(computeDetails)
+	logger.Info("computedetails printing..")
+	logger.Info(computeDetails)
 	var computeIDs = make([]string, 0)
 	for _, element := range computeDetails {
 		computeIDs = append(computeIDs, element.ID)
 
 	}
-	fmt.Println(computeIDs)
+	logger.Info(computeIDs)
 	if len(computeIDs) == 0 {
 		panicString := fmt.Sprint("No instances found, check to make sure access is correct")
-		panic(panicString)
+		logger.Error(panicString)
 	}
 	return computeDetails
 }
 
 func FinalCompute() []compute.DetailResponse {
+	logger := Loggers.New()
 	var flvObj []flavor.DetailResponse
 	flvObj = flavor.Flavor()
-	fmt.Println("&**********Showing FLVOBJ&************")
-	fmt.Println(flvObj)
-	fmt.Println("*********************")
-	fmt.Println("flvObj.FlavorID::", flvObj[1].FlavorID)
+	logger.Info("&**********Showing FLVOBJ&************")
+	logger.Info(flvObj)
+	logger.Info("*********************")
+	logger.Info("flvObj.FlavorID::", flvObj[1].FlavorID)
 
 	var obj []compute.DetailResponse
 	obj = Compute()
@@ -138,24 +141,24 @@ func FinalCompute() []compute.DetailResponse {
 	}
 	out, err := json.Marshal(obj)
 	if err != nil {
-        	panic (err)
+        	logger.Error (err)
     	}
-	fmt.Println("Out Sritng")
-	fmt.Println(string(out))
+	logger.Info("Out Sritng")
+	logger.Info(string(out))
 	temp := string(out)
 	temp1 := strings.TrimPrefix(temp, "[{")
 	tempstr:= strings.TrimSuffix(temp1, "}]")
 	tempVar := strings.Split(tempstr,"},{")
-	fmt.Println("-----------TempVar----------")
+	logger.Info("-----------TempVar----------")
 	for i:=0; i<len(tempVar);i++{
-		fmt.Println(tempVar[i])
+		logger.Info(tempVar[i])
 	}
 	for i:=0; i<len(tempVar);i++{
 		nevVar := string(tempVar[i])
 		tempVar1 := strings.Split(nevVar,",")
-		fmt.Println("-----------TempVar1.----------",i)
+		logger.Info("-----------TempVar1.----------",i)
 		for j:=0; j<len(tempVar1);j++{
-			fmt.Println(tempVar1[j])
+			logger.Info(tempVar1[j])
 		}
 	}
 	return obj

@@ -19,6 +19,7 @@ import (
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/vim25/mo"
+	"gclassec/loggers"
 	
 )
 var vmwarecreds = vmwareconf.Configurtion()
@@ -26,7 +27,7 @@ var EnvURL string = vmwarecreds.EnvURL
 var EnvUserName  string = vmwarecreds.EnvUserName
 var EnvPassword string = vmwarecreds.EnvPassword
 var EnvInsecure string = vmwarecreds.EnvInsecure
-
+var logger = Loggers.New()
 //var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", EnvURL)
 ////var urlFlag = flag.String("url", EnvURL, urlDescription)
 //
@@ -79,6 +80,7 @@ func ProcessOverride(u *url.URL) {
 }
 
 func exit(err error) {
+	logger.Error(os.Stderr, "Error: %s\n", err)
 	fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 	os.Exit(1)
 }
@@ -104,13 +106,14 @@ func VmwareInsert(){
 
 
 	var insecureFlag =  vmwarecontroller.ENVinsecureFlag/*flag.Bool("insecure", true, insecureDescription)*/
-	fmt.Println(*insecureFlag)
+	logger.Info(*insecureFlag)
 
 	flag.Parse()
 	var urlFlag =vmwarecontroller.ENVurlFlag
 	// Parse URL from string
 	u, err := url.Parse(*urlFlag)
 	if err != nil {
+		logger.Error("Error: ",err)
 		fmt.Println(err)
 	}
 
@@ -120,6 +123,7 @@ func VmwareInsert(){
 	// Connect and log in to ESX or vCenter
 	c, err := govmomi.NewClient(ctx, u, *insecureFlag)
 	if err != nil {
+		logger.Error("Error: ",err)
 		fmt.Println(err)
 	}
 
@@ -128,6 +132,7 @@ func VmwareInsert(){
 	// Find one and only datacenter
 	dc, err := f.DefaultDatacenter(ctx)
 	if err != nil {
+		logger.Error("Error: ",err)
 		fmt.Println(err)
 	}
 
@@ -137,6 +142,7 @@ func VmwareInsert(){
 	// Find virtual machines in datacenter
 	vms, err := f.VirtualMachineList(ctx, "*")
 	fmt.Println(vms)
+	logger.Info(vms)
 
 	pc := property.DefaultCollector(c.Client)
 
@@ -149,6 +155,7 @@ func VmwareInsert(){
 	var vmt []mo.VirtualMachine
 	err = pc.Retrieve(ctx, refv, []string{"summary"}, &vmt)
 	if err != nil {
+		logger.Error("Error: ",err)
   		fmt.Println(err)
 	}
 
@@ -156,13 +163,13 @@ func VmwareInsert(){
 	// Print summary
 	tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
-	fmt.Println("Virtual machines found:", len(vmt))
+	logger.Info("Virtual machines found:", len(vmt))
 	for _, vm := range vmt {
 
 		output := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumofCPU:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Guest.GuestFullName,IPaddress:vm.Summary.Guest.IpAddress}
 		//_ = json.NewEncoder(w).Encode(output)
 		db.Create(&output)
 	}
-
+	logger.Info("Successful in VmWareInsert.")
 	tw.Flush()
 }

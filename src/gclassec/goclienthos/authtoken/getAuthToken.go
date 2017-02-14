@@ -2,12 +2,12 @@ package authtoken
 
 import (
 	"strings"
-	"fmt"
 	"runtime"
 	"os"
 	"encoding/json"
 	"net/http"
 	"io/ioutil"
+	"gclassec/loggers"
 )
 
 
@@ -15,6 +15,7 @@ type HOSAutToken struct{
 	Access 	AccessStruct	`json:"access"`
 }
 
+var logger = Loggers.New()
 
 type  AccessStruct struct {
 	Token  		TokenStruct		`json:"token"`
@@ -59,6 +60,7 @@ type UserStruct struct{
 	Roles		[]RolesStruct	`json:"roles"`
 	Name		string		`json:"name"`
 }
+
 type RolesStruct struct{
 	RoleName 	string		`json:"name"`
 }
@@ -67,9 +69,6 @@ type Metadata struct{
 	Is_admin	int64		`json:"is_admin"`
 	Roles		[]string	`json:"roles"`
 }
-
-
-
 
 
 type Configuration struct {
@@ -88,51 +87,51 @@ func GetHOSAuthToken() (string, HOSAutToken){
 //func main(){
 	var filename string = "goclienthos/authtoken/getAuthToken.go"
 	_, filePath, _, _ := runtime.Caller(0)
-	fmt.Println("CurrentFilePath:==",filePath)
+	logger.Debug("CurrentFilePath:==",filePath)
 	absPath :=(strings.Replace(filePath, filename, "conf/hosconfiguration.json", 1))
 	//absPath :=(strings.Replace(filePath, filename, "openStackConfiguration.json", 1))
-	fmt.Println("HOSConfigurationFilePath:==",absPath)
+	logger.Debug("HOSConfigurationFilePath:==",absPath)
 	file, _ := os.Open(absPath)
 	decoder := json.NewDecoder(file)
 	tempConfig := Configuration{}
 	err := decoder.Decode(&tempConfig)
 	if err != nil{
-		fmt.Println("ConfigurationError:", err)
+		logger.Error("ConfigurationError:", err)
 	}
 
-	fmt.Println("TempConfig:===")
-	fmt.Println("IdentityEndPoint: ",tempConfig.IdentityEndpoint)
-    	fmt.Println("Container: ",tempConfig.Container)
-    	fmt.Println("Password: ",tempConfig.Password)
-	fmt.Println("Tenanat_id: ",tempConfig.TenantId)
-    	fmt.Println("TenantName: ",tempConfig.TenantName)
-	fmt.Println("Project_id: ",tempConfig.ProjectId)
-    	fmt.Println("ProjectName: ",tempConfig.ProjectName)
-	fmt.Println("Region: ",tempConfig.Region)
-	fmt.Println("UserName: ",tempConfig.UserName)
+	logger.Info("TempConfig:===")
+	logger.Info("IdentityEndPoint: ",tempConfig.IdentityEndpoint)
+    	logger.Info("Container: ",tempConfig.Container)
+    	logger.Info("Password: ",tempConfig.Password)
+	logger.Info("Tenanat_id: ",tempConfig.TenantId)
+    	logger.Info("TenantName: ",tempConfig.TenantName)
+	logger.Info("Project_id: ",tempConfig.ProjectId)
+    	logger.Info("ProjectName: ",tempConfig.ProjectName)
+	logger.Info("Region: ",tempConfig.Region)
+	logger.Info("UserName: ",tempConfig.UserName)
 
 	var reqBody string = `{"auth":{"passwordCredentials":{"username": "` + tempConfig.UserName +`", "password": "`+ tempConfig.Password +`"}, "tenantName": "`+ tempConfig.TenantName+`"}}`
 	//var reqBody string = `{"auth":{"passwordCredentials":{"username": "` + tempConfig.UserName +`", "password": "`+ tempConfig.Password +`"}, "tenantId": "`+ tempConfig.TenantId +`", "tenantName": "`+ tempConfig.TenantName+`", "Container": "`+ tempConfig.Container +`","ImageRegion": "`+ tempConfig.Region +`"}}`
-	fmt.Println("Request Body:==",reqBody)
+	logger.Info("Request Body:==",reqBody)
 
 	var reqURL string = tempConfig.IdentityEndpoint + "/tokens"
-	fmt.Println("\nRequest URL:==",reqURL)
+	logger.Info("\nRequest URL:==",reqURL)
 
 	req, _ := http.NewRequest("POST", reqURL, strings.NewReader(reqBody))
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("cache-control", "no-cache")
 
-	fmt.Println("Printing request:==",req)
+	logger.Info("Printing request:==",req)
 	res, _ := http.DefaultClient.Do(req)
-	fmt.Println("Status:==", res.Status)
+	logger.Info("Status:==", res.Status)
 	defer res.Body.Close()
 	respBody, _ := ioutil.ReadAll(res.Body)
 
 	//fmt.Print("In GET HOS AUTH TOKEN respBody:==",respBody)
 
 	respBodyInString:= string(respBody)
-	fmt.Println("\n\n\nIn GET HOS AUTH TOKEN respBodyInString:==\n\n",respBodyInString)
-	fmt.Println("\n\n\n")
+	logger.Info("\n\n\nIn GET HOS AUTH TOKEN respBodyInString:==\n\n",respBodyInString)
+	logger.Info("\n\n\n")
 	//rBodyInByte := []byte(respBody)
 	//fmt.Println("rBodyInByte",rBodyInByte)
 
@@ -143,7 +142,7 @@ func GetHOSAuthToken() (string, HOSAutToken){
 	//stringRespMarshed:=string(respMarshed)
 	//fmt.Println("marshedBody in string", stringRespMarshed)
 	if err = json.Unmarshal(respBody, &jsonAuthTokenBody); err != nil{
-		fmt.Println("Error in unmarshing:==",err)
+		logger.Error("Error in unmarshing:==",err)
 	}
 
 	//newDecoder := json.NewDecoder(respBody)
@@ -153,9 +152,9 @@ func GetHOSAuthToken() (string, HOSAutToken){
 	//	fmt.Println("ConfigurationError:", error)
 	//}
 	//
-	fmt.Println("\nIn GET HOS AUTH TOKEN HOSResponseBody:===\n", jsonAuthTokenBody)
-	fmt.Printf("\nIn GET HOS AUTH TOKEN jsonAuthTokenBody:===\n %+v\n\n", jsonAuthTokenBody)
-	fmt.Println("\nIn GET HOS AUTH TOKEN AuthToken:==\n",jsonAuthTokenBody.Access.Token.AuthToken)
+	logger.Info("\nIn GET HOS AUTH TOKEN HOSResponseBody:===\n", jsonAuthTokenBody)
+	logger.Info("\nIn GET HOS AUTH TOKEN jsonAuthTokenBody:===\n %+v\n\n", jsonAuthTokenBody)
+	logger.Info("\nIn GET HOS AUTH TOKEN AuthToken:==\n",jsonAuthTokenBody.Access.Token.AuthToken)
 	return  jsonAuthTokenBody.Access.Token.AuthToken, jsonAuthTokenBody
 
 }

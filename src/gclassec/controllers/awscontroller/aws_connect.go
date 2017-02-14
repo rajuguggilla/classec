@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/awsstructs"
+	"gclassec/loggers"
 )
 
 type (
@@ -32,7 +33,7 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
-
+var logger = Loggers.New()
 func (uc UserController) GetDetailsById(w http.ResponseWriter, r *http.Request) {
 	dbObj := []awsstructs.Rds_dynamic{}
 
@@ -49,6 +50,7 @@ func (uc UserController) GetDetailsById(w http.ResponseWriter, r *http.Request) 
 	err = db.DB().Ping()
 	if err != nil {
 		panic(err)
+		logger.Error(err)
 	}
 	//db.Close()
 }
@@ -62,11 +64,14 @@ func (uc UserController) GetDB(w http.ResponseWriter, r *http.Request) {
 	queryValue2 := r.URL.Query().Get("DatabaseConnections_max")
 
 	println(queryValue1)
+	logger.Info(queryValue1)
 	println(queryValue2)
+	logger.Info(queryValue2)
 	db.SingularTable(true)
 
 	err := db.Where("CPUUtilization_max < ? AND DatabaseConnections_max = ?", queryValue1, queryValue2).Find(&dbObj).Error
 	if err != nil{
+		logger.Error("Error: ",err)
 		tx.Rollback()
 	}
 
@@ -75,9 +80,10 @@ func (uc UserController) GetDB(w http.ResponseWriter, r *http.Request) {
 	// Ping function checks the database connectivity
 	err = db.DB().Ping()
 	if err != nil {
+		logger.Error("Error: ",err)
 		panic(err)
 	}
-
+	logger.Info("Successful in GetDB_AWS")
 	tx.Commit()
 
 }
@@ -94,6 +100,7 @@ func (uc UserController) GetPrice(w http.ResponseWriter, r *http.Request) {
 	db.SingularTable(true)
 	err := db.Find(&dbObj).Error
 	if err != nil{
+		logger.Error("Error: ",err)
 		tx.Rollback()
 	}
 
@@ -102,9 +109,10 @@ func (uc UserController) GetPrice(w http.ResponseWriter, r *http.Request) {
 	// Ping function checks the database connectivity
 	err = db.DB().Ping()
 	if err != nil {
+		logger.Error("Error: ",err)
 		panic(err)
 	}
-
+	logger.Info("Successful in GetPrice_AWS")
 	tx.Commit()
 }
 
@@ -118,16 +126,17 @@ func (uc UserController) GetDetails(w http.ResponseWriter, r *http.Request){
 	err := db.Find(&rds_dynamic).Error
 
 	if err != nil{
-
+		logger.Error("Error: ",err)
 		tx.Rollback()
 	}
 
 	_ = json.NewEncoder(w).Encode(db.Find(&rds_dynamic))
 
 		if err != nil {
+			logger.Error("Error: ",err)
 			println(err)
 		}
-
+	logger.Info("Successful in GetDetails_AWS")
 	tx.Commit()
 }
 

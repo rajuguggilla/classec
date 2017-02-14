@@ -2,10 +2,10 @@ package readawsconf
 
 import (
 	"encoding/json"
-	"fmt"
 	"runtime"
 	"strings"
 	"os"
+	"gclassec/loggers"
 )
 
 type Configuration struct {
@@ -18,11 +18,12 @@ type Configuration struct {
 }
 
 func Configurtion() Configuration{
+	logger := Loggers.New()
 	filename := "confmanagement/readawsconf/aws_conf.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/awsconf.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 
 	//dir, _ := os.Getwd()
@@ -31,7 +32,7 @@ func Configurtion() Configuration{
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		logger.Error("error:", err)
 	}
 
 	return configuration

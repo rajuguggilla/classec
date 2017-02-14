@@ -8,23 +8,26 @@ import(
 	"runtime"
 	"strings"
 	"os"
+	"gclassec/loggers"
 )
 
+var logger = Loggers.New()
+
 func MyFileWriter(data string, configFile string)(string){
-	fmt.Println("requestBody:==",data)
+	logger.Debug("requestBody:==",data)
 	// Split on NewLine.
     	tempVariableString := strings.Split(data, "&")
     	 //Display all elements.
-	fmt.Println("TempVariable Length:",len(tempVariableString))
+	logger.Info("TempVariable Length:",len(tempVariableString))
 	for i:= range tempVariableString {
-		fmt.Printf("\nTempVariable %d:%s", i,tempVariableString[i])
+		logger.Info("\nTempVariable %d:%s", i,tempVariableString[i])
 	}
 	//f, err := os.Create(configFile)
 	//var err = os.Remove(path)
 	//checkError(err)
 	f,err := os.OpenFile(configFile, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0666)
 	if err != nil {
-		fmt.Println("Error in creating File:==", err)
+		logger.Error("Error in creating File:==", err)
 		return("Failed")
 	}
 	defer f.Close()
@@ -40,6 +43,7 @@ func MyFileWriter(data string, configFile string)(string){
 		}
 	}
 	f.WriteString("\n}")
+	logger.Debug("Ok Successful in MyFileWriter")
 	return "Ok Sucessfull"
 }
 
@@ -56,9 +60,9 @@ func AwsCredentials(w http.ResponseWriter, r *http.Request){
 	//fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
 	_, filePath, _, _ := runtime.Caller(0)
-        fmt.Println("\nCurrentFilePath:==",filePath)
+        logger.Debug("\nCurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/awscred.json", 1))
-        fmt.Println("\nABSPATH:==",ConfigFilePath)
+        logger.Debug("\nABSPATH:==",ConfigFilePath)
 	resp:= MyFileWriter(bodyString, ConfigFilePath)
 	fmt.Fprintf(w,resp)
 }
@@ -76,9 +80,9 @@ func AzureCredentials(w http.ResponseWriter, r *http.Request){
 	fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        fmt.Println("CurrentFilePath:==",filePath)
+        logger.Info("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/azurecred.json", 1))
-        fmt.Println("ABSPATH:==",ConfigFilePath)
+        logger.Info("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }
@@ -92,12 +96,12 @@ func OpenstackCredentials(w http.ResponseWriter, r *http.Request){
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
+	logger.Info(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        fmt.Println("CurrentFilePath:==",filePath)
+        logger.Info("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
-        fmt.Println("ABSPATH:==",ConfigFilePath)
+        logger.Info("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }
@@ -115,9 +119,9 @@ func VmwareCredentials(w http.ResponseWriter, r *http.Request){
 	fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        fmt.Println("CurrentFilePath:==",filePath)
+        logger.Info("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/vmwareconf.json", 1))
-        fmt.Println("ABSPATH:==",ConfigFilePath)
+        logger.Info("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }
@@ -136,9 +140,9 @@ func HosCredentials(w http.ResponseWriter, r *http.Request){
 	fmt.Println(bodyString)
 	filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
-        fmt.Println("CurrentFilePath:==",filePath)
+        logger.Info("CurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, filename, "conf/hosconfiguration.json", 1))
-        fmt.Println("ABSPATH:==",ConfigFilePath)
+        logger.Info("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
 }

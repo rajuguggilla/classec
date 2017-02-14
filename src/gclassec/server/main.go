@@ -14,15 +14,13 @@ import (
     "gclassec/controllers/azurecontroller"
     "os"
     "gclassec/controllers/confcontroller"
-    //"gclassec/controllers/vmwarecontroller"
     "gclassec/controllers/hoscontroller"
     "time"
     "runtime"
     "strings"
     "encoding/json"
     "sync"
-    "gclassec/Loggers"
-    "log"
+    "gclassec/loggers"
     "gclassec/dao/hosinsert"
     //"gclassec/dao/vmwareinsert"
     //"gclassec/controllers/vmwarecontroller"
@@ -34,18 +32,19 @@ type Configuration struct {
 }
 
 func main() {
-    Loggers.MyLogger()
+    logger := Loggers.New()
     filename := "server/main.go"
     _, filePath, _, _ := runtime.Caller(0)
-    fmt.Println("CurrentFilePath:==",filePath)
+    logger.Debug("CurrentFilePath:==",filePath)
     ConfigFilePath :=(strings.Replace(filePath, filename, "conf/jobconf.json", 1))
-    fmt.Println("ABSPATH:==",ConfigFilePath)
+    logger.Debug("ABSPATH:==",ConfigFilePath)
     file, _ := os.Open(ConfigFilePath)
     decoder := json.NewDecoder(file)
     configuration := Configuration{}
     err := decoder.Decode(&configuration)
     if err != nil {
         fmt.Println("error:", err)
+        logger.Error("Error Occured",err)
     }
 
     runtime.GOMAXPROCS(2)
@@ -53,10 +52,10 @@ func main() {
     var wg sync.WaitGroup
     wg.Add(2)
 
-    log.Println("Starting Go Routines")
-    log.Println("Duration for Ticker : ",time.Duration(configuration.Interval) * configuration.Timespec)
-    log.Println("Interval : ", configuration.Interval)
-    log.Println("Timespec : ", configuration.Timespec)
+    logger.Info("Starting Go Routines")
+    logger.Info("Duration for Ticker : ",time.Duration(configuration.Interval) * configuration.Timespec)
+    logger.Info("Interval: ", configuration.Interval)
+    logger.Info("Timespec: ", configuration.Timespec)
 
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
@@ -145,6 +144,8 @@ func main() {
 
         http.Handle("/", mx)
         // Fire up the server
+        logger.Info("Server is on Port 9009")
+        logger.Info("Listening .....")
         fmt.Println("Server is on Port 9009")
         fmt.Println("Listening .....")
         // fmt.Println(os.Getwd())
@@ -152,7 +153,9 @@ func main() {
     }()
 
     fmt.Println("Waiting To Finish")
+    logger.Info("Waiting To Finish")
     wg.Wait()
 
     fmt.Println("\nTerminating Program")
+    logger.Info("\nTerminating Program")
 }

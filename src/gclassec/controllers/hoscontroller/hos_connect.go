@@ -14,6 +14,7 @@ import (
 	"gclassec/goclienthos/ceilometer"
 //	"sid/goclassec/src/github.com/Azure/azure-sdk-for-go/arm/recoveryservices"
 	"gclassec/goclienthos/hos_all_compute_details"
+	"gclassec/loggers"
 )
 
 type (
@@ -23,7 +24,7 @@ type (
 func NewUserController() *UserController {
     return &UserController{}
 }
-
+var logger = Loggers.New()
 var dbcredentials = readazureconf.Configurtion()
 var dbtype string = dbcredentials.Dbtype
 var dbname  string = dbcredentials.Dbname
@@ -41,6 +42,7 @@ func (uc UserController) CpuUtilDetails(w http.ResponseWriter, r *http.Request){
         vars := mux.Vars(r)
         id := vars["id"]
         res := util.GetCpuUtilDetails(id)
+	logger.Info(res)
         fmt.Fprintf(w,res)
 
 }
@@ -61,16 +63,17 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 	err := db.Find(&hos_compute).Error
 
 	if err != nil{
-
+		logger.Error("Error: ",err)
 		tx.Rollback()
 	}
 
 	_ = json.NewEncoder(w).Encode(db.Find(&hos_compute))
 
 		if err != nil {
+			logger.Error("Error: ",err)
 			println(err)
 		}
-
+	logger.Info("Successful in Compute.")
 	tx.Commit()
 }
 
@@ -84,6 +87,7 @@ func (uc UserController) GetFlavorsDetails(w http.ResponseWriter, r *http.Reques
 func (uc UserController) GetCeilometerStatitics(w http.ResponseWriter, r *http.Request){
 
 	res := ceilometer.GetCpuUtilStatistics()
+	logger.Info(res)
         fmt.Fprintf(w,res)
 
 }
@@ -92,12 +96,13 @@ func (uc UserController) GetCeilometerDetails(w http.ResponseWriter, r *http.Req
 
 	//res := compute.GetCeilometerDetail()
 	res := ceilometer.GetCeilometerDetail()
+	logger.Info(res)
         fmt.Fprintf(w,res)
 
 }
 
 func (uc UserController) Index(w http.ResponseWriter, r *http.Request){
-
+	logger.Info("Hi You Just tested Server ping.")
 	fmt.Fprintf(w, "Hi You Just tested Server ping.")
 }
 

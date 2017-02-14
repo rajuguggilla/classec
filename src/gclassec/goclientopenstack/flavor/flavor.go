@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 	"os"
+	"gclassec/loggers"
 )
 type Configuration struct {
     Host	string
@@ -22,11 +23,12 @@ type Configuration struct {
 
 func Flavor() []DetailResponse{
 	//config := getConfig()
+	logger := Loggers.New()
 	filename := "goclientopenstack/flavor/flavor.go"
        _, filePath, _, _ := runtime.Caller(0)
-       fmt.Println("CurrentFilePath:==",filePath)
+       logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
-       fmt.Println("ABSPATH:==",ConfigFilePath)
+       logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, _ := os.Open(ConfigFilePath)
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/computeVM.json")
@@ -34,7 +36,7 @@ func Flavor() []DetailResponse{
 	config := Configuration{}
 	err := decoder.Decode(&config)
 	if err != nil {
-		fmt.Println("error:", err)
+		logger.Error("error:", err)
 	}
 
 	// Authenticate with a username, password, tenant id.
@@ -48,46 +50,53 @@ func Flavor() []DetailResponse{
 	auth, err := openstack.DoAuthRequest(creds)
 	if err != nil {
 		panicString := fmt.Sprint("There was an error authenticating:", err)
+		logger.Error(panicString)
 		panic(panicString)
 	}
 	if !auth.GetExpiration().After(time.Now()) {
+		logger.Error("There was an error. The auth token has an invalid expiration.")
 		panic("There was an error. The auth token has an invalid expiration.")
 	}
-	fmt.Println(auth)
+	logger.Debug(auth)
 	// Find the endpoint for the Nova Compute service.
 	url, err := auth.GetEndpoint("compute", "")
 	url = strings.Replace(url,"compute", creds.Controller ,1)
 	if url == "" || err != nil {
+		logger.Error("EndPoint Not Found.")
 		panic("EndPoint Not Found.")
+		logger.Error(err)
 		panic(err)
 	}
 	// Make a new client with these creds
 	sess, err := openstack.NewSession(nil, auth, nil)
 	if err != nil {
 		panicString := fmt.Sprint("Error creating new Session:", err)
+		logger.Error(panicString)
 		panic(panicString)
 	}
-	fmt.Println(url)
+	logger.Info(url)
 	flavorService := Service{
 		Session: *sess,
 		Client:  *http.DefaultClient,
 		URL:     url, // We're forcing Volume v2 for now
 	}
 	flavorDetails, err := flavorService.FlavorsDetail()
-	fmt.Println(flavorDetails,"00000000000000000000000000")
+	logger.Info(flavorDetails,"00000000000000000000000000")
 	if err != nil {
 		panicString := fmt.Sprint("Cannot access Compute:", err)
+		logger.Error(panicString)
 		panic(panicString)
 	}
-	fmt.Println("computedetails printing..")
-	fmt.Println(flavorDetails)
+	logger.Info("computedetails printing..")
+	logger.Info(flavorDetails)
 	var flavorIDs = make([]string, 0)
 	for _, element := range flavorDetails {
 		flavorIDs = append(flavorIDs, element.FlavorID)
 	}
-	fmt.Println(flavorIDs)
+	logger.Info(flavorIDs)
 	if len(flavorIDs) == 0 {
 		panicString := fmt.Sprint("No instances found, check to make sure access is correct")
+		logger.Error(panicString)
 		panic(panicString)
 	}
 	return flavorDetails

@@ -7,6 +7,7 @@ import (
 	"gclassec/confmanagement/readopenstackconf"
 	_ "github.com/go-sql-driver/mysql"
 	"gclassec/structs/hosstruct"
+	"gclassec/loggers"
 
 )
 
@@ -23,8 +24,10 @@ var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
 
 func InsertHOSInstances(){
+	logger := Loggers.New()
 	//println(examples.ComputeFunc())
 	computeDetails:= compute.Compute()
+
 	//println(computeDetails)
 	//user := openstackInstance.Instances{}
 	//db.Delete(&user)
@@ -41,5 +44,5 @@ func InsertHOSInstances(){
 		db.Create(&user)
 		db.Model(&user).Updates(&user)
 	}
-
+	logger.Info("Successful in InsertHOSInstance.")
 }

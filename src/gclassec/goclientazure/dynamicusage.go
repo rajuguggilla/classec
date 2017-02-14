@@ -23,8 +23,10 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 	//"github.com/Azure/go-autorest/autorest/validation"
 	"net/http"
-	"fmt"
+	"gclassec/loggers"
 )
+
+var logger = Loggers.New()
 
 // UsageOperationsClient is the the Compute Management Client.
 type DynamicUsageOperationsClient struct {
@@ -34,12 +36,14 @@ type DynamicUsageOperationsClient struct {
 // NewUsageOperationsClient creates an instance of the UsageOperationsClient
 // client.
 func NewDynamicUsageOperationsClient(subscriptionID string) DynamicUsageOperationsClient {
+	logger.Debug("Subscription ID: ", subscriptionID)
 	return NewDynamicUsageOperationsClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewUsageOperationsClientWithBaseURI creates an instance of the
 // UsageOperationsClient client.
 func NewDynamicUsageOperationsClientWithBaseURI(baseURI string, subscriptionID string) DynamicUsageOperationsClient {
+	logger.Debug("Subscription ID: ", subscriptionID)
 	return DynamicUsageOperationsClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
@@ -56,22 +60,26 @@ func (client DynamicUsageOperationsClient) ListDynamic(name string, resourceGrou
 	}*/
 
 	req, err := client.ListPreparer(name, resourceGroupName)
-	fmt.Println(name, resourceGroupName)
+	logger.Info(name, resourceGroupName)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return result, autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", nil, "Failure preparing request")
 	}
 
 	resp, err := client.ListSender(req)
 	if err != nil {
+		logger.Error("Error: ", err)
 		result.Response = autorest.Response{Response: resp}
+		logger.Error("Response: ", resp)
 		return result, autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", resp, "Failure sending request")
 	}
 
 	result, err = client.ListResponder(resp)
 	if err != nil {
+		logger.Error("Error: ", err)
 		err = autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", resp, "Failure responding to request")
 	}
-	//fmt.Println(result)
+	logger.Info(result)
 	return
 }
 
@@ -98,6 +106,7 @@ func (client DynamicUsageOperationsClient) ListPreparer(name string, resourceGro
 // ListSender sends the List request. The method will close the
 // http.Response Body if it receives an error.
 func (client DynamicUsageOperationsClient) ListSender(req *http.Request) (*http.Response, error) {
+	logger.Info(req)
 	return autorest.SendWithSender(client, req)
 }
 
@@ -111,7 +120,7 @@ func (client DynamicUsageOperationsClient) ListResponder(resp *http.Response) (r
 		autorest.ByUnmarshallingJSON(&result),
 		autorest.ByClosing())
 	result.Response = autorest.Response{Response: resp}
-	//fmt.Println(result.Response)
+	logger.Info(result.Response)
 	return
 }
 
@@ -119,6 +128,7 @@ func (client DynamicUsageOperationsClient) ListResponder(resp *http.Response) (r
 func (client DynamicUsageOperationsClient) ListNextResults(lastResults ListUsagesResult) (result ListDynamicUsagesResult, err error) {
 	req, err := lastResults.ListUsagesResultPreparer()
 	if err != nil {
+		logger.Error("Error: ", err)
 		return result, autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", nil, "Failure preparing next results request")
 	}
 	if req == nil {
@@ -127,12 +137,15 @@ func (client DynamicUsageOperationsClient) ListNextResults(lastResults ListUsage
 
 	resp, err := client.ListSender(req)
 	if err != nil {
+		logger.Error("Error: ", err)
 		result.Response = autorest.Response{Response: resp}
+		logger.Error("Response: ", resp)
 		return result, autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", resp, "Failure sending next results request")
 	}
 
 	result, err = client.ListResponder(resp)
 	if err != nil {
+		logger.Error("Error: ", err)
 		err = autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", resp, "Failure responding to next results request")
 	}
 

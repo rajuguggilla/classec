@@ -29,8 +29,8 @@ import (
 	"net/http"
 	"gclassec/goclientopenstack/util"
 	"net/url"
-	"fmt"
 	"gclassec/goclientopenstack/flavor"
+	"gclassec/loggers"
 )
 // Service is a client service that can make
 // requests against a OpenStack version 2 Compute service.
@@ -42,6 +42,8 @@ type Service struct {
 	Client  http.Client
 	URL     string
 }
+
+var logger = Loggers.New()
 
 // Response is a structure for all properties of
 // an instance for a non detailed query
@@ -93,15 +95,15 @@ type DetailResponse struct {
 type Volume struct{
 	Vol	string `json:"os-extended-volumes:volumes_attached"`
 }
+
 type Image struct{
 	ID	string `json:"id"`
 }
-/*type Flavor struct{
-	ID	string `json:"id"`
-}*/
+
 type security_groups struct{
 	Name	string `json:"name"`
 }
+
 type address struct{
 	Mac_addr	string	`json:"OS-EXT-IPS-MAC:mac_addr"`
 	Version		string	`json:"version"`
@@ -160,6 +162,7 @@ func (computeService Service) QueryInstances(queryParameters *QueryParameters) (
 	computeContainer := computeResponse{}
 	err := computeService.queryInstances(false /*includeDetails*/, &computeContainer, queryParameters)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return nil, err
 	}
 
@@ -172,6 +175,7 @@ func (computeService Service) QueryInstancesDetail(queryParameters *QueryParamet
 	computeDetailContainer := computeDetailResponse{}
 	err := computeService.queryInstances(true /*includeDetails*/, &computeDetailContainer, queryParameters)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return nil, err
 	}
 
@@ -183,34 +187,39 @@ func (computeService Service) queryInstances(includeDetails bool, computeRespons
 	if includeDetails {
 		urlPostFix = urlPostFix + "/detail"
 	}
-	fmt.Println(urlPostFix)
+	logger.Info(urlPostFix)
 	reqURL, err := buildQueryURL(computeService, queryParameters, urlPostFix)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return err
 	}
 
-	fmt.Println("cghvgjvgjgjvgj",reqURL)
+	logger.Info("cghvgjvgjgjvgj",reqURL)
 
 	var headers http.Header = http.Header{}
 	headers.Set("Accept", "application/json")
 	resp, err := computeService.Session.Get(reqURL.String(), nil, &headers)
-	fmt.Println("********************",headers)
+	logger.Info("********************",headers)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return err
 	}
 
 	err = util.CheckHTTPResponseStatusCode(resp)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return err
 	}
 
 	rbody, err := ioutil.ReadAll(resp.Body)
-	fmt.Println("response body printng.")
-	fmt.Println(rbody)
+	logger.Info("response body printng.")
+	logger.Info(rbody)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return errors.New("aaa")
 	}
 	if err = json.Unmarshal(rbody, &computeResponseContainer); err != nil {
+		logger.Error("Error: ", err)
 		return err
 	}
 	return nil
@@ -219,6 +228,7 @@ func (computeService Service) queryInstances(includeDetails bool, computeRespons
 func buildQueryURL(computeService Service, queryParameters *QueryParameters, computePartialURL string) (*url.URL, error) {
 	reqURL, err := url.Parse(computeService.URL)
 	if err != nil {
+		logger.Error("Error: ", err)
 		return nil, err
 	}
 

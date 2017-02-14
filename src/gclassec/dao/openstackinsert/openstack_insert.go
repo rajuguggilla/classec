@@ -8,6 +8,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/openstackInstance"
 	"gclassec/goclientopenstack"
+	"gclassec/loggers"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -16,7 +17,7 @@ type (
 func NewUserController() *UserController {
     return &UserController{}
 }
-
+var logger = Loggers.New()
 var dbcredentials = readopenstackconf.Configurtion()
 var dbtype string = dbcredentials.Dbtype
 var dbname  string = dbcredentials.Dbname
@@ -33,6 +34,7 @@ func InsertInstances(){
 	//println(examples.ComputeFunc())
 	computeDetails:= goclientcompute.FinalCompute()
 	println(computeDetails)
+	logger.Info(computeDetails)
 	for _, element := range computeDetails {
 		//println(element.Name,element.ID,element.Status,element.Progress)
 		/*user :=	openstackInstance.Instances{Name:element.Name,InstanceID:element.ID,Status:element.Status,AvailabilityZone:element.Availability_zone,CreationTime:element.Created,
@@ -44,5 +46,5 @@ func InsertInstances(){
 		db.Create(&user)
 		db.Model(&user).Updates(&user)
 	}
-
+	logger.Info("Successful in InsertInstances.")
 }
