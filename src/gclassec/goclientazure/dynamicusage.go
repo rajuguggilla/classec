@@ -24,6 +24,7 @@ import (
 	//"github.com/Azure/go-autorest/autorest/validation"
 	"net/http"
 	"fmt"
+	"gclassec/structs/azurestruct"
 )
 
 // UsageOperationsClient is the the Compute Management Client.
@@ -48,7 +49,7 @@ func NewDynamicUsageOperationsClientWithBaseURI(baseURI string, subscriptionID s
 // subscription.
 //
 // location is the location for which resource usage is queried.
-func (client DynamicUsageOperationsClient) ListDynamic(name string, resourceGroupName string) (result ListDynamicUsagesResult, err error) {
+func (client DynamicUsageOperationsClient) ListDynamic(name string, resourceGroupName string) (result azurestruct.ListDynamicUsagesResult, err error) {
 	/*if err := validation.Validate([]validation.Validation{
 		{TargetValue: name,
 			Constraints: []validation.Constraint{{Target: "name", Name: validation.Pattern, Rule: `^[-\w\._]+$`, Chain: nil}}}}); err != nil {
@@ -103,7 +104,7 @@ func (client DynamicUsageOperationsClient) ListSender(req *http.Request) (*http.
 
 // ListResponder handles the response to the List request. The method always
 // closes the http.Response Body.
-func (client DynamicUsageOperationsClient) ListResponder(resp *http.Response) (result ListDynamicUsagesResult, err error) {
+func (client DynamicUsageOperationsClient) ListResponder(resp *http.Response) (result azurestruct.ListDynamicUsagesResult, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -116,7 +117,7 @@ func (client DynamicUsageOperationsClient) ListResponder(resp *http.Response) (r
 }
 
 // ListNextResults retrieves the next set of results, if any.
-func (client DynamicUsageOperationsClient) ListNextResults(lastResults ListUsagesResult) (result ListDynamicUsagesResult, err error) {
+func (client DynamicUsageOperationsClient) ListNextResults(lastResults azurestruct.ListUsagesResult) (result azurestruct.ListDynamicUsagesResult, err error) {
 	req, err := lastResults.ListUsagesResultPreparer()
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", nil, "Failure preparing next results request")

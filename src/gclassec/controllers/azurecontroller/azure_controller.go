@@ -67,7 +67,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 
 	ls, _ := ac.ListAll()
 
-	obj := &goclientazure.VirtualMachineStaticDynamic{}
+	obj := &azurestruct.VirtualMachineStaticDynamic{}
 	for _, element := range *ls.Value {
 		rgroup := *(element.AvailabilitySet.ID)
 		resourcegroupname := strings.Split(rgroup, "/")
@@ -80,7 +80,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		dlist, _ := dc.ListDynamic(vmName, rsgroup)
 		fmt.Println(dlist)
 		for _, element1 := range *dlist.Value {
-			obj = &goclientazure.VirtualMachineStaticDynamic{VmName:element.Name, Type:element.Type, Location:element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:element.VMID, Publisher:element.StorageProfile.ImageReference.Publisher, Offer:element.StorageProfile.ImageReference.Offer, SKU:element.StorageProfile.ImageReference.Sku, AvailabilitySetName:element.AvailabilitySet.ID, Provisioningstate:element.ProvisioningState, ResourcegroupName:rsgroup,TimeStamp:element1.Data[len(element1.Data)-2].TimeStamp,Average:element1.Data[len(element1.Data)-2].Average}
+			obj = &azurestruct.VirtualMachineStaticDynamic{VmName:element.Name, Type:element.Type, Location:element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:element.VMID, Publisher:element.StorageProfile.ImageReference.Publisher, Offer:element.StorageProfile.ImageReference.Offer, SKU:element.StorageProfile.ImageReference.Sku, AvailabilitySetName:element.AvailabilitySet.ID, Provisioningstate:element.ProvisioningState, ResourcegroupName:rsgroup,TimeStamp:element1.Data[len(element1.Data)-2].TimeStamp,Average:element1.Data[len(element1.Data)-2].Average}
 		}
 	}
 	fmt.Println(obj)
