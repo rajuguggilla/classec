@@ -69,7 +69,7 @@ func main() {
                     azureinsert.AzureInsert()
                     openstackinsert.InsertInstances()
                     vmwareinsert.VmwareInsert()
-                    hosinsert.InsertHOSInstances()
+                    hosinsert.HosInsert()
                 case <- quit:
                     ticker.Stop()
                     return
