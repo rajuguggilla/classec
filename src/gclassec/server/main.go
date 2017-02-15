@@ -24,6 +24,8 @@ import (
     "gclassec/dao/hosinsert"
     //"gclassec/dao/vmwareinsert"
     //"gclassec/controllers/vmwarecontroller"
+    "gclassec/dao/vmwareinsert"
+    "gclassec/controllers/vmwarecontroller"
 )
 
 type Configuration struct {
@@ -66,7 +68,7 @@ func main() {
                 case <- ticker.C:
                     azureinsert.AzureInsert()
                     openstackinsert.InsertInstances()
-                    //vmwareinsert.VmwareInsert()
+                    vmwareinsert.VmwareInsert()
                     hosinsert.InsertHOSInstances()
                 case <- quit:
                     ticker.Stop()
@@ -83,7 +85,7 @@ func main() {
         op := openstackcontroller.NewUserController()
         ac := azurecontroller.NewUserController()
         uc1 := confcontroller.NewUserController()
-        //vc := vmwarecontroller.NewUserController()
+        vc := vmwarecontroller.NewUserController()
         hc := hoscontroller.NewUserController()
 
         mx.NotFoundHandler = http.HandlerFunc(validation.ValidateWrongURL)
@@ -116,9 +118,9 @@ func main() {
 
         mx.HandleFunc("/dbaas/azureInstance", ac.GetAzureStaticDynamic).Methods("GET")
 
-        //mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
+        mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
 
-        //mx.HandleFunc("/dbaas/vcenterDetail/static", vc.GetVcenterDetails).Methods("GET")
+        mx.HandleFunc("/dbaas/vcenterDetail/static", vc.GetVcenterDetails).Methods("GET")
 
         mx.HandleFunc("/selectProvider", uc1.SelectProvider)
 
