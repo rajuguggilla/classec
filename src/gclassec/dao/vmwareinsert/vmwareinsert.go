@@ -169,6 +169,7 @@ func VmwareInsert(){
 		output := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumofCPU:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Guest.GuestFullName,IPaddress:vm.Summary.Guest.IpAddress}
 		//_ = json.NewEncoder(w).Encode(output)
 		db.Create(&output)
+		db.Model(&output).Updates(&output)
 	}
 	logger.Info("Successful in VmWareInsert.")
 	tw.Flush()
