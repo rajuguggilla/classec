@@ -77,6 +77,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	ls, _ := ac.ListAll()
 
 	obj := &azurestruct.VirtualMachineStaticDynamic{}
+	fmt.Fprintf(w, "{\"Value\":[")
 	for _, element := range *ls.Value {
 		rgroup := *(element.AvailabilitySet.ID)
 		resourcegroupname := strings.Split(rgroup, "/")
@@ -96,6 +97,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	fmt.Println(obj)
 	logger.Info(obj)
 	_ = json.NewEncoder(w).Encode(&obj)
+	fmt.Fprintf(w, "]}")
 }
 
 func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Request)(){
