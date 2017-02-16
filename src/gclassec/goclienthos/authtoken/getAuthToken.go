@@ -118,9 +118,9 @@ func GetHOSAuthToken() (string, HOSAutToken, error){
 	logger.Info("\nRequest URL:==",reqURL)
 
 	req, err := http.NewRequest("POST", reqURL, strings.NewReader(reqBody))
-	/*if err != nil{
+	if err != nil{
 			return "", HOSAutToken{}, err
-		}*/
+		}
 
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("cache-control", "no-cache")
@@ -129,9 +129,9 @@ func GetHOSAuthToken() (string, HOSAutToken, error){
 	res, err := http.DefaultClient.Do(req)
 
 
-		/*if err != nil{
+		if err != nil{
 			return "", HOSAutToken{}, err
-		}*/
+		}
 
 //	logger.Info("Status:==", res.Status)
 	defer res.Body.Close()
