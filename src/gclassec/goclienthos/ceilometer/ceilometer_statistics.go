@@ -13,7 +13,12 @@ func GetCpuUtilStatistics() string {
 	//var auth,_ = authtoken.GetHOSAuthToken()
 	//fmt.Println("Auth Token in Compute.go:=====\n", auth)
 	var meteringEndpoint string
-	var auth, hosConfig = authtoken.GetHOSAuthToken()
+	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
+
+	if err != nil{
+			return ""
+		}
+
 	logger.Debug("HOS AuthToken:=====\n", auth)
 	logger.Debug("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {

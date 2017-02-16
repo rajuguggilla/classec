@@ -65,7 +65,11 @@ func AvgCpuUtil(id string) float64{
 	//var auth,_ = HOSAuthToken.GetHOSAuthToken()
 	//fmt.Println("Auth Token in Compute.go:=====\n", auth)
 	var meteringEndpoint string
-	var auth, hosConfig = authtoken.GetHOSAuthToken()
+	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
+
+		if err != nil{
+			return 0
+		}
 //	fmt.Println("HOS AuthToken:=====\n", auth)
 //	fmt.Println("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {

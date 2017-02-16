@@ -102,7 +102,11 @@ func ComputeWithCPU() CompleteComputeResponse{
 	fmt.Println("Hello .......:")
 	//fmt.Println("This to get Nothing")
 	var computeEndpoint string
-	var auth, hosConfig = authtoken.GetHOSAuthToken()
+	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
+
+		if err != nil{
+			return CompleteComputeResponse{}
+		}
 	fmt.Println("HOS AuthToken:=====\n", auth)
 	fmt.Println("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {

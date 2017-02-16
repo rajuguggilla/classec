@@ -29,7 +29,12 @@ func Flavors() hosstruct.FlvRespStruct {
 	//fmt.Println("This to get Nothing")
 	logger := Loggers.New()
 	var computeEndpoint string
-	var auth, hosConfig = authtoken.GetHOSAuthToken()
+	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
+
+		if err != nil{
+			return hosstruct.FlvRespStruct{}
+		}
+
 	logger.Debug("HOS AuthToken:=====\n", auth)
 	logger.Debug("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {

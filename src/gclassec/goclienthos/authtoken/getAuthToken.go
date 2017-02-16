@@ -83,7 +83,7 @@ type Configuration struct {
     	Region	 		string	`json:"region"`
 }
 
-func GetHOSAuthToken() (string, HOSAutToken){
+func GetHOSAuthToken() (string, HOSAutToken, error){
 //func main(){
 	var filename string = "goclienthos/authtoken/getAuthToken.go"
 	_, filePath, _, _ := runtime.Caller(0)
@@ -117,15 +117,30 @@ func GetHOSAuthToken() (string, HOSAutToken){
 	var reqURL string = tempConfig.IdentityEndpoint + "/tokens"
 	logger.Info("\nRequest URL:==",reqURL)
 
-	req, _ := http.NewRequest("POST", reqURL, strings.NewReader(reqBody))
+	req, err := http.NewRequest("POST", reqURL, strings.NewReader(reqBody))
+	/*if err != nil{
+			return "", HOSAutToken{}, err
+		}*/
+
 	req.Header.Add("content-type", "application/json")
 	req.Header.Add("cache-control", "no-cache")
 
 	logger.Info("Printing request:==",req)
-	res, _ := http.DefaultClient.Do(req)
-	logger.Info("Status:==", res.Status)
+	res, err := http.DefaultClient.Do(req)
+
+
+		/*if err != nil{
+			return "", HOSAutToken{}, err
+		}*/
+
+//	logger.Info("Status:==", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, err := ioutil.ReadAll(res.Body)
+
+	var emptyStruct = HOSAutToken{}
+		if err != nil{
+			return "", emptyStruct, err
+		}
 
 	//fmt.Print("In GET HOS AUTH TOKEN respBody:==",respBody)
 
@@ -155,6 +170,6 @@ func GetHOSAuthToken() (string, HOSAutToken){
 	logger.Info("\nIn GET HOS AUTH TOKEN HOSResponseBody:===\n", jsonAuthTokenBody)
 	logger.Info("\nIn GET HOS AUTH TOKEN jsonAuthTokenBody:===\n %+v\n\n", jsonAuthTokenBody)
 	logger.Info("\nIn GET HOS AUTH TOKEN AuthToken:==\n",jsonAuthTokenBody.Access.Token.AuthToken)
-	return  jsonAuthTokenBody.Access.Token.AuthToken, jsonAuthTokenBody
+	return  jsonAuthTokenBody.Access.Token.AuthToken, jsonAuthTokenBody, nil
 
 }
