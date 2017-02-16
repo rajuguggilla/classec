@@ -46,22 +46,6 @@ func NewUserController() *UserController {
 }
 
 
-type FinalVmwareInstances struct {
-	VMName              string
-	Uuid                string
-	MemorySizeMB        int32
-	PowerState          string
-	NumCpu              int32
-	GuestFullName       string
-	IpAddress           string
-
-}
-type DynamicValues struct{
-	VMName			string
-	OverallCpuUsage         int32
-	GuestMemoryUsage	int32
-	StorageCommitted	float32
-}
 var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", EnvURL)
 var ENVurlFlag = flag.String("url", EnvURL, urlDescription)
 
@@ -121,6 +105,89 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
+
+func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter, r *http.Request)(){
+       ctx, cancel := context.WithCancel(context.Background())
+       defer cancel()
+//       var insecureFlag = flag.Bool("insecure", true, insecureDescription)
+       fmt.Println(*ENVinsecureFlag)
+	logger.Debug(*ENVinsecureFlag)
+       //fmt.Println("Inside Vcenter get details !!!!!!!!! 1")
+
+       flag.Parse()
+//	var urlFlag = flag.String("url", EnvURL, urlDescription)
+  //     // Parse URL from string
+       u, err := url.Parse(*ENVurlFlag)
+       if err != nil {
+	       logger.Error("Error: ",err)
+              exit(err)
+       }
+
+       // Override username and/or password as required
+       ProcessOverride(u)
+
+       // Connect and log in to ESX or vCenter
+       c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
+       if err != nil {
+	       logger.Error("Error: ",err)
+              exit(err)
+       }
+
+       f := find.NewFinder(c.Client, true)
+
+       // Find one and only datacenter
+       dc, err := f.DefaultDatacenter(ctx)
+       if err != nil {
+	       logger.Error("Error: ",err)
+              exit(err)
+       }
+
+       // Make future calls local to this datacenterth
+       f.SetDatacenter(dc)
+
+       // Find virtual machines in datacenter
+       vms, err := f.VirtualMachineList(ctx, "*")
+       fmt.Println(vms)
+	logger.Info(vms)
+
+       pc := property.DefaultCollector(c.Client)
+
+       var refv []types.ManagedObjectReference
+       for _, ds := range vms {
+              refv = append(refv, ds.Reference())
+       }
+
+       // Retrieve name property for all vms
+       var vmt []mo.VirtualMachine
+       err = pc.Retrieve(ctx, refv, []string{"summary"}, &vmt)
+       if err != nil {
+	       logger.Error("Error: ",err)
+              exit(err)
+       }
+
+       // Print summary
+       tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
+
+       logger.Info("Virtual machines found:", len(vmt))
+       logger.Info(w,   "{\"Value\" : [")
+	fmt.Fprintf(w, "{\"Value\" : [")
+       for _, vm := range vmt {
+              //fmt.Fprintf(tw, "%s\n", vm.Name)
+              logger.Info("VM Name : ", vm.Summary.Config.Name)
+              logger.Info("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
+              logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
+              logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
+              //_ = json.NewEncoder(os.Stdout).Encode(&vm)
+              output := vmwarestructs.StaticDynamicValues{VMName:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumCpu:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Config.GuestFullName,IpAddress:vm.Summary.Guest.IpAddress,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024),MemoryOverhead  :vm.Summary.Runtime.MemoryOverhead ,MaxCpuUsage :vm.Summary.Runtime.MaxCpuUsage,Uncommitted:vm.Summary.Storage.Uncommitted,Unshared:vm.Summary.Storage.Unshared}
+              _ = json.NewEncoder(w).Encode(output)
+	       logger.Info(",")
+             fmt.Fprintf(w, ",")
+       }
+	logger.Info("{}]}")
+      fmt.Fprintf(w, "{}]}")
+//,PowerState:vm.Summary.Runtime.PowerState
+       tw.Flush()
+}
 
 func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Request)() {
 	tx := db.Begin()
@@ -205,7 +272,9 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
        logger.Info("Virtual machines found:", len(vmt))
-       logger.Info(w, "[")
+	logger.Info(w,"{\"Value\" : [")
+
+       fmt.Fprintf(w, "{\"Value\" : [")
        for _, vm := range vmt {
               //fmt.Fprintf(tw, "%s\n", vm.Name)
               logger.Info("VM Name : ", vm.Summary.Config.Name)
@@ -213,13 +282,13 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
               logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
               logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
               //_ = json.NewEncoder(os.Stdout).Encode(&vm)
-              output := DynamicValues{VMName:vm.Summary.Config.Name,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024)}
+              output := vmwarestructs.DynamicValues{VMName:vm.Summary.Config.Name,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024)}
               _ = json.NewEncoder(w).Encode(output)
 	       logger.Info(",")
              fmt.Fprintf(w, ",")
        }
-	logger.Info("{}]")
-      fmt.Fprintf(w, "{}]")
+	logger.Info("{}]}")
+      fmt.Fprintf(w, "{}]}")
 
        tw.Flush()
 }

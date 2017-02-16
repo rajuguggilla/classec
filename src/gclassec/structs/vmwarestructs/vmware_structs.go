@@ -1,7 +1,6 @@
 package vmwarestructs
 
 
-
 type VmwareInstances struct{
 
 	Name string 		`gorm:"column:Name"`
@@ -13,3 +12,28 @@ type VmwareInstances struct{
 	IPaddress string        `gorm:"column:IPaddress"`
 
 }
+
+
+type DynamicValues struct{
+	VMName			string
+	OverallCpuUsage         int32
+	GuestMemoryUsage	int32
+	StorageCommitted	float32
+}
+type StaticDynamicValues struct{
+	VMName              string
+	Uuid                string
+	MemorySizeMB        int32
+	PowerState          string
+	NumCpu              int32
+	GuestFullName       string
+	IpAddress           string
+	OverallCpuUsage         int32
+	GuestMemoryUsage	int32
+	StorageCommitted	float32
+	MemoryOverhead  		int64
+	MaxCpuUsage 		 int32
+	Uncommitted int64
+	Unshared    int64
+}
+

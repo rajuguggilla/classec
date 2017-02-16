@@ -122,6 +122,8 @@ func main() {
 
         mx.HandleFunc("/dbaas/vcenterDetail/static", vc.GetVcenterDetails).Methods("GET")
 
+        mx.HandleFunc("/dbaas/vcenterDetail/staticdynamic", vc.GetStaticDynamicVcenterDetails).Methods("GET")
+
         mx.HandleFunc("/selectProvider", uc1.SelectProvider)
 
         mx.HandleFunc("/selectedOs", uc1.OpenstackCreds)
