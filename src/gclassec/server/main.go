@@ -26,6 +26,7 @@ import (
     //"gclassec/controllers/vmwarecontroller"
     "gclassec/dao/vmwareinsert"
     "gclassec/controllers/vmwarecontroller"
+    "gclassec/dao/instancetags"
 )
 
 type Configuration struct {
@@ -145,6 +146,8 @@ func main() {
         mx.HandleFunc("/vmware/updatecredentials",uc1.UpdateVmwareCredentials).Methods("POST")
 
         mx.HandleFunc("/azure/updatecredentials",uc1.UpdateAzureCredentials).Methods("POST")
+
+        mx.HandleFunc("/instanceTag", instancetags.InstanceProvider).Methods("POST")
 
         http.Handle("/", mx)
         // Fire up the server

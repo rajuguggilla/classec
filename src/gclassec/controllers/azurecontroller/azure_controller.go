@@ -17,6 +17,7 @@ import(
 	"gclassec/goclientazure"
 	"gclassec/readcredentials"
 	"gclassec/loggers"
+	"gclassec/structs/tagstruct"
 )
 type (
 
@@ -76,7 +77,14 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 
 	ls, _ := ac.ListAll()
 
+	tx := db.Begin()
+	db.SingularTable(true)
+
 	obj := &azurestruct.VirtualMachineStaticDynamic{}
+	tag := []tagstruct.Providers{}
+
+	db.Where("Cloud = ?", "azure").Find(&tag)
+
 	fmt.Fprintf(w, "{\"Value\":[")
 	for _, element := range *ls.Value {
 		rgroup := *(element.AvailabilitySet.ID)
@@ -91,13 +99,16 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		fmt.Println(dlist)
 		logger.Info(dlist)
 		for _, element1 := range *dlist.Value {
-			obj = &azurestruct.VirtualMachineStaticDynamic{VmName:element.Name, Type:element.Type, Location:element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:element.VMID, Publisher:element.StorageProfile.ImageReference.Publisher, Offer:element.StorageProfile.ImageReference.Offer, SKU:element.StorageProfile.ImageReference.Sku, AvailabilitySetName:element.AvailabilitySet.ID, Provisioningstate:element.ProvisioningState, ResourcegroupName:rsgroup,TimeStamp:element1.Data[len(element1.Data)-2].TimeStamp,Average:element1.Data[len(element1.Data)-2].Average}
+			for _, el := range tag {
+				obj = &azurestruct.VirtualMachineStaticDynamic{VmName:element.Name, Type:element.Type, Location:element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:element.VMID, Publisher:element.StorageProfile.ImageReference.Publisher, Offer:element.StorageProfile.ImageReference.Offer, SKU:element.StorageProfile.ImageReference.Sku, AvailabilitySetName:element.AvailabilitySet.ID, Provisioningstate:element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:element1.Data[len(element1.Data) - 2].TimeStamp, Average:element1.Data[len(element1.Data) - 2].Average,Tagname:el.Tagname}
+			}
 		}
 	}
 	fmt.Println(obj)
 	logger.Info(obj)
 	_ = json.NewEncoder(w).Encode(&obj)
 	fmt.Fprintf(w, "]}")
+	tx.Commit()
 }
 
 func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Request)(){

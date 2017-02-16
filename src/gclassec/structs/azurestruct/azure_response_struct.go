@@ -846,6 +846,7 @@ type VirtualMachineStaticDynamic struct{
 	ResourcegroupName string	`json:"ResourcegroupName,omitempty"`
 	TimeStamp    *date.Time   	`json:"TimeStamp,omitempty"`
 	Average      *float64     	`json:"Average,omitempty"`
+	Tagname string			`json:"Tagname,omitempty"`
 	/*autorest.Response `json:"-"`
 	Value             *VirtualMachineListResult `json:"value,omitempty"`
 	NextLink          *string           `json:"nextLink,omitempty"`
