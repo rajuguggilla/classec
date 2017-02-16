@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 )
 
 //MyLogger custom logger
@@ -18,16 +19,18 @@ type MyLogger struct {
 //New returns logger
 //TODO : deal with error
 func New() *MyLogger {
+	ct := time.Now()
+	dt := string(ct.Local().Format("2006-01-02"))
 	filename := "newlogs.go"
 	_, filePath, _, _ := runtime.Caller(0)
 	//fmt.Println("CurrentFilePath:==",filePath)
-	ErrorFilePath :=(strings.Replace(filePath, filename, "log_error.txt", 1))
+	ErrorFilePath :=(strings.Replace(filePath, filename, "log_error-"+dt+".log", 1))
 	//fmt.Println("Error File Path:==",ErrorFilePath)
-	InfoFilePath :=(strings.Replace(filePath, filename, "log_info.txt", 1))
+	InfoFilePath :=(strings.Replace(filePath, filename, "log_info-"+dt+".log", 1))
 	//fmt.Println("Info File Path:==",InfoFilePath)
-	DebugFilePath :=(strings.Replace(filePath, filename, "log_debug.txt", 1))
+	DebugFilePath :=(strings.Replace(filePath, filename, "log_debug-"+dt+".log", 1))
 	//fmt.Println("Debug File Path:==",DebugFilePath)
-	WarnFilePath :=(strings.Replace(filePath, filename, "log_warn.txt", 1))
+	WarnFilePath :=(strings.Replace(filePath, filename, "log_warn-"+dt+".log", 1))
 	//fmt.Println("Warning File Path:==",WarnFilePath)
 	ml := new(MyLogger)
 	if logFile, err := os.OpenFile(ErrorFilePath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666); err == nil {
