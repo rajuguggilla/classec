@@ -27,7 +27,7 @@ func NewUserController() *UserController {
     return &UserController{}
 }
 var logger = Loggers.New()
-var counter = 0
+//var counter = 0
 var dbcredentials1 = readazureconf.Configurtion()
 var dbtype string = dbcredentials1.Dbtype
 var dbname  string = dbcredentials1.Dbname
@@ -43,6 +43,7 @@ var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
 
 func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Request)(){
+	counter := 0
 	var azureCreds = readazurecreds.Configurtion()
 	os.Setenv("AZURE_CLIENT_ID", azureCreds.ClientId)
 	os.Setenv("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
