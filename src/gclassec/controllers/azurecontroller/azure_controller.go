@@ -83,7 +83,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	obj := &azurestruct.VirtualMachineStaticDynamic{}
 	tag := []tagstruct.Providers{}
 
-	db.Where("Cloud = ?", "azure").Find(&tag)
+	db.Where("Cloud = ?", "azure").Or("Cloud = ?", "Azure").Find(&tag)
 
 	fmt.Fprintf(w, "{\"Value\":[")
 	for _, element := range *ls.Value {

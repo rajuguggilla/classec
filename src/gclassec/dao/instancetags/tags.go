@@ -49,5 +49,6 @@ func InstanceProvider(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.InstanceId)
 		user := tagstruct.Providers{InstanceId:r.InstanceId, Cloud:r.Cloud, Tagname:r.Tagname}
 		db.Create(&user)
+		db.Model(&user).Updates(&user)
 	}
 }
