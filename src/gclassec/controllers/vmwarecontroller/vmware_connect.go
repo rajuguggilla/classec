@@ -88,7 +88,7 @@ func ProcessOverride(u *url.URL) {
 func exit(err error) {
 	logger.Error(os.Stderr, "Error: %s\n", err)
 	fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-	os.Exit(1)
+	//os.Exit(1)
 }
 
 
