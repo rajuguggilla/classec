@@ -22,6 +22,7 @@ import (
 	"github.com/vmware/govmomi/units"
 	"gclassec/loggers"
 	"github.com/vmware/govmomi/vim25/types"
+
 )
 
 //const (
@@ -171,20 +172,34 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
        logger.Info("Virtual machines found:", len(vmt))
        logger.Info(w,   "{\"Value\" : [")
 	fmt.Fprintf(w, "{\"Value\" : [")
-       for _, vm := range vmt {
+       //for _, vm := range vmt {
+       //       //fmt.Fprintf(tw, "%s\n", vm.Name)
+       //       logger.Info("VM Name : ", vm.Summary.Config.Name)
+       //       logger.Info("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
+       //       logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
+       //       logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
+       //       //_ = json.NewEncoder(os.Stdout).Encode(&vm)
+       //       output := vmwarestructs.StaticDynamicValues{VMName:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumCpu:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Config.GuestFullName,IpAddress:vm.Summary.Guest.IpAddress,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024),MemoryOverhead  :vm.Summary.Runtime.MemoryOverhead ,MaxCpuUsage :vm.Summary.Runtime.MaxCpuUsage,Uncommitted:vm.Summary.Storage.Uncommitted,Unshared:vm.Summary.Storage.Unshared}
+       //       _ = json.NewEncoder(w).Encode(output)
+	//       logger.Info(",")
+       //      fmt.Fprintf(w, ",")
+       //}
+	for i:=0; i<len(vmt); i++ {
               //fmt.Fprintf(tw, "%s\n", vm.Name)
-              logger.Info("VM Name : ", vm.Summary.Config.Name)
-              logger.Info("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
-              logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
-              logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
+              logger.Info("VM Name : ", vmt[i].Summary.Config.Name)
+              logger.Info("Overall CPU : ", vmt[i].Summary.QuickStats.OverallCpuUsage)
+              logger.Info("Guest memory : ", vmt[i].Summary.QuickStats.GuestMemoryUsage)
+              logger.Info("Committed storage : ", units.ByteSize(vmt[i].Summary.Storage.Committed))
               //_ = json.NewEncoder(os.Stdout).Encode(&vm)
-              output := vmwarestructs.StaticDynamicValues{VMName:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumCpu:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Config.GuestFullName,IpAddress:vm.Summary.Guest.IpAddress,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024),MemoryOverhead  :vm.Summary.Runtime.MemoryOverhead ,MaxCpuUsage :vm.Summary.Runtime.MaxCpuUsage,Uncommitted:vm.Summary.Storage.Uncommitted,Unshared:vm.Summary.Storage.Unshared}
+              output := vmwarestructs.StaticDynamicValues{VMName:vmt[i].Summary.Config.Name,Uuid:vmt[i].Summary.Config.Uuid,MemorySizeMB:vmt[i].Summary.Config.MemorySizeMB,PowerState:string(vmt[i].Summary.Runtime.PowerState),NumCpu:vmt[i].Summary.Config.NumCpu,GuestFullName:vmt[i].Summary.Config.GuestFullName,IpAddress:vmt[i].Summary.Guest.IpAddress,OverallCpuUsage:vmt[i].Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vmt[i].Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vmt[i].Summary.Storage.Committed)/float32(1024*1024*1024),MemoryOverhead:vmt[i].Summary.Runtime.MemoryOverhead ,MaxCpuUsage:vmt[i].Summary.Runtime.MaxCpuUsage,Uncommitted:vmt[i].Summary.Storage.Uncommitted,Unshared:vmt[i].Summary.Storage.Unshared}
               _ = json.NewEncoder(w).Encode(output)
-	       logger.Info(",")
-             fmt.Fprintf(w, ",")
+	      if i< (len(vmt)-1){
+		     logger.Info(",")
+		     fmt.Fprintf(w, ",")
+	     }
        }
-	logger.Info("{}]}")
-      fmt.Fprintf(w, "{}]}")
+	logger.Info("]}")
+      fmt.Fprintf(w, "]}")
 //,PowerState:vm.Summary.Runtime.PowerState
        tw.Flush()
 }
@@ -275,20 +290,37 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
 	logger.Info(w,"{\"Value\" : [")
 
        fmt.Fprintf(w, "{\"Value\" : [")
-       for _, vm := range vmt {
+       //for _, vm := range vmt {
+       //       //fmt.Fprintf(tw, "%s\n", vm.Name)
+       //       logger.Info("VM Name : ", vm.Summary.Config.Name)
+       //       logger.Info("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
+       //       logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
+       //       logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
+       //       //_ = json.NewEncoder(os.Stdout).Encode(&vm)
+       //       output := vmwarestructs.DynamicValues{VMName:vm.Summary.Config.Name,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024)}
+       //       _ = json.NewEncoder(w).Encode(output)
+	//       logger.Info(",")
+	//
+       //      fmt.Fprintf(w, ",")
+       //}
+	for i:=0; i<len(vmt); i++ {
               //fmt.Fprintf(tw, "%s\n", vm.Name)
-              logger.Info("VM Name : ", vm.Summary.Config.Name)
-              logger.Info("Overall CPU : ", vm.Summary.QuickStats.OverallCpuUsage)
-              logger.Info("Guest memory : ", vm.Summary.QuickStats.GuestMemoryUsage)
-              logger.Info("Committed storage : ", units.ByteSize(vm.Summary.Storage.Committed))
+              logger.Info("VM Name : ", vmt[i].Summary.Config.Name)
+              logger.Info("Overall CPU : ", vmt[i].Summary.QuickStats.OverallCpuUsage)
+              logger.Info("Guest memory : ", vmt[i].Summary.QuickStats.GuestMemoryUsage)
+              logger.Info("Committed storage : ", units.ByteSize(vmt[i].Summary.Storage.Committed))
               //_ = json.NewEncoder(os.Stdout).Encode(&vm)
-              output := vmwarestructs.DynamicValues{VMName:vm.Summary.Config.Name,OverallCpuUsage:vm.Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vm.Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024)}
+              output := vmwarestructs.DynamicValues{VMName:vmt[i].Summary.Config.Name,OverallCpuUsage:vmt[i].Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vmt[i].Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vmt[i].Summary.Storage.Committed)/float32(1024*1024*1024)}
               _ = json.NewEncoder(w).Encode(output)
-	       logger.Info(",")
-             fmt.Fprintf(w, ",")
+
+	     if i< (len(vmt)-1){
+		     logger.Info(",")
+		     fmt.Fprintf(w, ",")
+	     }
+
        }
-	logger.Info("{}]}")
-      fmt.Fprintf(w, "{}]}")
+	logger.Info("]}")
+      fmt.Fprintf(w, "]}")
 
        tw.Flush()
 }

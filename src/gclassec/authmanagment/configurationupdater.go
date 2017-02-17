@@ -10,6 +10,13 @@ import(
 	"os"
 	"gclassec/loggers"
 )
+const updatingFileName = "authmanagment/configurationupdater.go"
+const awsFileName = "conf/awscred.json"
+const azureFileName = "conf/azurecred.json"
+const hosFileName = "conf/hosconfiguration.json"
+const osFileName = "conf/computeVM.json"
+const vmwareFileName = "conf/vmwareconf.json"
+
 
 var logger = Loggers.New()
 
@@ -58,10 +65,10 @@ func AwsCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	//fmt.Println(bodyString)
-	filename := "authmanagment/configurationupdater.go"
+	//filename := "authmanagment/configurationupdater.go"
 	_, filePath, _, _ := runtime.Caller(0)
         logger.Debug("\nCurrentFilePath:==",filePath)
-        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/awscred.json", 1))
+        ConfigFilePath :=(strings.Replace(filePath, updatingFileName, awsFileName, 1))
         logger.Debug("\nABSPATH:==",ConfigFilePath)
 	resp:= MyFileWriter(bodyString, ConfigFilePath)
 	fmt.Fprintf(w,resp)
@@ -78,10 +85,10 @@ func AzureCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "authmanagment/configurationupdater.go"
+	//filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         logger.Debug("CurrentFilePath:==",filePath)
-        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/azurecred.json", 1))
+        ConfigFilePath :=(strings.Replace(filePath, updatingFileName, azureFileName, 1))
         logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
@@ -97,10 +104,10 @@ func OpenstackCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	logger.Info(bodyString)
-	filename := "authmanagment/configurationupdater.go"
+	//filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         logger.Debug("CurrentFilePath:==",filePath)
-        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
+        ConfigFilePath :=(strings.Replace(filePath, updatingFileName, osFileName, 1))
         logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
@@ -117,10 +124,10 @@ func VmwareCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "authmanagment/configurationupdater.go"
+	//filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         logger.Debug("CurrentFilePath:==",filePath)
-        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/vmwareconf.json", 1))
+        ConfigFilePath :=(strings.Replace(filePath, updatingFileName, vmwareFileName, 1))
         logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
@@ -138,10 +145,10 @@ func HosCredentials(w http.ResponseWriter, r *http.Request){
 	// Use the content
 	bodyString := string(bodyBytes)
 	fmt.Println(bodyString)
-	filename := "authmanagment/configurationupdater.go"
+	//filename := "authmanagment/configurationupdater.go"
         _, filePath, _, _ := runtime.Caller(0)
         logger.Debug("CurrentFilePath:==",filePath)
-        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/hosconfiguration.json", 1))
+        ConfigFilePath :=(strings.Replace(filePath, updatingFileName, hosFileName, 1))
         logger.Debug("ABSPATH:==",ConfigFilePath)
 	resp:=(MyFileWriter(bodyString, ConfigFilePath))
 	fmt.Fprintf(w,resp)
