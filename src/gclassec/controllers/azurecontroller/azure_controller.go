@@ -118,7 +118,8 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		if counter < len(*ls.Value){
 		     logger.Info(",")
 		     fmt.Fprintf(w, ",")
-	     }
+
+	     }else {counter=0}
 	}
 	fmt.Println(obj)
 	logger.Info(obj)
