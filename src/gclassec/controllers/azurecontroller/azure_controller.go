@@ -27,7 +27,7 @@ func NewUserController() *UserController {
     return &UserController{}
 }
 var logger = Loggers.New()
-
+var counter = 0
 var dbcredentials1 = readazureconf.Configurtion()
 var dbtype string = dbcredentials1.Dbtype
 var dbname  string = dbcredentials1.Dbname
@@ -87,10 +87,14 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 
 	fmt.Fprintf(w, "{\"Value\":[")
 	for _, element := range *ls.Value {
+		counter++
 		rgroup := *(element.AvailabilitySet.ID)
 		resourcegroupname := strings.Split(rgroup, "/")
 		rsgroup := resourcegroupname[4]
 		vmName := *(element.Name)
+		vmId := *(element.VMID)
+		fmt.Println("Hello")
+		fmt.Println(*(element.VMID))
 
 		dc := goclientazure.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
 		dc.Authorizer = spt
@@ -100,13 +104,25 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		logger.Info(dlist)
 		for _, element1 := range *dlist.Value {
 			for _, el := range tag {
-				obj = &azurestruct.VirtualMachineStaticDynamic{VmName:element.Name, Type:element.Type, Location:element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:element.VMID, Publisher:element.StorageProfile.ImageReference.Publisher, Offer:element.StorageProfile.ImageReference.Offer, SKU:element.StorageProfile.ImageReference.Sku, AvailabilitySetName:element.AvailabilitySet.ID, Provisioningstate:element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:element1.Data[len(element1.Data) - 2].TimeStamp, Average:element1.Data[len(element1.Data) - 2].Average,Tagname:el.Tagname}
+				if vmId != el.InstanceId {
+					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Tagname:"Nil"}
+				}else {
+					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Tagname:el.Tagname}
+				}
+				_ = json.NewEncoder(w).Encode(&obj)
+
+
 			}
+
 		}
+		if counter < len(*ls.Value){
+		     logger.Info(",")
+		     fmt.Fprintf(w, ",")
+	     }
 	}
 	fmt.Println(obj)
 	logger.Info(obj)
-	_ = json.NewEncoder(w).Encode(&obj)
+	//_ = json.NewEncoder(w).Encode(&obj)
 	fmt.Fprintf(w, "]}")
 	tx.Commit()
 }

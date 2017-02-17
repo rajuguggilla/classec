@@ -833,19 +833,19 @@ type VirtualMachineInstanceView struct {
 }
 
 type VirtualMachineStaticDynamic struct{
-	VmName *string 			`json:"VmName,omitempty"`
-	Type *string 			`json:"Type,omitempty"`
-	Location *string 		`json:"Location,omitempty"`
+	VmName string 			`json:"VmName,omitempty"`
+	Type string 			`json:"Type,omitempty"`
+	Location string 		`json:"Location,omitempty"`
 	VmSize string           	`json:"VmSize,omitempty"`
-	Publisher *string 		`json:"Publisher,omitempty"`
-	Offer *string 			`json:"Offer,omitempty"`
-	SKU *string 			`json:"SKU,omitempty"`
-	VmId *string			`json:"VmId,omitempty"`
-	AvailabilitySetName *string 	`json:"AvailabilitySetName,omitempty"`
-	Provisioningstate *string	`json:"Provisioningstate,omitempty"`
+	Publisher string 		`json:"Publisher,omitempty"`
+	Offer string 			`json:"Offer,omitempty"`
+	SKU string 			`json:"SKU,omitempty"`
+	VmId string			`json:"VmId,omitempty"`
+	AvailabilitySetName string 	`json:"AvailabilitySetName,omitempty"`
+	Provisioningstate string	`json:"Provisioningstate,omitempty"`
 	ResourcegroupName string	`json:"ResourcegroupName,omitempty"`
-	TimeStamp    *date.Time   	`json:"TimeStamp,omitempty"`
-	Average      *float64     	`json:"Average,omitempty"`
+	TimeStamp    date.Time   	`json:"TimeStamp,omitempty"`
+	Average      float64     	`json:"Average,omitempty"`
 	Tagname string			`json:"Tagname,omitempty"`
 	/*autorest.Response `json:"-"`
 	Value             *VirtualMachineListResult `json:"value,omitempty"`
