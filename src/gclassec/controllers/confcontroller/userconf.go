@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"gclassec/authmanagment"
 	"gclassec/loggers"
+	"encoding/json"
 )
 
 var redirectTarget string
@@ -221,15 +222,37 @@ func (uc UserController) UpdateAwsCredentials(w http.ResponseWriter, r *http.Req
 
 }
 
+func (uc UserController) GetAwsCredentials(w http.ResponseWriter, r *http.Request){
+
+	resp := authmanagment.ReadAwsCredentials()
+	_ = json.NewEncoder(w).Encode(&resp)
+
+
+}
+
 func (uc UserController) UpdateAzureCredentials(w http.ResponseWriter, r *http.Request){
 
 	authmanagment.AzureCredentials(w, r)
 
 }
 
+func (uc UserController) GetAzureCredentials(w http.ResponseWriter, r *http.Request){
+
+	resp := authmanagment.ReadAzureCredentials()
+	_ = json.NewEncoder(w).Encode(&resp)
+}
+
 func (uc UserController) UpdateOsCredentials(w http.ResponseWriter, r *http.Request){
 
 	authmanagment.OpenstackCredentials(w, r)
+
+}
+
+func (uc UserController) GetOsCredentials(w http.ResponseWriter, r *http.Request){
+
+
+	resp := authmanagment.ReadOpenstackCredentials()
+	_ = json.NewEncoder(w).Encode(&resp)
 
 }
 
@@ -239,8 +262,21 @@ func (uc UserController) UpdateHosCredentials(w http.ResponseWriter, r *http.Req
 
 }
 
+func (uc UserController) GetHosCredentials(w http.ResponseWriter, r *http.Request){
+
+	resp := authmanagment.ReadHosCredentials()
+	_ = json.NewEncoder(w).Encode(&resp)
+
+}
+
 func (uc UserController) UpdateVmwareCredentials(w http.ResponseWriter, r *http.Request){
 
 	authmanagment.VmwareCredentials(w, r)
 
+}
+
+func (uc UserController) GetVmwareCredentials(w http.ResponseWriter, r *http.Request){
+
+	resp := authmanagment.ReadVmwareCredentials()
+	_ = json.NewEncoder(w).Encode(&resp)
 }

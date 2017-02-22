@@ -48,7 +48,7 @@ func checkEnvVar(envVars *map[string]string) error {
 	return nil
 }
 
-func AzureInsert() {
+func AzureInsert() error{
 	var azureCreds = readazurecreds.Configurtion()
 	os.Setenv("AZURE_CLIENT_ID", azureCreds.ClientId)
 	os.Setenv("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
@@ -65,17 +65,22 @@ func AzureInsert() {
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
 		logger.Error("Error: %v", err)
-		return
+		fmt.Println("\n\n Failed to connect AZURE")
+		return err
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
 		logger.Error("Error: %v", err)
-		return
+		fmt.Println("\n\n Failed to connect AZURE")
+		return err
 	}
 	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
 	ac.Authorizer = spt
 
-	ls, _ := ac.ListAll()
+	ls, err := ac.ListAll()
+	if err != nil{
+		return err
+	}
 	_ = json.NewEncoder(os.Stdout).Encode(&ls)
 
 	//var drggroup string
@@ -99,5 +104,5 @@ func AzureInsert() {
 
 	_ = json.NewEncoder(os.Stdout).Encode(&dlist)*/
 
-
+	return nil
 }

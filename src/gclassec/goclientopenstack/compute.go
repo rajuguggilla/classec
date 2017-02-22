@@ -116,10 +116,18 @@ func Compute() []compute.DetailResponse {
 	return computeDetails
 }
 
-func FinalCompute() []compute.DetailResponse {
+func FinalCompute() ([]compute.DetailResponse, error) {
 	logger := Loggers.New()
 	var flvObj []flavor.DetailResponse
-	flvObj = flavor.Flavor()
+	flvObj, err := flavor.Flavor()
+
+		if err !=nil{
+			fmt.Println("Failed to connect Openstack")
+			return []compute.DetailResponse{}, err
+		}
+
+
+
 	logger.Info("&**********Showing FLVOBJ&************")
 	logger.Info(flvObj)
 	logger.Info("*********************")
@@ -142,6 +150,7 @@ func FinalCompute() []compute.DetailResponse {
 	out, err := json.Marshal(obj)
 	if err != nil {
         	logger.Error (err)
+		return []compute.DetailResponse{}, err
     	}
 	logger.Info("Out Sritng")
 	logger.Info(string(out))
@@ -161,5 +170,5 @@ func FinalCompute() []compute.DetailResponse {
 			logger.Info(tempVar1[j])
 		}
 	}
-	return obj
+	return obj, nil
 }

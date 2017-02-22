@@ -81,11 +81,20 @@ func ProcessOverride(u *url.URL) {
 
 func exit(err error) {
 	logger.Error(os.Stderr, "Error: %s\n", err)
-	fmt.Fprintf(os.Stderr, "Error: %s\n", err)
-	os.Exit(1)
+	//fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+	//os.Exit(1)
+
 }
 
-func VmwareInsert(){
+
+/*func VmWareInsertDB(){
+	err := VmwareInsert()
+	if err != nil{
+
+	}
+}*/
+
+func VmwareInsert() error{
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -114,7 +123,9 @@ func VmwareInsert(){
 	u, err := url.Parse(*urlFlag)
 	if err != nil {
 		logger.Error("Error: ",err)
-		fmt.Println(err)
+		//fmt.Println(err)
+		//exit(err)
+		return err
 	}
 
 	// Override username and/or password as required
@@ -123,8 +134,12 @@ func VmwareInsert(){
 	// Connect and log in to ESX or vCenter
 	c, err := govmomi.NewClient(ctx, u, *insecureFlag)
 	if err != nil {
+		logger.Error("\n\n Failed to connect VMWare  ")
+		fmt.Println("\n\n Failed to connect VMWare ")
 		logger.Error("Error: ",err)
-		fmt.Println(err)
+		//fmt.Println(err)
+		//exit(err)
+		return err
 	}
 
 	f := find.NewFinder(c.Client, true)
@@ -133,7 +148,9 @@ func VmwareInsert(){
 	dc, err := f.DefaultDatacenter(ctx)
 	if err != nil {
 		logger.Error("Error: ",err)
-		fmt.Println(err)
+		//fmt.Println(err)
+		//exit(err)
+		return err
 	}
 
 	// Make future calls local to this datacenter
@@ -157,6 +174,7 @@ func VmwareInsert(){
 	if err != nil {
 		logger.Error("Error: ",err)
   		fmt.Println(err)
+		return err
 	}
 
 
@@ -173,4 +191,6 @@ func VmwareInsert(){
 	}
 	logger.Info("Successful in VmWareInsert.")
 	tw.Flush()
+
+	return nil
 }

@@ -8,82 +8,84 @@ import (
 	"net/http"
 	"io/ioutil"
 	"gclassec/loggers"
+	"gclassec/structs/hosstruct"
 )
 
 
-type HOSAutToken struct{
-	Access 	AccessStruct	`json:"access"`
-}
+//type HOSAutToken struct{
+//	Access 	AccessStruct	`json:"access"`
+//}
+//
+//
+//type  AccessStruct struct {
+//	Token  		TokenStruct		`json:"token"`
+//	ServiceCatalog	[]ServiceCatalogStruct	`json:"serviceCatalog"`
+//	User		UserStruct		`json:"user"`
+//	Metadata	Metadata		`json:"metadata"`
+//
+//}
+//
+//type TokenStruct struct{
+//	Issued_at	string		`json:"issued_at"`
+//	Expires		string		`json:"expires"`
+//	AuthToken	string		`json:"id"`
+//	Tenant		TenantStruct	`json:"tenant"`
+//	Audit_ids	[]string	`json:"audit_ids"`
+//}
+//type TenantStruct struct{
+//	Description	string		`json:"description"`
+//	Enabled		bool		`json:"enabled"`
+//	TenanatID	string		`json:"id"`
+//	TenantName	string		`json:"name"`
+//}
+//
+//type ServiceCatalogStruct struct{
+//	Endpoints		[]EndpointsStruct	`json:"endpoints"`
+//	Endpoints_links		[]string		`json:"endpoints_links"`
+//	EndpointType		string			`json:"type"`
+//	EndpointName		string			`json:"name"`
+//}
+//type EndpointsStruct struct{
+//	AdminURL		string	`json:"adminURL"`
+//	Region			string	`json:"region"`
+//	EndpiontID		string	`json:"id"`
+//	InternalURL		string	`json:"internalURL"`
+//	PublicURL		string	`json:"publicURL"`
+//}
+//
+//type UserStruct struct{
+//	UserName	string		`json:"username"`
+//	Roles_links	[]string	`json:"roles_links"`
+//	UserID		string		`json:"id"`
+//	Roles		[]RolesStruct	`json:"roles"`
+//	Name		string		`json:"name"`
+//}
+//
+//type RolesStruct struct{
+//	RoleName 	string		`json:"name"`
+//}
+//
+//type Metadata struct{
+//	Is_admin	int64		`json:"is_admin"`
+//	Roles		[]string	`json:"roles"`
+//}
+//
+//
+//type Configuration struct {
+//	IdentityEndpoint	string	`json:"IdentityEndpoint"`
+//    	UserName		string	`json:"userName"`
+//	Password		string	`json:"password"`
+//    	TenantName 		string	`json:"tenantName"`
+//    	TenantId 		string	`json:"tenantID"`
+//	ProjectId		string	`json:"projectID"`
+//	ProjectName		string	`json:"projectName"`
+//    	Container 		string	`json:"container"`
+//    	Region	 		string	`json:"region"`
+//}
 
 var logger = Loggers.New()
 
-type  AccessStruct struct {
-	Token  		TokenStruct		`json:"token"`
-	ServiceCatalog	[]ServiceCatalogStruct	`json:"serviceCatalog"`
-	User		UserStruct		`json:"user"`
-	Metadata	Metadata		`json:"metadata"`
-
-}
-
-type TokenStruct struct{
-	Issued_at	string		`json:"issued_at"`
-	Expires		string		`json:"expires"`
-	AuthToken	string		`json:"id"`
-	Tenant		TenantStruct	`json:"tenant"`
-	Audit_ids	[]string	`json:"audit_ids"`
-}
-type TenantStruct struct{
-	Description	string		`json:"description"`
-	Enabled		bool		`json:"enabled"`
-	TenanatID	string		`json:"id"`
-	TenantName	string		`json:"name"`
-}
-
-type ServiceCatalogStruct struct{
-	Endpoints		[]EndpointsStruct	`json:"endpoints"`
-	Endpoints_links		[]string		`json:"endpoints_links"`
-	EndpointType		string			`json:"type"`
-	EndpointName		string			`json:"name"`
-}
-type EndpointsStruct struct{
-	AdminURL		string	`json:"adminURL"`
-	Region			string	`json:"region"`
-	EndpiontID		string	`json:"id"`
-	InternalURL		string	`json:"internalURL"`
-	PublicURL		string	`json:"publicURL"`
-}
-
-type UserStruct struct{
-	UserName	string		`json:"username"`
-	Roles_links	[]string	`json:"roles_links"`
-	UserID		string		`json:"id"`
-	Roles		[]RolesStruct	`json:"roles"`
-	Name		string		`json:"name"`
-}
-
-type RolesStruct struct{
-	RoleName 	string		`json:"name"`
-}
-
-type Metadata struct{
-	Is_admin	int64		`json:"is_admin"`
-	Roles		[]string	`json:"roles"`
-}
-
-
-type Configuration struct {
-	IdentityEndpoint	string	`json:"IdentityEndpoint"`
-    	UserName		string	`json:"userName"`
-	Password		string	`json:"password"`
-    	TenantName 		string	`json:"tenantName"`
-    	TenantId 		string	`json:"tenantID"`
-	ProjectId		string	`json:"projectID"`
-	ProjectName		string	`json:"projectName"`
-    	Container 		string	`json:"container"`
-    	Region	 		string	`json:"region"`
-}
-
-func GetHOSAuthToken() (string, HOSAutToken, error){
+func GetHOSAuthToken() (string, hosstruct.HOSAutToken, error){
 //func main(){
 	var filename string = "goclienthos/authtoken/getAuthToken.go"
 	_, filePath, _, _ := runtime.Caller(0)
@@ -93,7 +95,7 @@ func GetHOSAuthToken() (string, HOSAutToken, error){
 	logger.Debug("HOSConfigurationFilePath:==",absPath)
 	file, _ := os.Open(absPath)
 	decoder := json.NewDecoder(file)
-	tempConfig := Configuration{}
+	tempConfig := hosstruct.Configuration{}
 	err := decoder.Decode(&tempConfig)
 	if err != nil{
 		logger.Error("ConfigurationError:", err)
@@ -119,7 +121,7 @@ func GetHOSAuthToken() (string, HOSAutToken, error){
 
 	req, err := http.NewRequest("POST", reqURL, strings.NewReader(reqBody))
 	if err != nil{
-			return "", HOSAutToken{}, err
+			return "", hosstruct.HOSAutToken{}, err
 		}
 
 	req.Header.Add("content-type", "application/json")
@@ -130,14 +132,14 @@ func GetHOSAuthToken() (string, HOSAutToken, error){
 
 
 		if err != nil{
-			return "", HOSAutToken{}, err
+			return "", hosstruct.HOSAutToken{}, err
 		}
 
 //	logger.Info("Status:==", res.Status)
 	defer res.Body.Close()
 	respBody, err := ioutil.ReadAll(res.Body)
 
-	var emptyStruct = HOSAutToken{}
+	var emptyStruct = hosstruct.HOSAutToken{}
 		if err != nil{
 			return "", emptyStruct, err
 		}
@@ -150,7 +152,7 @@ func GetHOSAuthToken() (string, HOSAutToken, error){
 	//rBodyInByte := []byte(respBody)
 	//fmt.Println("rBodyInByte",rBodyInByte)
 
-	var jsonAuthTokenBody HOSAutToken
+	var jsonAuthTokenBody hosstruct.HOSAutToken
 
 	//respMarshed,_ := json.Marshal(rBodyInByte)
 	//fmt.Println("marshedRespBody:===",respMarshed)

@@ -7,7 +7,7 @@ type VmwareInstances struct{
 	Uuid string 	        `gorm:"column:Uuid"`
 	MemorySizeMB int32 	`gorm:"column:MemorySizeMB"`
 	PowerState  string	`gorm:"column:PowerState"`
-	NumofCPU int32           `gorm:"column:NumofCPU"`
+	NumofCPU int32          `gorm:"column:NumofCPU"`
 	GuestFullName string 	`gorm:"column:GuestFullName"`
 	IPaddress string        `gorm:"column:IPaddress"`
 
@@ -21,19 +21,28 @@ type DynamicValues struct{
 	StorageCommitted	float32
 }
 type StaticDynamicValues struct{
-	VMName              string
-	Uuid                string
-	MemorySizeMB        int32
-	PowerState          string
-	NumCpu              int32
-	GuestFullName       string
-	IpAddress           string
+	VMName              	string
+	Uuid                	string
+	MemorySizeMB        	int32
+	PowerState          	string
+	NumCpu              	int32
+	GuestFullName       	string
+	IpAddress           	string
 	OverallCpuUsage         int32
 	GuestMemoryUsage	int32
 	StorageCommitted	float32
-	MemoryOverhead  		int64
-	MaxCpuUsage 		 int32
-	Uncommitted int64
-	Unshared    int64
+	MemoryOverhead  	int64
+	MaxCpuUsage 		int32
+	Uncommitted 		int64
+	Unshared    		int64
+}
+
+
+//---------------------------------Structure for Configuration File in OpenStack------------------------------------//
+type Configuration struct {
+    EnvURL		string		`json:"EnvURL"`
+    EnvUserName		string		`json:"EnvUserName"`
+    EnvPassword		string		`json:"EnvPassword"`
+    EnvInsecure		string		`json:"EnvInsecure"`
 }
 

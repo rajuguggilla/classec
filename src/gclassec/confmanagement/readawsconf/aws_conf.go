@@ -9,10 +9,10 @@ import (
 )
 
 type Configuration struct {
-    Dbtype    string
-    Dbname   string
+    	Dbtype    string
+    	Dbname   string
 	Dbusername   string
-    Dbpassword   string
+    	Dbpassword   string
 	Dbhostname   string
 	Dbport   string
 }

@@ -20,3 +20,15 @@ type Instances struct{
 	InsertionDate string 	`sql:"type:date" gorm:"column:insertion_date"`
 
 }
+
+//---------------------------------Structure for Configuration File in OpenStack------------------------------------//
+type Configuration struct {
+    Host    string		`json:"Host"`
+    Username   string		`json:"Username"`
+    Password   string		`json:"Password"`
+    ProjectID   string		`json:"ProjectID"`
+    ProjectName   string	`json:"ProjectName"`
+    Container   string		`json:"Container"`
+    ImageRegion string		`json:"ImageRegion"`
+    Controller string		`json:"Controller"`
+}
