@@ -21,7 +21,7 @@ type Configuration struct {
 	Controller string
 }
 
-func Flavor() []DetailResponse{
+func Flavor() ([]DetailResponse, error){
 	//config := getConfig()
 	logger := Loggers.New()
 	filename := "goclientopenstack/flavor/flavor.go"
@@ -37,6 +37,7 @@ func Flavor() []DetailResponse{
 	err := decoder.Decode(&config)
 	if err != nil {
 		logger.Error("error:", err)
+		//return []DetailResponse{},err
 	}
 
 	// Authenticate with a username, password, tenant id.
@@ -51,11 +52,13 @@ func Flavor() []DetailResponse{
 	if err != nil {
 		panicString := fmt.Sprint("There was an error authenticating:", err)
 		logger.Error(panicString)
-		panic(panicString)
+//		panic(panicString)
+		return []DetailResponse{}, err
+
 	}
 	if !auth.GetExpiration().After(time.Now()) {
 		logger.Error("There was an error. The auth token has an invalid expiration.")
-		panic("There was an error. The auth token has an invalid expiration.")
+		//panic("There was an error. The auth token has an invalid expiration.")
 	}
 	logger.Debug(auth)
 	// Find the endpoint for the Nova Compute service.
@@ -63,16 +66,20 @@ func Flavor() []DetailResponse{
 	url = strings.Replace(url,"compute", creds.Controller ,1)
 	if url == "" || err != nil {
 		logger.Error("EndPoint Not Found.")
-		panic("EndPoint Not Found.")
+	//	panic("EndPoint Not Found.")
 		logger.Error(err)
-		panic(err)
+	//	panic(err)
+
+		return []DetailResponse{},err
 	}
 	// Make a new client with these creds
 	sess, err := openstack.NewSession(nil, auth, nil)
 	if err != nil {
 		panicString := fmt.Sprint("Error creating new Session:", err)
 		logger.Error(panicString)
-		panic(panicString)
+	//	panic(panicString)
+
+		return []DetailResponse{}, err
 	}
 	logger.Info(url)
 	flavorService := Service{
@@ -81,11 +88,18 @@ func Flavor() []DetailResponse{
 		URL:     url, // We're forcing Volume v2 for now
 	}
 	flavorDetails, err := flavorService.FlavorsDetail()
+
+	if err != nil{
+		return []DetailResponse{}, err
+	}
+
+
 	logger.Info(flavorDetails,"00000000000000000000000000")
 	if err != nil {
 		panicString := fmt.Sprint("Cannot access Compute:", err)
 		logger.Error(panicString)
-		panic(panicString)
+	//	panic(panicString)
+		return []DetailResponse{},err
 	}
 	logger.Info("computedetails printing..")
 	logger.Info(flavorDetails)
@@ -97,7 +111,7 @@ func Flavor() []DetailResponse{
 	if len(flavorIDs) == 0 {
 		panicString := fmt.Sprint("No instances found, check to make sure access is correct")
 		logger.Error(panicString)
-		panic(panicString)
+	//	panic(panicString)
 	}
-	return flavorDetails
+	return flavorDetails, nil
 }

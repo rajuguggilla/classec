@@ -32,7 +32,10 @@ var db,err  = gorm.Open(dbtype, c)
 
 func InsertInstances(){
 	//println(examples.ComputeFunc())
-	computeDetails:= goclientcompute.FinalCompute()
+	computeDetails, err:= goclientcompute.FinalCompute()
+	if err != nil{
+		return
+	}
 	println(computeDetails)
 	logger.Info(computeDetails)
 	for _, element := range computeDetails {
