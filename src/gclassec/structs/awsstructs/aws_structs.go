@@ -71,3 +71,9 @@ type Vw_rds struct {
 	Windows_Reserved_cost string `gorm:"column:Windows_Reserved_cost"`
 }
 
+
+//------------------------------------Aws Configuration File Structure----------------------------------------//
+type Configuration struct {
+    AccessKeyID string		`json:"accessKeyID"`
+    AccessKeyValue string	`json:"accessKeyValue"`
+}

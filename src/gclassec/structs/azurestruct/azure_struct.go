@@ -18,3 +18,12 @@ type AzureInstances struct{
 	ResourcegroupName string	`gorm:"column:resourcegroupname"`
 
 }
+
+
+//---------------------------------Structure for Configuration File in Azure------------------------------------//
+type Configuration struct {
+    Clientid		string 		`json:"clientid"`
+    Clientsecret	string		`json:"clientsecret"`
+    Subscriptionid	string		`json:"subscriptionid"`
+    Tenantid		string		`json:"tenantid"`
+}

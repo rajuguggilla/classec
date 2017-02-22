@@ -27,6 +27,7 @@ import (
     "gclassec/dao/vmwareinsert"
     "gclassec/controllers/vmwarecontroller"
     "gclassec/dao/instancetags"
+
 )
 
 type Configuration struct {
@@ -139,13 +140,23 @@ func main() {
 
 	mx.HandleFunc("/hos/updatecredentials",uc1.UpdateHosCredentials).Methods("POST")
 
+        mx.HandleFunc("/hos/readcredentials",uc1.GetHosCredentials).Methods("GET")
+
         mx.HandleFunc("/aws/updatecredentials",uc1.UpdateAwsCredentials).Methods("POST")
+
+        mx.HandleFunc("/aws/readcredentials",uc1.GetAwsCredentials).Methods("GET")
 
         mx.HandleFunc("/openstack/updatecredentials",uc1.UpdateOsCredentials).Methods("POST")
 
+        mx.HandleFunc("/openstack/readcredentials",uc1.GetOsCredentials).Methods("GET")
+
         mx.HandleFunc("/vmware/updatecredentials",uc1.UpdateVmwareCredentials).Methods("POST")
 
+        mx.HandleFunc("/vmware/readcredentials",uc1.GetVmwareCredentials).Methods("GET")
+
         mx.HandleFunc("/azure/updatecredentials",uc1.UpdateAzureCredentials).Methods("POST")
+
+        mx.HandleFunc("/azure/readcredentials",uc1.GetAzureCredentials).Methods("GET")
 
         mx.HandleFunc("/instanceTag", instancetags.InstanceProvider).Methods("POST")
 

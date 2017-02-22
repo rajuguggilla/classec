@@ -1,5 +1,7 @@
 package hosstruct
 
+
+
 type HosInstances struct {
 	Vm_Name	string		`gorm:"column:Name"`
 	InstanceID	string	`gorm:"column:Instance_id"`
@@ -18,7 +20,7 @@ type HosInstances struct {
 }
 
 
-//---------------------------------Structure for CcmputeVM in HOS------------------------------------//
+//---------------------------------Structure for ComputeVM in HOS------------------------------------//
 
 type ComputeResponse struct {
       Servers       []ServersResponse      `json:"servers"`
@@ -99,4 +101,79 @@ type FlavorsStruct struct{
 }
 type FlvRespStruct struct {
 	Flavors []FlavorsStruct		`json:"flavors"`
+}
+
+
+//---------------------------------Structure for AuthToken in HOS------------------------------------//
+
+
+type HOSAutToken struct{
+	Access 	AccessStruct	`json:"access"`
+}
+
+
+type  AccessStruct struct {
+	Token  		TokenStruct		`json:"token"`
+	ServiceCatalog	[]ServiceCatalogStruct	`json:"serviceCatalog"`
+	User		UserStruct		`json:"user"`
+	Metadata	Metadata		`json:"metadata"`
+
+}
+
+type TokenStruct struct{
+	Issued_at	string		`json:"issued_at"`
+	Expires		string		`json:"expires"`
+	AuthToken	string		`json:"id"`
+	Tenant		TenantStruct	`json:"tenant"`
+	Audit_ids	[]string	`json:"audit_ids"`
+}
+type TenantStruct struct{
+	Description	string		`json:"description"`
+	Enabled		bool		`json:"enabled"`
+	TenanatID	string		`json:"id"`
+	TenantName	string		`json:"name"`
+}
+
+type ServiceCatalogStruct struct{
+	Endpoints		[]EndpointsStruct	`json:"endpoints"`
+	Endpoints_links		[]string		`json:"endpoints_links"`
+	EndpointType		string			`json:"type"`
+	EndpointName		string			`json:"name"`
+}
+type EndpointsStruct struct{
+	AdminURL		string	`json:"adminURL"`
+	Region			string	`json:"region"`
+	EndpiontID		string	`json:"id"`
+	InternalURL		string	`json:"internalURL"`
+	PublicURL		string	`json:"publicURL"`
+}
+
+type UserStruct struct{
+	UserName	string		`json:"username"`
+	Roles_links	[]string	`json:"roles_links"`
+	UserID		string		`json:"id"`
+	Roles		[]RolesStruct	`json:"roles"`
+	Name		string		`json:"name"`
+}
+
+type RolesStruct struct{
+	RoleName 	string		`json:"name"`
+}
+
+type Metadata struct{
+	Is_admin	int64		`json:"is_admin"`
+	Roles		[]string	`json:"roles"`
+}
+
+//---------------------------------Structure for Configuration file in HOS------------------------------------//
+type Configuration struct {
+	IdentityEndpoint	string	`json:"IdentityEndpoint"`
+    	UserName		string	`json:"userName"`
+	Password		string	`json:"password"`
+    	TenantName 		string	`json:"tenantName"`
+    	TenantId 		string	`json:"tenantID"`
+	ProjectId		string	`json:"projectID"`
+	ProjectName		string	`json:"projectName"`
+    	Container 		string	`json:"container"`
+    	Region	 		string	`json:"region"`
 }
