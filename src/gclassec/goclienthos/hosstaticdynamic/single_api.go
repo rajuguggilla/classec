@@ -17,16 +17,49 @@ import (
 	"gclassec/structs/hosstruct"
 	"gclassec/errorcodes/errcode"
 	"gclassec/loggers"
+	"gclassec/structs/tagstruct"
+	"regexp"
+	"gclassec/confmanagement/readazureconf"
+	"strings"
+	"github.com/jinzhu/gorm"
 )
 
 
 
+var dbcredentials1 = readazureconf.Configurtion()
+var dbtype string = dbcredentials1.Dbtype
+var dbname  string = dbcredentials1.Dbname
+var dbusername string = dbcredentials1.Dbusername
+var dbpassword string = dbcredentials1.Dbpassword
+var dbhostname string = dbcredentials1.Dbhostname
+var dbport string = dbcredentials1.Dbport
 
+var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
+
+var c string = (strings.Join(b,""))
+
+var db,err  = gorm.Open(dbtype, c)
 
 
 func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 	logger := Loggers.New()
 	//fmt.Println("This to get Nothing")
+	tx := db.Begin()
+	db.SingularTable(true)
+
+	tag := []tagstruct.Providers{}
+
+	//create a regex `(?i)hos` will match string contains "hos" case insensitive
+	reg := regexp.MustCompile("(?i)hos")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag)
+
 	var computeEndpoint string
 	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
 
@@ -108,11 +141,26 @@ func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 		jsonComputeResponse.Servers[k].Cpu_Util=dynamicData
 	}
 
+	for j := 0; j < len(jsonComputeResponse.Servers); j++{
+		if len(tag) == 0 {
+			jsonComputeResponse.Servers[j].Tagname = "Nil"
+		}else {
+			for _, el := range tag {
+				if jsonComputeResponse.Servers[j].InstanceID != el.InstanceId{
+					jsonComputeResponse.Servers[j].Tagname = "Nil"
+				}else {
+					jsonComputeResponse.Servers[j].Tagname = el.Tagname
+				}
+			}
+		}
+	}
+
 
 
 	fmt.Println("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
 
 	fmt.Printf("%+v",jsonComputeResponse)
+	tx.Commit()
 	return jsonComputeResponse
 
 

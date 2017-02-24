@@ -5,6 +5,7 @@ package azurestruct
 //import "github.com/Azure/go-autorest/autorest/date"
 
 type AzureInstances struct{
+	SubscriptionId	string		`gorm:"column:subscriptionid"`
 	VmName string 			`gorm:"column:name"`
 	Type string 			`gorm:"column:type"`
 	Location string 		`gorm:"column:location"`
@@ -16,6 +17,8 @@ type AzureInstances struct{
 	AvailabilitySetName string 	`gorm:"column:availabilitysetid"`
 	Provisioningstate string	`sql:"type:decimal" gorm:"column:provisioningstate"`
 	ResourcegroupName string	`gorm:"column:resourcegroupname"`
+	Tagname string			`gorm:"column:tagname"`
+	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 
 }
 

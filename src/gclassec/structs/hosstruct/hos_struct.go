@@ -15,6 +15,8 @@ type HosInstances struct {
 	VCPU	int32	`gorm:"column:vcpu"`
 	Disk	int32	`gorm:"column:disk"`
 	//Volumes_Attached	string	`gorm:"column:volumes_attached"`
+	Tagname	string	`gorm:"column:tagname"`
+	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 }
 //-------------------------------- Structure to get AuthToken-----------------------------------------//
 
@@ -232,7 +234,8 @@ type CompleteServersResponse struct {
        Vm_Name               string `json:"name"`
        Tenant_Id               string `json:"tenant_id"`
        Power_State               int32 `json:"OS-EXT-STS:power_state"`
-	Cpu_Util	float64
+	Cpu_Util	float64		`json:"Cpu_util"`
+	Tagname	string	`json:"Tagname"`
 
 }
 

@@ -22,6 +22,8 @@ import (
 	"gclassec/loggers"
 
 	"gclassec/errorcodes/errcode"
+	"gclassec/structs/tagstruct"
+	"regexp"
 )
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
@@ -170,20 +172,85 @@ func VmwareInsert() error{
 		return err
 	}
 
+	tx := db.Begin()
+	db.SingularTable(true)
+
+	tag := []tagstruct.Providers{}
+
+	//create a regex `(?i)vmware` will match string contains "vmware" case insensitive
+	reg := regexp.MustCompile("(?i)vmware")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
+
+	fmt.Println("Tag : ", tag)
+
+	vmware_struct := []vmwarestructs.VmwareInstances{}
+	er := db.Find(&vmware_struct).Error
+	if er != nil {
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Find(&vmware_struct)
 
 	// Print summary
 	tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
 	logger.Info("Virtual machines found:", len(vmt))
-	for _, vm := range vmt {
 
-		output := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumofCPU:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Guest.GuestFullName,IPaddress:vm.Summary.Guest.IpAddress}
-		//_ = json.NewEncoder(w).Encode(output)
-		db.Create(&output)
-		db.Model(&output).Updates(&output)
+	for _, element := range vmware_struct {
+       		db.Table("vmware_instances").Where("Name = ?",element.Name).Update("deleted", true)
 	}
+
+	for _, vm := range vmt {
+       		for _, ele := range vmware_struct {
+              if vm.Summary.Config.Name != ele.Name {
+                     continue
+              }else {
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,Tagname:"Nil", Deleted:true}
+                     db.Model(&user).Where("Name =?",vm.Summary.Config.Name).Updates(user)
+
+
+              }
+       }
+}
+
+	for _, i := range vmware_struct {
+		if len(tag) == 0 {
+			fmt.Println("----Nothing in Tag----")
+			db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+		}else {
+			for _, el := range tag {
+				if i.Uuid != el.InstanceId{
+					fmt.Println("----No Tag for this instance----")
+					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+				}else {
+					fmt.Println("----Update Tag for this instance----")
+					fmt.Println("el.Tagname : ", el.Tagname)
+					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
+				}
+			}
+		}
+	}
+
+	for _, element := range vmware_struct {
+              for _, ele := range vmt{
+                     if element.Name != ele.Summary.Config.Name {
+                            continue
+                            fmt.Println("insdie  continue")
+                     }else{
+                            db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", false)
+              }
+
+              }
+              }
 	logger.Info("Successful in VmWareInsert.")
 	tw.Flush()
-
+	tx.Commit()
 	return nil
 }
