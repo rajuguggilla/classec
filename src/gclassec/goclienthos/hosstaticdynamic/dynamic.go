@@ -1,4 +1,4 @@
-package hos_all_compute_details
+package hosstaticdynamic
 import (
 	"fmt"
 	"encoding/json"
@@ -7,59 +7,16 @@ import (
 	//"hos/HOSAuthToken"
 //	"hos/HOS_API_Function/comp"
 	"gclassec/goclienthos/authtoken"
+	"gclassec/errorcodes/errcode"
+	"gclassec/loggers"
+	"gclassec/structs/hosstruct"
 )
 
-type AvgData struct {
-	Avg float64 `json:"avg"`
-	
-}
-type LatestDynamicData struct {
-        Count int `json:"count"`
-        DurationStart string `json:"duration_start"`
-        Min float64 `json:"min"`
-        DurationEnd string `json:"duration_end"`
-        Max float64 `json:"max"`
-        Sum float64 `json:"sum"`
-        Period int `json:"period"`
-        PeriodEnd string `json:"period_end"`
-        Duration float64 `json:"duration"`
-        PeriodStart string `json:"period_start"`
-        Avg float64 `json:"avg"`
-        Groupby Group `json:"groupby"`
-        Unit string `json:"unit"`
- }
-
-
-
-type DynamicData []struct {
-        Count int `json:"count"`
-        DurationStart string `json:"duration_start"`
-        Min float64 `json:"min"`
-        DurationEnd string `json:"duration_end"`
-        Max float64 `json:"max"`
-        Sum float64 `json:"sum"`
-        Period int `json:"period"`
-        PeriodEnd string `json:"period_end"`
-        Duration float64 `json:"duration"`
-        PeriodStart string `json:"period_start"`
-        Avg float64 `json:"avg"`
-        Groupby Group `json:"groupby"`
-        Unit string `json:"unit"`
- }
-
-
-type Group struct{
-        GroupBy string `json:"groupby"`
-}
-
-type DynamicDataResponse struct {
-        Data []DynamicData
-}
 
 
 
 func AvgCpuUtil(id string) float64{
-
+	logger := Loggers.New()
 	fmt.Println("\n\n================================================== for Id ::::::::::::    %s ======================",id)
 	//fmt.Println("This to get Nothing")
 	//var auth,_ = HOSAuthToken.GetHOSAuthToken()
@@ -68,6 +25,8 @@ func AvgCpuUtil(id string) float64{
 	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
 
 		if err != nil{
+			fmt.Println("HOS : ", errcode.ErrAuth)
+			logger.Error("HOS : ", errcode.ErrAuth)
 			return 0
 		}
 //	fmt.Println("HOS AuthToken:=====\n", auth)
@@ -102,7 +61,7 @@ func AvgCpuUtil(id string) float64{
 //	return respBodyInString
 
 
-        var jsonComputeResponse DynamicData
+        var jsonComputeResponse hosstruct.DynamicData
         if err := json.Unmarshal(respBody, &jsonComputeResponse); err != nil {
                 fmt.Println("Error in Unmarshing:==", err)
         }
@@ -111,7 +70,7 @@ func AvgCpuUtil(id string) float64{
 
 	//fmt.Println("Printing Initial jsonComputeResponse ")
         //fmt.Printf("%+v\n\n", jsonComputeResponse)
-        var cpu_util LatestDynamicData
+        var cpu_util hosstruct.LatestDynamicData
         for i:=0; i<len(jsonComputeResponse); i++{
                         if i == len(jsonComputeResponse)-1{
 

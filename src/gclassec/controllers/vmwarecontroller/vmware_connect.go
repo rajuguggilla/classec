@@ -23,6 +23,7 @@ import (
 	"gclassec/loggers"
 	"github.com/vmware/govmomi/vim25/types"
 
+	"gclassec/errorcodes/errcode"
 )
 
 //const (
@@ -130,7 +131,8 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
        // Connect and log in to ESX or vCenter
        c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
        if err != nil {
-	       logger.Error("Error: ",err)
+	       logger.Error("VMWare : ",errcode.ErrAuth)
+	       fmt.Println("VMWare : ", errcode.ErrAuth)
               exit(err)
        }
 
@@ -208,9 +210,9 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 	tx := db.Begin()
 	db.SingularTable(true)
 	vmware_struct := []vmwarestructs.VmwareInstances{}
-	err := db.Find(&vmware_struct).Error
-	if err != nil {
-		logger.Error("Rolling Back. Error: ",err)
+	errFind := db.Find(&vmware_struct).Error
+	if errFind != nil {
+		logger.Error("Error: ",errcode.ErrFindDB)
 		tx.Rollback()
 	}
 
@@ -247,7 +249,8 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        // Connect and log in to ESX or vCenter
        c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
        if err != nil {
-	       logger.Error("Error: ",err)
+	       logger.Error("VMWare: ", errcode.ErrAuth)
+	       fmt.Println("VMWare : ", errcode.ErrAuth)
               exit(err)
        }
 

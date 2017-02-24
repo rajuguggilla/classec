@@ -13,8 +13,9 @@ import (
 	"gclassec/goclienthos/util"
 	"gclassec/goclienthos/ceilometer"
 //	"sid/goclassec/src/github.com/Azure/azure-sdk-for-go/arm/recoveryservices"
-	"gclassec/goclienthos/hos_all_compute_details"
+
 	"gclassec/loggers"
+	"gclassec/goclienthos/hosstaticdynamic"
 )
 
 type (
@@ -109,8 +110,7 @@ func (uc UserController) Index(w http.ResponseWriter, r *http.Request){
 
 func (uc UserController) GetCompleteDetail(w http.ResponseWriter, r *http.Request){
 
-	fmt.Println("Hello.......")
-	res := hos_all_compute_details.ComputeWithCPU()
+	res := hosstaticdynamic.ComputeWithCPU()
 	_ = json.NewEncoder(w).Encode(&res)
 
 }

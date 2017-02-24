@@ -9,6 +9,7 @@ import (
 	"strings"
 	"os"
 	"gclassec/loggers"
+	"gclassec/errorcodes/errcode"
 )
 type Configuration struct {
     Host	string
@@ -29,7 +30,14 @@ func Flavor() ([]DetailResponse, error){
        logger.Debug("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
        logger.Debug("ABSPATH:==",ConfigFilePath)
-	file, _ := os.Open(ConfigFilePath)
+	file, errOpen := os.Open(ConfigFilePath)
+
+	if errOpen != nil{
+		fmt.Println("Error : ", errcode.ErrFileOpen)
+		logger.Error("Error : ", errcode.ErrFileOpen)
+		return []DetailResponse{}, errOpen
+	}
+
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/computeVM.json")
 	decoder := json.NewDecoder(file)
@@ -37,7 +45,7 @@ func Flavor() ([]DetailResponse, error){
 	err := decoder.Decode(&config)
 	if err != nil {
 		logger.Error("error:", err)
-		//return []DetailResponse{},err
+		return []DetailResponse{},err
 	}
 
 	// Authenticate with a username, password, tenant id.
@@ -50,8 +58,9 @@ func Flavor() ([]DetailResponse, error){
 	}
 	auth, err := openstack.DoAuthRequest(creds)
 	if err != nil {
-		panicString := fmt.Sprint("There was an error authenticating:", err)
-		logger.Error(panicString)
+		//panicString := fmt.Sprint("There was an error authenticating:", err)
+		logger.Error("OpenStack : ", errcode.ErrAuth)
+		fmt.Println("OpenStack : ", errcode.ErrAuth)
 //		panic(panicString)
 		return []DetailResponse{}, err
 

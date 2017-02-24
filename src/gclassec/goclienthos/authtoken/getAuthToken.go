@@ -9,79 +9,11 @@ import (
 	"io/ioutil"
 	"gclassec/loggers"
 	"gclassec/structs/hosstruct"
+	"fmt"
+	"gclassec/errorcodes/errcode"
+
 )
 
-
-//type HOSAutToken struct{
-//	Access 	AccessStruct	`json:"access"`
-//}
-//
-//
-//type  AccessStruct struct {
-//	Token  		TokenStruct		`json:"token"`
-//	ServiceCatalog	[]ServiceCatalogStruct	`json:"serviceCatalog"`
-//	User		UserStruct		`json:"user"`
-//	Metadata	Metadata		`json:"metadata"`
-//
-//}
-//
-//type TokenStruct struct{
-//	Issued_at	string		`json:"issued_at"`
-//	Expires		string		`json:"expires"`
-//	AuthToken	string		`json:"id"`
-//	Tenant		TenantStruct	`json:"tenant"`
-//	Audit_ids	[]string	`json:"audit_ids"`
-//}
-//type TenantStruct struct{
-//	Description	string		`json:"description"`
-//	Enabled		bool		`json:"enabled"`
-//	TenanatID	string		`json:"id"`
-//	TenantName	string		`json:"name"`
-//}
-//
-//type ServiceCatalogStruct struct{
-//	Endpoints		[]EndpointsStruct	`json:"endpoints"`
-//	Endpoints_links		[]string		`json:"endpoints_links"`
-//	EndpointType		string			`json:"type"`
-//	EndpointName		string			`json:"name"`
-//}
-//type EndpointsStruct struct{
-//	AdminURL		string	`json:"adminURL"`
-//	Region			string	`json:"region"`
-//	EndpiontID		string	`json:"id"`
-//	InternalURL		string	`json:"internalURL"`
-//	PublicURL		string	`json:"publicURL"`
-//}
-//
-//type UserStruct struct{
-//	UserName	string		`json:"username"`
-//	Roles_links	[]string	`json:"roles_links"`
-//	UserID		string		`json:"id"`
-//	Roles		[]RolesStruct	`json:"roles"`
-//	Name		string		`json:"name"`
-//}
-//
-//type RolesStruct struct{
-//	RoleName 	string		`json:"name"`
-//}
-//
-//type Metadata struct{
-//	Is_admin	int64		`json:"is_admin"`
-//	Roles		[]string	`json:"roles"`
-//}
-//
-//
-//type Configuration struct {
-//	IdentityEndpoint	string	`json:"IdentityEndpoint"`
-//    	UserName		string	`json:"userName"`
-//	Password		string	`json:"password"`
-//    	TenantName 		string	`json:"tenantName"`
-//    	TenantId 		string	`json:"tenantID"`
-//	ProjectId		string	`json:"projectID"`
-//	ProjectName		string	`json:"projectName"`
-//    	Container 		string	`json:"container"`
-//    	Region	 		string	`json:"region"`
-//}
 
 var logger = Loggers.New()
 
@@ -93,12 +25,19 @@ func GetHOSAuthToken() (string, hosstruct.HOSAutToken, error){
 	absPath :=(strings.Replace(filePath, filename, "conf/hosconfiguration.json", 1))
 	//absPath :=(strings.Replace(filePath, filename, "openStackConfiguration.json", 1))
 	logger.Debug("HOSConfigurationFilePath:==",absPath)
-	file, _ := os.Open(absPath)
+	file, errOpen := os.Open(absPath)
+
+	if errOpen != nil{
+		fmt.Println("Error : ", errcode.ErrFileOpen)
+		logger.Error("Error : ", errcode.ErrFileOpen)
+		return "", hosstruct.HOSAutToken{}, errOpen
+	}
+
 	decoder := json.NewDecoder(file)
 	tempConfig := hosstruct.Configuration{}
 	err := decoder.Decode(&tempConfig)
 	if err != nil{
-		logger.Error("ConfigurationError:", err)
+		logger.Error("ConfigurationError:", errcode.ErrDecode)
 	}
 
 	logger.Info("TempConfig:===")

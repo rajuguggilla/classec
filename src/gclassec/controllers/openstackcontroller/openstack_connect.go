@@ -10,6 +10,7 @@ import(
 	"gclassec/confmanagement/readopenstackconf"
 
 	"gclassec/loggers"
+	"gclassec/errorcodes/errcode"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -41,17 +42,17 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 	logger.Info("We are Fetching Static Data from Database.")
 	openstack_struct := []openstackInstance.Instances{}
 
-	err := db.Find(&openstack_struct).Error
+	errFind := db.Find(&openstack_struct).Error
 
-	if err != nil{
-		logger.Error("Getting Error: ", err)
+	if errFind != nil{
+		logger.Error("Error: ", errcode.ErrFindDB)
 		tx.Rollback()
 	}
 
 	_ = json.NewEncoder(w).Encode(db.Find(&openstack_struct))
 
 		if err != nil {
-			logger.Error(err)
+			logger.Error("Error :", err)
 			println(err)
 		}
 

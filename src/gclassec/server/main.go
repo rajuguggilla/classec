@@ -28,6 +28,7 @@ import (
     "gclassec/controllers/vmwarecontroller"
     "gclassec/dao/instancetags"
 
+    "gclassec/errorcodes/errcode"
 )
 
 type Configuration struct {
@@ -42,13 +43,21 @@ func main() {
     logger.Debug("CurrentFilePath:==",filePath)
     ConfigFilePath :=(strings.Replace(filePath, filename, "conf/jobconf.json", 1))
     logger.Debug("ABSPATH:==",ConfigFilePath)
-    file, _ := os.Open(ConfigFilePath)
+    file, errOpen := os.Open(ConfigFilePath)
+
+    if errOpen != nil{
+        fmt.Println("Error : ", errcode.ErrFileOpen)
+        logger.Error("Error : ", errcode.ErrFileOpen)
+    }
+
+
     decoder := json.NewDecoder(file)
     configuration := Configuration{}
-    err := decoder.Decode(&configuration)
-    if err != nil {
-        fmt.Println("error:", err)
-        logger.Error("Error Occured",err)
+    errDecode := decoder.Decode(&configuration)
+
+    if errDecode != nil {
+        fmt.Println("Error : ", errcode.ErrDecode)
+        logger.Error("Error : ",errcode.ErrDecode)
     }
 
     runtime.GOMAXPROCS(2)

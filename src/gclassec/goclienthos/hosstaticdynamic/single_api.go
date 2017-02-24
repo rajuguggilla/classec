@@ -1,38 +1,47 @@
-package compute
+package hosstaticdynamic
 
 import (
+	"fmt"
 	"net/http"
 	"io/ioutil"
+//	"hos/HOSAuthToken"
+//	"hos/HOS_API_Function/comp/flavor"
 	"encoding/json"
+
+//	"HOS_API_Function"
+	//"hos/HOS_API_Function/comp/flavor"
+//"hos/HOSAuthToken"
+
 	"gclassec/goclienthos/authtoken"
+	"gclassec/goclienthos/compute"
 	"gclassec/structs/hosstruct"
-	"gclassec/loggers"
-	"fmt"
 	"gclassec/errorcodes/errcode"
+	"gclassec/loggers"
 )
 
 
 
 
-func Compute() hosstruct.ComputeResponse {
 
 
-	//fmt.Println("This to get Nothing")
+func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 	logger := Loggers.New()
+	//fmt.Println("This to get Nothing")
 	var computeEndpoint string
 	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
+
 		if err != nil{
 			fmt.Println("HOS : ", errcode.ErrAuth)
-			logger.Error("HOS :", errcode.ErrAuth)
-			return hosstruct.ComputeResponse{}
+			logger.Error("HOS : ", errcode.ErrAuth)
+			return hosstruct.CompleteComputeResponse{}
 		}
-	logger.Debug("HOS AuthToken:=====\n", auth)
-	logger.Debug("HOS Configuration:=====\n %+v", hosConfig)
+	fmt.Println("HOS AuthToken:=====\n", auth)
+	fmt.Println("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {
 		if hosConfig.Access.ServiceCatalog[i].EndpointType =="compute"{
 			//for j:= 0; j< len(hosConfig.Access.ServiceCatalog[i].Endpoints); j++ {
 			computeEndpoint = hosConfig.Access.ServiceCatalog[i].Endpoints[0].PublicURL
-			logger.Info("ComputeEndPoint:====",computeEndpoint)
+			fmt.Println("ComputeeNDpOINT:====",computeEndpoint)
 			//https://120.120.120.4:8774/v2.1/cf5489c2c0d040c6907eeae1d7d2614c
 					//}
 			}
@@ -40,36 +49,28 @@ func Compute() hosstruct.ComputeResponse {
 
 	var reqURL string =  computeEndpoint + "/servers/detail"
 	//var reqURL string = "http://" + hosConfiguration.KeystoneEndpointIP + ":8774/v2.1/" + hosConfiguration.TenantId + "/servers/detail"
-	logger.Info("Request Body:==",reqURL)
+	fmt.Println("Request Body:==",reqURL)
 	req, _ := http.NewRequest("GET", reqURL, nil)
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
 	res, _ := http.DefaultClient.Do(req)
-	logger.Info("Status:======== ", res.Status)
+	fmt.Println("Status:======== ", res.Status)
 	defer res.Body.Close()
 	respBody, _ := ioutil.ReadAll(res.Body)
 
-	//fmt.Print("respBody:==\n",respBody)
-	respBodyInString:= string(respBody)
-	logger.Info("\nrespBodyInString:==\n",respBodyInString)
-	//return respBodyInString
-	var jsonComputeResponse hosstruct.ComputeResponse
+	var jsonComputeResponse hosstruct.CompleteComputeResponse
+
 	if err := json.Unmarshal(respBody, &jsonComputeResponse); err != nil {
-		logger.Error("Error in Unmarshing:==", err)
+		fmt.Println("Error in Unmarshing:==", err)
 	}
-	logger.Info("Printing Initial jsonComputeResponse ")
-	logger.Info("%+v\n\n", jsonComputeResponse)
-	//return jsonComputeResponse
+
+
 
 	var FlavorsList hosstruct.FlvRespStruct
-	FlavorsList = Flavors()
-	//var jsonFlavorList FlvRespStruct
-	//if err := json.Unmarshal([]byte(FlavorsStringList), &jsonFlavorList); err != nil {
-	//	fmt.Println("Error in Unmarshing:==", err)
-	//}
-	//
-	logger.Info("%+v\n\n", FlavorsList)
+	FlavorsList = compute.Flavors()
+
+	fmt.Printf("%+v\n\n", FlavorsList)
 
 
 	for i:=0; i<len(jsonComputeResponse.Servers);i++{
@@ -86,11 +87,33 @@ func Compute() hosstruct.ComputeResponse {
 		}
 
 	}
-	logger.Info("Printing Final jsonComputeResponse ")
-	logger.Info("%+v\n\n", jsonComputeResponse)
-	TempStr, _ := json.Marshal(&jsonComputeResponse)
-	logger.Info("Printing Final jsonComputeResponse in string:===\n\n ",string(TempStr))
+
+	fmt.Println("Printing Final jsonComputeResponse ")
+	fmt.Printf("%+v\n\n", jsonComputeResponse)
+
+
+
+	fmt.Println("\n\n ++++++++++++++++++++++++++++++ End of Static +++++++++++++++++++++++++++++\n\n")
+
+	for k:=0; k<len(jsonComputeResponse.Servers);k++{
+		temID := jsonComputeResponse.Servers[k].InstanceID
+		dynamicData := AvgCpuUtil(temID)
+		//fmt.Println("dynamicData)
+		fmt.Println("\n\n--------------------------------------------\n\n")
+		fmt.Println("@@@@@@@@@@@@@@@@@@---  DYNAMIC @@@@@@@@@@@@@",dynamicData)
+		//var jsonStaticResponse MyStruct
+		//jsonStaticResponse.ServersResp = jsonStaticResponse1.Servers[k]
+		//jsonStaticResponse.Cpu_Util = dynamicData
+		//jsonStaticResponses = append(jsonStaticResponses,jsonStaticResponse)
+		jsonComputeResponse.Servers[k].Cpu_Util=dynamicData
+	}
+
+
+
+	fmt.Println("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")
+
+	fmt.Printf("%+v",jsonComputeResponse)
 	return jsonComputeResponse
-	//return string(TempStr)
+
 
 }

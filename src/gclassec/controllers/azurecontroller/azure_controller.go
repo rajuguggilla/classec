@@ -11,13 +11,14 @@ import(
 	"github.com/gorilla/mux"
 	"fmt"
 	"os"
-	"log"
+//	"log"
 	"github.com/Azure/azure-sdk-for-go/arm/examples/helpers"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"gclassec/goclientazure"
 	"gclassec/readcredentials"
 	"gclassec/loggers"
 	"gclassec/structs/tagstruct"
+	"gclassec/errorcodes/errcode"
 )
 type (
 
@@ -63,20 +64,28 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		"AZURE_SUBSCRIPTION_ID": os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
-		log.Fatalf("Error: %v", err)
+		//log.Fatalf("Error: %v", err)
+		fmt.Println("Error: ", err)
 		logger.Error("Error: %v", err)
 		return
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
-		logger.Error("Error: %v", err)
+		//log.Fatalf("Error: %v", errcode.ErrAuth)
+		fmt.Println("Azure : ",errcode.ErrAuth)
+		logger.Error("Azure : ", errcode.ErrAuth)
 		return
 	}
 	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
 	ac.Authorizer = spt
 
-	ls, _ := ac.ListAll()
+	ls, err := ac.ListAll()
+
+		if err != nil{
+		fmt.Println("Azure : ",errcode.ErrAuth)
+		logger.Error("Azure :", errcode.ErrAuth)
+//		return
+	}
 
 	tx := db.Begin()
 	db.SingularTable(true)
@@ -94,7 +103,6 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		rsgroup := resourcegroupname[4]
 		vmName := *(element.Name)
 		vmId := *(element.VMID)
-		fmt.Println("Hello")
 		fmt.Println(*(element.VMID))
 
 		dc := goclientazure.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
@@ -136,10 +144,10 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 
 	azure_struct := []azurestruct.AzureInstances{}
 
-	err := db.Find(&azure_struct).Error
+	errFind := db.Find(&azure_struct).Error
 
-	if err != nil{
-		logger.Error("Error: ",err)
+	if errFind != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
 		tx.Rollback()
 	}
 
@@ -168,13 +176,14 @@ func   (uc UserController) GetDynamicAzureDetails(w http.ResponseWriter, r *http
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
 		logger.Error("Error: %v", err)
-		log.Fatalf("Error: %v", err)
+		fmt.Println("Error: ", err)
+		//log.Fatalf("Error: %v", err)
 		return
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
-		logger.Error("Error: %v", err)
-		log.Fatalf("Error: %v", err)
+		logger.Error("Azure : ", errcode.ErrAuth)
+		fmt.Println("Azure : ", errcode.ErrAuth)
 		return
 	}
 

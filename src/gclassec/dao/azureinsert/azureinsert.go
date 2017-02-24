@@ -15,6 +15,7 @@ import (
 	"gclassec/readcredentials"
 	"gclassec/goclientazure"
 	"gclassec/loggers"
+	"gclassec/errorcodes/errcode"
 )
 
 type ls struct {
@@ -65,13 +66,13 @@ func AzureInsert() error{
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
 		logger.Error("Error: %v", err)
-		fmt.Println("\n\n Failed to connect AZURE")
+		fmt.Println("Error : ", err)
 		return err
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
 		logger.Error("Error: %v", err)
-		fmt.Println("\n\n Failed to connect AZURE")
+		fmt.Println("Error : ", err)
 		return err
 	}
 	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
@@ -79,8 +80,11 @@ func AzureInsert() error{
 
 	ls, err := ac.ListAll()
 	if err != nil{
+		fmt.Println("Azure :", errcode.ErrAuth)
+		logger.Error("Azure :", errcode.ErrAuth)
 		return err
 	}
+
 	_ = json.NewEncoder(os.Stdout).Encode(&ls)
 
 	//var drggroup string
