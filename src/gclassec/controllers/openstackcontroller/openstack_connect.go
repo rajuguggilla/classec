@@ -7,10 +7,9 @@ import(
 	"encoding/json"
 
 	"gclassec/structs/openstackInstance"
-	"gclassec/confmanagement/readopenstackconf"
-
 	"gclassec/loggers"
 	"gclassec/errorcodes/errcode"
+	"gclassec/dbmanagement"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -19,15 +18,12 @@ type (
 func NewUserController() *UserController {
     return &UserController{}
 }
-
-var dbcredentials1 = readopenstackconf.Configurtion()
-var dbtype string = dbcredentials1.Dbtype
-var dbname  string = dbcredentials1.Dbname
-var dbusername string = dbcredentials1.Dbusername
-var dbpassword string = dbcredentials1.Dbpassword
-var dbhostname string = dbcredentials1.Dbhostname
-var dbport string = dbcredentials1.Dbport
-
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))

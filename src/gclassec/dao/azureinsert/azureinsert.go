@@ -8,7 +8,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/arm/examples/helpers"
 	_ "github.com/go-sql-driver/mysql"
 	"strings"
-	"gclassec/confmanagement/readazureconf"
 	"gclassec/structs/azurestruct"
 	"github.com/jinzhu/gorm"
 	"encoding/json"
@@ -18,6 +17,7 @@ import (
 	"gclassec/errorcodes/errcode"
 	"gclassec/structs/tagstruct"
 	"regexp"
+	"gclassec/dbmanagement"
 )
 
 type ls struct {
@@ -25,13 +25,14 @@ type ls struct {
 }
 
 var logger = Loggers.New()
-var dbcredentials = readazureconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
+
+
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))

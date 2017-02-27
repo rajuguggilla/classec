@@ -9,13 +9,13 @@ import (
 	"strings"
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/hosstruct"
-	"gclassec/confmanagement/readazureconf"
 	"gclassec/goclienthos/util"
 	"gclassec/goclienthos/ceilometer"
 //	"sid/goclassec/src/github.com/Azure/azure-sdk-for-go/arm/recoveryservices"
 
 	"gclassec/loggers"
 	"gclassec/goclienthos/hosstaticdynamic"
+	"gclassec/dbmanagement"
 )
 
 type (
@@ -26,13 +26,13 @@ func NewUserController() *UserController {
     return &UserController{}
 }
 var logger = Loggers.New()
-var dbcredentials = readazureconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+//var counter = 0
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))

@@ -3,13 +3,13 @@ package awscontroller
 import (
 	"net/http"
 	_ "github.com/go-sql-driver/mysql"
-	"gclassec/confmanagement/readawsconf"
 	"strings"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/awsstructs"
 	"gclassec/loggers"
+	"gclassec/dbmanagement"
 )
 
 type (
@@ -21,13 +21,12 @@ func NewUserController() *UserController {
 }
 
 
-var dbcredentials = readawsconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnameaws
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))

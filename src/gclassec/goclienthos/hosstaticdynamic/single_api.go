@@ -19,20 +19,20 @@ import (
 	"gclassec/loggers"
 	"gclassec/structs/tagstruct"
 	"regexp"
-	"gclassec/confmanagement/readazureconf"
+
 	"strings"
 	"github.com/jinzhu/gorm"
+	"gclassec/dbmanagement"
 )
 
 
 
-var dbcredentials1 = readazureconf.Configurtion()
-var dbtype string = dbcredentials1.Dbtype
-var dbname  string = dbcredentials1.Dbname
-var dbusername string = dbcredentials1.Dbusername
-var dbpassword string = dbcredentials1.Dbpassword
-var dbhostname string = dbcredentials1.Dbhostname
-var dbport string = dbcredentials1.Dbport
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 

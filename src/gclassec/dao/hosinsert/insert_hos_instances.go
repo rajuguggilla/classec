@@ -4,7 +4,6 @@ import (
 	"strings"
 	"github.com/jinzhu/gorm"
 	"gclassec/goclienthos/compute"
-	"gclassec/confmanagement/readopenstackconf"
 	_ "github.com/go-sql-driver/mysql"
 	"gclassec/structs/hosstruct"
 	"gclassec/loggers"
@@ -13,15 +12,16 @@ import (
 	"regexp"
 	"fmt"
 	"gclassec/errorcodes/errcode"
+	"gclassec/dbmanagement"
 )
 
-var dbcredentials = readopenstackconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+var logger = Loggers.New()
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))

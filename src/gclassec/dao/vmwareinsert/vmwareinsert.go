@@ -1,7 +1,6 @@
 package vmwareinsert
 
 import (
-	"gclassec/confmanagement/readazureconf"
 	"strings"
 	"context"
 	"github.com/vmware/govmomi/vim25/types"
@@ -24,26 +23,27 @@ import (
 	"gclassec/errorcodes/errcode"
 	"gclassec/structs/tagstruct"
 	"regexp"
+	"gclassec/dbmanagement"
 )
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
 var EnvUserName  string = vmwarecreds.EnvUserName
 var EnvPassword string = vmwarecreds.EnvPassword
 var EnvInsecure string = vmwarecreds.EnvInsecure
-var logger = Loggers.New()
+
 //var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", EnvURL)
 ////var urlFlag = flag.String("url", EnvURL, urlDescription)
 //
 //var insecureDescription = fmt.Sprintf("Don't verify the server's certificate chain [%s]", EnvInsecure)
 ////var insecureFlag = flag.Bool("insecure", true, insecureDescription)
 
-var dbcredentials = readazureconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+var logger = Loggers.New()
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
@@ -97,16 +97,16 @@ func VmwareInsert() error{
 	defer cancel()
 
 
-	fmt.Println("dbtype string =", dbcredentials.Dbtype)
-	fmt.Println(" dbname  string =", dbcredentials.Dbname)
-	fmt.Println(" dbusername string =", dbcredentials.Dbusername)
-	fmt.Println(" dbpassword string =", dbcredentials.Dbpassword)
-	fmt.Println(" dbhostname string =", dbcredentials.Dbhostname)
-	fmt.Println("dbport string = ",dbcredentials.Dbport)
-	fmt.Println(" EnvURL string = ",vmwarecreds.EnvURL)
+	fmt.Println("dbtype string =",dbmanagement.ENVdbtype)
+	fmt.Println(" dbname  string =", dbmanagement.ENVdbnamegodb)
+	fmt.Println(" dbusername string =", dbmanagement.ENVdbusername)
+	fmt.Println(" dbpassword string =", dbmanagement.ENVdbpassword)
+	fmt.Println(" dbhostname string =", dbmanagement.ENVdbhostname)
+	fmt.Println("dbport string = ",dbmanagement.ENVdbport)
+	fmt.Println(" EnvURL string = ",EnvURL)
 	fmt.Println(" EnvUserName  string =", vmwarecreds.EnvUserName)
 	fmt.Println(" EnvPassword string =", vmwarecreds.EnvPassword)
-	fmt.Println(" EnvInsecure string =", vmwarecreds.EnvInsecure)
+	fmt.Println(" EnvInsecure string =", EnvInsecure)
 
 
 
