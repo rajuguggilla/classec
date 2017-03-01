@@ -1,34 +1,34 @@
 package main
 
 import (
-    // Standard library packages
-    "net/http"
-    // Third party packages
-    "gclassec/controllers/awscontroller"
-    "github.com/gorilla/mux"
+    //Standard library packages
+    "encoding/json"
     "fmt"
-    "gclassec/controllers/openstackcontroller"
-    "gclassec/validation"
-    "gclassec/dao/openstackinsert"
-    "gclassec/dao/azureinsert"
-    "gclassec/controllers/azurecontroller"
+    "net/http"
     "os"
-    "gclassec/controllers/confcontroller"
-    "gclassec/controllers/hoscontroller"
-    "time"
     "runtime"
     "strings"
-    "encoding/json"
     "sync"
-    "gclassec/loggers"
-    "gclassec/dao/hosinsert"
-    //"gclassec/dao/vmwareinsert"
-    //"gclassec/controllers/vmwarecontroller"
-    "gclassec/dao/vmwareinsert"
-    "gclassec/controllers/vmwarecontroller"
-    "gclassec/dao/instancetags"
+    "time"
 
+    //Classec packages
+    "gclassec/controllers/awscontroller"
+    "gclassec/controllers/azurecontroller"
+    "gclassec/controllers/confcontroller"
+    "gclassec/controllers/hoscontroller"
+    "gclassec/controllers/openstackcontroller"
+    "gclassec/controllers/vmwarecontroller"
+    "gclassec/dao/openstackinsert"
+    "gclassec/dao/azureinsert"
+    "gclassec/dao/hosinsert"
+    "gclassec/dao/vmwareinsert"
+    "gclassec/dao/instancetags"
     "gclassec/errorcodes/errcode"
+    "gclassec/loggers"
+    "gclassec/validation"
+
+    //Third party packages
+    "github.com/gorilla/mux"
 )
 
 type Configuration struct {
@@ -36,6 +36,9 @@ type Configuration struct {
 	Timespec time.Duration
 }
 
+/**
+    Classec server and Job initiator
+ */
 func main() {
     logger := Loggers.New()
     filename := "server/main.go"
@@ -118,20 +121,18 @@ func main() {
         mx.HandleFunc(HOSROOT+"/flavors",hoc.GetFlavorsDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/utilization/{id}",hoc.CpuUtilDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdynamic",hoc.GetCompleteDetail).Methods("GET")
-        //mux.HandleFunc(HOSROOT+"/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
-	//mux.HandleFunc(HOSROOT+"/ceilometerdetails",GetCeilometerDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/test/index",hoc.Index).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.Compute).Methods("GET")
 
-        mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
-        mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")  // 'http://localhost:9009/dbaas/list/dev01-a-tky-customerorderpf'
-        mx.HandleFunc(AWSROOT+"/instances/utilization", awc.GetDB).Methods("GET")  // 'http://localhost:9009/dbaas/get?CPUUtilization_max=5&DatabaseConnections_max=0'
-        mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")  // 'http://localhost:9009/dbaas/pricing'
+        mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/utilization", awc.GetDB).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")
 
         mx.HandleFunc(OPSROOT+"/instances/staticdata", opc.GetDetailsOpenstack).Methods("GET")
         //TODO add openstack dynamic services
 
-        mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
+        mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET")
         mx.HandleFunc(AZUROOT+"/instances/utilization/{resourceGroup}/{name}", azc.GetDynamicAzureDetails).Methods("GET")
         mx.HandleFunc(AZUROOT+"/instances/staticdynamic", azc.GetAzureStaticDynamic).Methods("GET")
 
