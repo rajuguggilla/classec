@@ -11,7 +11,7 @@ type VmwareInstances struct{
 	GuestFullName string 	`gorm:"column:GuestFullName"`
 	IPaddress string        `gorm:"column:IPaddress"`
 	Tagname	string		`gorm:"column:tagname"`
-	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
+	Deleted bool     	`sql:"type:varchar" gorm:"column:deleted"`
 
 }
 
