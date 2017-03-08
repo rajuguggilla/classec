@@ -10,6 +10,8 @@ type VmwareInstances struct{
 	NumofCPU int32          `gorm:"column:NumofCPU"`
 	GuestFullName string 	`gorm:"column:GuestFullName"`
 	IPaddress string        `gorm:"column:IPaddress"`
+	Tagname	string		`gorm:"column:tagname"`
+	Deleted bool     	`sql:"type:varchar" gorm:"column:deleted"`
 
 }
 
@@ -21,20 +23,21 @@ type DynamicValues struct{
 	StorageCommitted	float32
 }
 type StaticDynamicValues struct{
-	VMName              	string
-	Uuid                	string
-	MemorySizeMB        	int32
-	PowerState          	string
-	NumCpu              	int32
-	GuestFullName       	string
-	IpAddress           	string
-	OverallCpuUsage         int32
-	GuestMemoryUsage	int32
-	StorageCommitted	float32
-	MemoryOverhead  	int64
-	MaxCpuUsage 		int32
-	Uncommitted 		int64
-	Unshared    		int64
+	VMName              	string	//`json:"Name,omitempty"`
+	Uuid                	string	//`json:"Uuid,omitempty"`
+	MemorySizeMB        	int32	//`json:"MemorySizeMB,omitempty"`
+	PowerState          	string	//`json:"PowerState,omitempty"`
+	NumCpu              	int32	//`json:"NumofCPU,omitempty"`
+	GuestFullName       	string	//`json:"GuestFullName,omitempty"`
+	IpAddress           	string	//`json:"IPaddress,omitempty"`
+	OverallCpuUsage         int32	//`json:"OverallCpuUsage,omitempty"`
+	GuestMemoryUsage	int32	//`json:"GuestMemoryUsage,omitempty"`
+	StorageCommitted	float32	//`json:"StorageCommitted,omitempty"`
+	MemoryOverhead  	int64	//`json:"MemoryOverhead,omitempty"`
+	MaxCpuUsage 		int32	//`json:"MaxCpuUsage,omitempty"`
+	Uncommitted 		int64	//`json:"Uncommitted,omitempty"`
+	Unshared    		int64	//`json:"Unshared,omitempty"`
+	Tagname	string	//`json:"Tagname,omitempty"`
 }
 
 

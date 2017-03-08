@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"gclassec/confmanagement/readazureconf"
 	"strings"
 	"github.com/jinzhu/gorm"
 	"net/http"
@@ -23,6 +22,10 @@ import (
 	"gclassec/loggers"
 	"github.com/vmware/govmomi/vim25/types"
 
+	"gclassec/errorcodes/errcode"
+	"gclassec/structs/tagstruct"
+	"regexp"
+	"gclassec/dbmanagement"
 )
 
 //const (
@@ -93,14 +96,12 @@ func exit(err error) {
 
 
 
-var dbcredentials1 = readazureconf.Configurtion()
-var dbtype string = dbcredentials1.Dbtype
-var dbname  string = dbcredentials1.Dbname
-var dbusername string = dbcredentials1.Dbusername
-var dbpassword string = dbcredentials1.Dbpassword
-var dbhostname string = dbcredentials1.Dbhostname
-var dbport string = dbcredentials1.Dbport
-
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))
@@ -130,7 +131,8 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
        // Connect and log in to ESX or vCenter
        c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
        if err != nil {
-	       logger.Error("Error: ",err)
+	       logger.Error("VMWare : ",errcode.ErrAuth)
+	       fmt.Println("VMWare : ", errcode.ErrAuth)
               exit(err)
        }
 
@@ -166,6 +168,23 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
               exit(err)
        }
 
+	tx := db.Begin()
+	db.SingularTable(true)
+
+	output := vmwarestructs.StaticDynamicValues{}
+	tag := []tagstruct.Providers{}
+
+	//create a regex `(?i)vmware` will match string contains "vmware" case insensitive
+	reg := regexp.MustCompile("(?i)vmware")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
+
        // Print summary
        tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
@@ -191,8 +210,21 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
               logger.Info("Guest memory : ", vmt[i].Summary.QuickStats.GuestMemoryUsage)
               logger.Info("Committed storage : ", units.ByteSize(vmt[i].Summary.Storage.Committed))
               //_ = json.NewEncoder(os.Stdout).Encode(&vm)
-              output := vmwarestructs.StaticDynamicValues{VMName:vmt[i].Summary.Config.Name,Uuid:vmt[i].Summary.Config.Uuid,MemorySizeMB:vmt[i].Summary.Config.MemorySizeMB,PowerState:string(vmt[i].Summary.Runtime.PowerState),NumCpu:vmt[i].Summary.Config.NumCpu,GuestFullName:vmt[i].Summary.Config.GuestFullName,IpAddress:vmt[i].Summary.Guest.IpAddress,OverallCpuUsage:vmt[i].Summary.QuickStats.OverallCpuUsage,GuestMemoryUsage:vmt[i].Summary.QuickStats.GuestMemoryUsage,StorageCommitted:float32(vmt[i].Summary.Storage.Committed)/float32(1024*1024*1024),MemoryOverhead:vmt[i].Summary.Runtime.MemoryOverhead ,MaxCpuUsage:vmt[i].Summary.Runtime.MaxCpuUsage,Uncommitted:vmt[i].Summary.Storage.Uncommitted,Unshared:vmt[i].Summary.Storage.Unshared}
-              _ = json.NewEncoder(w).Encode(output)
+		fmt.Println("Tag : ", tag)
+		if len(tag) == 0 {
+			output = vmwarestructs.StaticDynamicValues{VMName:vmt[i].Summary.Config.Name, Uuid:vmt[i].Summary.Config.Uuid, MemorySizeMB:vmt[i].Summary.Config.MemorySizeMB, PowerState:string(vmt[i].Summary.Runtime.PowerState), NumCpu:vmt[i].Summary.Config.NumCpu, GuestFullName:vmt[i].Summary.Config.GuestFullName, IpAddress:vmt[i].Summary.Guest.IpAddress, OverallCpuUsage:vmt[i].Summary.QuickStats.OverallCpuUsage, GuestMemoryUsage:vmt[i].Summary.QuickStats.GuestMemoryUsage, StorageCommitted:float32(vmt[i].Summary.Storage.Committed) / float32(1024 * 1024 * 1024), MemoryOverhead:vmt[i].Summary.Runtime.MemoryOverhead, MaxCpuUsage:vmt[i].Summary.Runtime.MaxCpuUsage, Uncommitted:vmt[i].Summary.Storage.Uncommitted, Unshared:vmt[i].Summary.Storage.Unshared, Tagname:"Nil"}
+			_ = json.NewEncoder(w).Encode(output)
+		}else {
+			for _, el := range tag {
+				fmt.Println("In tag loop")
+				if vmt[i].Summary.Config.Uuid != el.InstanceId {
+					output = vmwarestructs.StaticDynamicValues{VMName:vmt[i].Summary.Config.Name, Uuid:vmt[i].Summary.Config.Uuid, MemorySizeMB:vmt[i].Summary.Config.MemorySizeMB, PowerState:string(vmt[i].Summary.Runtime.PowerState), NumCpu:vmt[i].Summary.Config.NumCpu, GuestFullName:vmt[i].Summary.Config.GuestFullName, IpAddress:vmt[i].Summary.Guest.IpAddress, OverallCpuUsage:vmt[i].Summary.QuickStats.OverallCpuUsage, GuestMemoryUsage:vmt[i].Summary.QuickStats.GuestMemoryUsage, StorageCommitted:float32(vmt[i].Summary.Storage.Committed) / float32(1024 * 1024 * 1024), MemoryOverhead:vmt[i].Summary.Runtime.MemoryOverhead, MaxCpuUsage:vmt[i].Summary.Runtime.MaxCpuUsage, Uncommitted:vmt[i].Summary.Storage.Uncommitted, Unshared:vmt[i].Summary.Storage.Unshared, Tagname:"Nil"}
+				}else {
+					output = vmwarestructs.StaticDynamicValues{VMName:vmt[i].Summary.Config.Name, Uuid:vmt[i].Summary.Config.Uuid, MemorySizeMB:vmt[i].Summary.Config.MemorySizeMB, PowerState:string(vmt[i].Summary.Runtime.PowerState), NumCpu:vmt[i].Summary.Config.NumCpu, GuestFullName:vmt[i].Summary.Config.GuestFullName, IpAddress:vmt[i].Summary.Guest.IpAddress, OverallCpuUsage:vmt[i].Summary.QuickStats.OverallCpuUsage, GuestMemoryUsage:vmt[i].Summary.QuickStats.GuestMemoryUsage, StorageCommitted:float32(vmt[i].Summary.Storage.Committed) / float32(1024 * 1024 * 1024), MemoryOverhead:vmt[i].Summary.Runtime.MemoryOverhead, MaxCpuUsage:vmt[i].Summary.Runtime.MaxCpuUsage, Uncommitted:vmt[i].Summary.Storage.Uncommitted, Unshared:vmt[i].Summary.Storage.Unshared, Tagname:el.Tagname}
+				}
+				_ = json.NewEncoder(w).Encode(output)
+			}
+		}
 	      if i< (len(vmt)-1){
 		     logger.Info(",")
 		     fmt.Fprintf(w, ",")
@@ -202,15 +234,16 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
       fmt.Fprintf(w, "]}")
 //,PowerState:vm.Summary.Runtime.PowerState
        tw.Flush()
+	tx.Commit()
 }
 
 func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Request)() {
 	tx := db.Begin()
 	db.SingularTable(true)
 	vmware_struct := []vmwarestructs.VmwareInstances{}
-	err := db.Find(&vmware_struct).Error
-	if err != nil {
-		logger.Error("Rolling Back. Error: ",err)
+	errFind := db.Find(&vmware_struct).Error
+	if errFind != nil {
+		logger.Error("Error: ",errcode.ErrFindDB)
 		tx.Rollback()
 	}
 
@@ -247,7 +280,8 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
        // Connect and log in to ESX or vCenter
        c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
        if err != nil {
-	       logger.Error("Error: ",err)
+	       logger.Error("VMWare: ", errcode.ErrAuth)
+	       fmt.Println("VMWare : ", errcode.ErrAuth)
               exit(err)
        }
 

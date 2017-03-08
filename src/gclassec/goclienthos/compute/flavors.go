@@ -7,6 +7,8 @@ import (
 	"gclassec/goclienthos/authtoken"
 	"gclassec/loggers"
 	"gclassec/structs/hosstruct"
+	"fmt"
+	"gclassec/errorcodes/errcode"
 )
 
 //type FlavorsStruct struct{
@@ -32,9 +34,10 @@ func Flavors() hosstruct.FlvRespStruct {
 	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
 
 		if err != nil{
+			fmt.Println("HOS : ", errcode.ErrAuth)
+			logger.Error("HOS :", errcode.ErrAuth)
 			return hosstruct.FlvRespStruct{}
 		}
-
 	logger.Debug("HOS AuthToken:=====\n", auth)
 	logger.Debug("HOS Configuration:=====\n %+v", hosConfig)
 	for i := 0; i < len(hosConfig.Access.ServiceCatalog); i++ {

@@ -1,33 +1,34 @@
 package main
 
 import (
-    // Standard library packages
-    "net/http"
-    // Third party packages
-    "gclassec/controllers/awscontroller"
-    "github.com/gorilla/mux"
+    //Standard library packages
+    "encoding/json"
     "fmt"
-    "gclassec/controllers/openstackcontroller"
-    "gclassec/validation"
-    "gclassec/dao/openstackinsert"
-    "gclassec/dao/azureinsert"
-    "gclassec/controllers/azurecontroller"
+    "net/http"
     "os"
-    "gclassec/controllers/confcontroller"
-    "gclassec/controllers/hoscontroller"
-    "time"
     "runtime"
     "strings"
-    "encoding/json"
     "sync"
-    "gclassec/loggers"
-    "gclassec/dao/hosinsert"
-    //"gclassec/dao/vmwareinsert"
-    //"gclassec/controllers/vmwarecontroller"
-    "gclassec/dao/vmwareinsert"
-    "gclassec/controllers/vmwarecontroller"
-    "gclassec/dao/instancetags"
+    "time"
 
+    //Classec packages
+    "gclassec/controllers/awscontroller"
+    "gclassec/controllers/azurecontroller"
+    "gclassec/controllers/confcontroller"
+    "gclassec/controllers/hoscontroller"
+    "gclassec/controllers/openstackcontroller"
+    "gclassec/controllers/vmwarecontroller"
+    "gclassec/dao/openstackinsert"
+    "gclassec/dao/azureinsert"
+    "gclassec/dao/hosinsert"
+    "gclassec/dao/vmwareinsert"
+    "gclassec/dao/instancetags"
+    "gclassec/errorcodes/errcode"
+    "gclassec/loggers"
+    "gclassec/validation"
+
+    //Third party packages
+    "github.com/gorilla/mux"
 )
 
 type Configuration struct {
@@ -35,6 +36,9 @@ type Configuration struct {
 	Timespec time.Duration
 }
 
+/**
+    Classec server and Job initiator
+ */
 func main() {
     logger := Loggers.New()
     filename := "server/main.go"
@@ -42,13 +46,21 @@ func main() {
     logger.Debug("CurrentFilePath:==",filePath)
     ConfigFilePath :=(strings.Replace(filePath, filename, "conf/jobconf.json", 1))
     logger.Debug("ABSPATH:==",ConfigFilePath)
-    file, _ := os.Open(ConfigFilePath)
+    file, errOpen := os.Open(ConfigFilePath)
+
+    if errOpen != nil{
+        fmt.Println("Error : ", errcode.ErrFileOpen)
+        logger.Error("Error : ", errcode.ErrFileOpen)
+    }
+
+
     decoder := json.NewDecoder(file)
     configuration := Configuration{}
-    err := decoder.Decode(&configuration)
-    if err != nil {
-        fmt.Println("error:", err)
-        logger.Error("Error Occured",err)
+    errDecode := decoder.Decode(&configuration)
+
+    if errDecode != nil {
+        fmt.Println("Error : ", errcode.ErrDecode)
+        logger.Error("Error : ",errcode.ErrDecode)
     }
 
     runtime.GOMAXPROCS(2)
@@ -83,85 +95,80 @@ func main() {
         defer wg.Done()
         mx := mux.NewRouter()
 
-        uc := awscontroller.NewUserController()
-        op := openstackcontroller.NewUserController()
-        ac := azurecontroller.NewUserController()
-        uc1 := confcontroller.NewUserController()
-        vc := vmwarecontroller.NewUserController()
-        hc := hoscontroller.NewUserController()
+        awc := awscontroller.NewUserController()
+        opc := openstackcontroller.NewUserController()
+        azc := azurecontroller.NewUserController()
+        usrc := confcontroller.NewUserController()
+        vwc := vmwarecontroller.NewUserController()
+        hoc := hoscontroller.NewUserController()
 
         mx.NotFoundHandler = http.HandlerFunc(validation.ValidateWrongURL)
+        //Root url
+        var CLAROOT = "/class"
+
+        //Cloud provider specific roots
+        var HOSROOT = CLAROOT+"/hosas"
+        var AWSROOT = CLAROOT+"/awsas"
+        var AZUROOT = CLAROOT+"/azuas"
+        var VMWROOT = CLAROOT+"/vmwas"
+        var OPSROOT = CLAROOT+"/opsas"
+
+        //Authentication & authorization service root
+        var ATHSROOT = CLAROOT+"/athas"
 
         // Get a instance resource
-        mx.HandleFunc("/goclienthos/computedetails",hc.GetComputeDetails).Methods("GET")
-        mx.HandleFunc("/goclienthos/flavorsdetails",hc.GetFlavorsDetails).Methods("GET")
-        mx.HandleFunc("/goclienthos/cpu_utilization/{id}",hc.CpuUtilDetails).Methods("GET")
-        mx.HandleFunc("/goclienthos/compute_with_cpu_utilization",hc.GetCompleteDetail).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.GetComputeDetails).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/flavors",hoc.GetFlavorsDetails).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/instances/utilization/{id}",hoc.CpuUtilDetails).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/instances/staticdynamic",hoc.GetCompleteDetail).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/test/index",hoc.Index).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.Compute).Methods("GET")
 
-        //mux.HandleFunc("/goclienthos/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
-	//mux.HandleFunc("/goclienthos/ceilometerdetails",GetCeilometerDetails).Methods("GET")
-        mx.HandleFunc("/goclienthos/index",hc.Index).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/utilization", awc.GetDB).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")
 
-        mx.HandleFunc("/goclienthos/instanceDetails",hc.Compute).Methods("GET")
+        mx.HandleFunc(OPSROOT+"/instances/staticdata", opc.GetDetailsOpenstack).Methods("GET")
+        //TODO add openstack dynamic services
 
-        mx.HandleFunc("/dbaas/list", uc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
+        mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET")
+        mx.HandleFunc(AZUROOT+"/instances/utilization/{resourceGroup}/{name}", azc.GetDynamicAzureDetails).Methods("GET")
+        mx.HandleFunc(AZUROOT+"/instances/staticdynamic", azc.GetAzureStaticDynamic).Methods("GET")
 
-        mx.HandleFunc("/dbaas/list/{id}", uc.GetDetailsById).Methods("GET")  // 'http://localhost:9009/dbaas/list/dev01-a-tky-customerorderpf'
+        mx.HandleFunc(VMWROOT+"/instances/utilization", vwc.GetDynamicVcenterDetails).Methods("GET")
+        mx.HandleFunc(VMWROOT+"/instances/staticdata", vwc.GetVcenterDetails).Methods("GET")
+        mx.HandleFunc(VMWROOT+"/vcenterDetail/staticdynamic", vwc.GetStaticDynamicVcenterDetails).Methods("GET")
 
-        mx.HandleFunc("/dbaas/get", uc.GetDB).Methods("GET")  // 'http://localhost:9009/dbaas/get?CPUUtilization_max=5&DatabaseConnections_max=0'
 
-        mx.HandleFunc("/dbaas/pricing", uc.GetPrice).Methods("GET")  // 'http://localhost:9009/dbaas/pricing'
+        mx.HandleFunc("/selectProvider", usrc.SelectProvider)
+        mx.HandleFunc("/selectedOs", usrc.OpenstackCreds)
+	mx.HandleFunc("/selectedAzure", usrc.AzureCreds)
 
-        mx.HandleFunc("/dbaas/openstackDetail", op.GetDetailsOpenstack).Methods("GET")
+        mx.HandleFunc("/providers", usrc.ProviderHandler).Methods("POST")
+        mx.HandleFunc("/providers/openstack", usrc.ProviderOpenstack).Methods("POST")
+	mx.HandleFunc("/providers/azure", usrc.ProviderAzure).Methods("POST")
 
-        mx.HandleFunc("/dbaas/azureDetail", ac.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
+	mx.HandleFunc(ATHSROOT+"/hos/credentials",usrc.UpdateHosCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT+"/hos/credentials",usrc.GetHosCredentials).Methods("GET")
 
-        mx.HandleFunc("/dbaas/azureDetail/percentCPU/{resourceGroup}/{name}", ac.GetDynamicAzureDetails).Methods("GET")
+        mx.HandleFunc(ATHSROOT+"/aws/credentials",usrc.UpdateAwsCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT+"/aws/credentials",usrc.GetAwsCredentials).Methods("GET")
 
-        mx.HandleFunc("/dbaas/azureInstance", ac.GetAzureStaticDynamic).Methods("GET")
+        mx.HandleFunc(ATHSROOT+"/openstack/credentials",usrc.UpdateOsCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT+"/openstack/credentials",usrc.GetOsCredentials).Methods("GET")
 
-        mx.HandleFunc("/dbaas/vcenterDetail", vc.GetDynamicVcenterDetails).Methods("GET")
+        mx.HandleFunc(ATHSROOT+"/vmware/credentials",usrc.UpdateVmwareCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT+"/vmware/credentials",usrc.GetVmwareCredentials).Methods("GET")
 
-        mx.HandleFunc("/dbaas/vcenterDetail/static", vc.GetVcenterDetails).Methods("GET")
+        mx.HandleFunc(ATHSROOT+"/azure/credentials",usrc.UpdateAzureCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT+"/azure/credentials",usrc.GetAzureCredentials).Methods("GET")
 
-        mx.HandleFunc("/dbaas/vcenterDetail/staticdynamic", vc.GetStaticDynamicVcenterDetails).Methods("GET")
-
-        mx.HandleFunc("/selectProvider", uc1.SelectProvider)
-
-        mx.HandleFunc("/selectedOs", uc1.OpenstackCreds)
-
-	mx.HandleFunc("/selectedAzure", uc1.AzureCreds)
-
-        mx.HandleFunc("/providers", uc1.ProviderHandler).Methods("POST")
-
-        mx.HandleFunc("/providers/openstack", uc1.ProviderOpenstack).Methods("POST")
-
-	mx.HandleFunc("/providers/azure", uc1.ProviderAzure).Methods("POST")
-
-	mx.HandleFunc("/hos/updatecredentials",uc1.UpdateHosCredentials).Methods("POST")
-
-        mx.HandleFunc("/hos/readcredentials",uc1.GetHosCredentials).Methods("GET")
-
-        mx.HandleFunc("/aws/updatecredentials",uc1.UpdateAwsCredentials).Methods("POST")
-
-        mx.HandleFunc("/aws/readcredentials",uc1.GetAwsCredentials).Methods("GET")
-
-        mx.HandleFunc("/openstack/updatecredentials",uc1.UpdateOsCredentials).Methods("POST")
-
-        mx.HandleFunc("/openstack/readcredentials",uc1.GetOsCredentials).Methods("GET")
-
-        mx.HandleFunc("/vmware/updatecredentials",uc1.UpdateVmwareCredentials).Methods("POST")
-
-        mx.HandleFunc("/vmware/readcredentials",uc1.GetVmwareCredentials).Methods("GET")
-
-        mx.HandleFunc("/azure/updatecredentials",uc1.UpdateAzureCredentials).Methods("POST")
-
-        mx.HandleFunc("/azure/readcredentials",uc1.GetAzureCredentials).Methods("GET")
-
-        mx.HandleFunc("/instanceTag", instancetags.InstanceProvider).Methods("POST")
+        mx.HandleFunc("/instancetag/{instanceid}", instancetags.InstanceProvider).Methods("POST")
 
         http.Handle("/", mx)
         // Fire up the server
+        //TODO IMPLEMENT CONFIGURABLE Port
         logger.Info("Server is on Port 9009")
         logger.Info("Listening .....")
         fmt.Println("Server is on Port 9009")

@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"gclassec/goclienthos/authtoken"
 	"gclassec/loggers"
+	"fmt"
+	"gclassec/errorcodes/errcode"
 )
 
 
@@ -35,6 +37,8 @@ func GetCeilometerDetail() string{
 	var auth, hosConfig, err = authtoken.GetHOSAuthToken()
 
 	if err != nil{
+		fmt.Println("HOS: ", errcode.ErrAuth)
+		logger.Error("HOS : ", errcode.ErrAuth)
 			return ""
 		}
 

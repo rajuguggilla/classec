@@ -1,31 +1,35 @@
-package readawsconf
-
+package readdbconf
 import (
 	"encoding/json"
 	"runtime"
 	"strings"
 	"os"
 	"gclassec/loggers"
+
+
 )
 
 type Configuration struct {
-    	Dbtype    string
-    	Dbname   string
-	Dbusername   string
-    	Dbpassword   string
-	Dbhostname   string
-	Dbport   string
+    Dbtype    string
+    Dbname   string
+    Dbusername   string
+    Dbpassword   string
+    Dbhostname   string
+    Dbport   string
+    Dbnameforaws string
 }
 
 func Configurtion() Configuration{
 	logger := Loggers.New()
-	filename := "confmanagement/readawsconf/aws_conf.go"
+	filename := "confmanagement/readdbconf/db_conf.go"
        _, filePath, _, _ := runtime.Caller(0)
        logger.Debug("CurrentFilePath:==",filePath)
-       ConfigFilePath :=(strings.Replace(filePath, filename, "conf/awsconf.json", 1))
+       ConfigFilePath :=(strings.Replace(filePath, filename, "conf/dbconf.json", 1))
        logger.Debug("ABSPATH:==",ConfigFilePath)
-	file, _ := os.Open(ConfigFilePath)
-
+	file, err1:= os.Open(ConfigFilePath)
+	if err1 != nil {
+			println("DB conf File is not present")
+			}
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/awsconf.json")
 	decoder := json.NewDecoder(file)
@@ -33,8 +37,7 @@ func Configurtion() Configuration{
 	err := decoder.Decode(&configuration)
 	if err != nil {
 		logger.Error("error:", err)
+		println("There is empty field in dbconf file")
 	}
-
 	return configuration
 }
-

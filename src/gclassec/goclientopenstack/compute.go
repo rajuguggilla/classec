@@ -27,6 +27,7 @@ import (
 	"runtime"
 	"os"
 	"gclassec/loggers"
+	"gclassec/errorcodes/errcode"
 )
 type Configuration struct {
     Host    string
@@ -49,7 +50,13 @@ func Compute() []compute.DetailResponse {
        logger.Info("CurrentFilePath:==",filePath)
        ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
        logger.Info("ABSPATH:==",ConfigFilePath)
-	file, _ := os.Open(ConfigFilePath)
+	file, errOpen := os.Open(ConfigFilePath)
+
+	if errOpen != nil{
+		fmt.Println("Error : ", errcode.ErrFileOpen)
+		logger.Error("Error : ", errcode.ErrFileOpen)
+		return []compute.DetailResponse{}
+	}
 
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/computeVM.json")
@@ -58,6 +65,7 @@ func Compute() []compute.DetailResponse {
 	err := decoder.Decode(&config)
 	if err != nil {
 		logger.Error("error:", err)
+		return []compute.DetailResponse{}
 	}
 
 	// Authenticate with a username, password, tenant id.
@@ -122,7 +130,8 @@ func FinalCompute() ([]compute.DetailResponse, error) {
 	flvObj, err := flavor.Flavor()
 
 		if err !=nil{
-			fmt.Println("Failed to connect Openstack")
+			fmt.Println("OpenStack : ", errcode.ErrAuth)
+			logger.Error("OpenStack : ", errcode.ErrAuth)
 			return []compute.DetailResponse{}, err
 		}
 
@@ -149,7 +158,7 @@ func FinalCompute() ([]compute.DetailResponse, error) {
 	}
 	out, err := json.Marshal(obj)
 	if err != nil {
-        	logger.Error (err)
+        	logger.Error("Error : ", err)
 		return []compute.DetailResponse{}, err
     	}
 	logger.Info("Out Sritng")

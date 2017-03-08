@@ -8,13 +8,16 @@ import (
 	"github.com/Azure/azure-sdk-for-go/arm/examples/helpers"
 	_ "github.com/go-sql-driver/mysql"
 	"strings"
-	"gclassec/confmanagement/readazureconf"
 	"gclassec/structs/azurestruct"
 	"github.com/jinzhu/gorm"
 	"encoding/json"
 	"gclassec/readcredentials"
 	"gclassec/goclientazure"
 	"gclassec/loggers"
+	"gclassec/errorcodes/errcode"
+	"gclassec/structs/tagstruct"
+	"regexp"
+	"gclassec/dbmanagement"
 )
 
 type ls struct {
@@ -22,17 +25,21 @@ type ls struct {
 }
 
 var logger = Loggers.New()
-var dbcredentials = readazureconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
+
+
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
 var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
+
+var azure_details = readazurecreds.Configurtion()
+var subscriptionid = azure_details.SubscriptionId
 
 
 func checkEnvVar(envVars *map[string]string) error {
@@ -65,44 +72,98 @@ func AzureInsert() error{
 		"AZURE_TENANT_ID":       os.Getenv("AZURE_TENANT_ID")}
 	if err := checkEnvVar(&c); err != nil {
 		logger.Error("Error: %v", err)
-		fmt.Println("\n\n Failed to connect AZURE")
+		fmt.Println("Error : ", err)
 		return err
 	}
 	spt, err := helpers.NewServicePrincipalTokenFromCredentials(c, azure.PublicCloud.ResourceManagerEndpoint)
 	if err != nil {
 		logger.Error("Error: %v", err)
-		fmt.Println("\n\n Failed to connect AZURE")
+		fmt.Println("Error : ", err)
 		return err
 	}
 	ac := goclientazure.NewVirtualMachinesClient(c["AZURE_SUBSCRIPTION_ID"])
 	ac.Authorizer = spt
 
+	tx := db.Begin()
+	db.SingularTable(true)
+
+	tag := []tagstruct.Providers{}
+	azure_struct := []azurestruct.AzureInstances{}
+
+	//create a regex `(?i)azure` will match string contains "azure" case insensitive
+	reg := regexp.MustCompile("(?i)azure")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag)
+
+	er := db.Find(&azure_struct).Error
+
+	if er != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Find(&azure_struct)
+
 	ls, err := ac.ListAll()
 	if err != nil{
+		fmt.Println("Azure :", errcode.ErrAuth)
+		logger.Error("Azure :", errcode.ErrAuth)
 		return err
 	}
+
 	_ = json.NewEncoder(os.Stdout).Encode(&ls)
 
-	//var drggroup string
+	for _, element := range azure_struct {
+              db.Table("azure_instances").Where("Name = ?",element.VmName).Update("deleted", true)
+       }
+
 	for _, element := range *ls.Value {
-		//println(element.Name,element.ID,element.Status,element.Progress)
-		//user :=	azurestruct.AzureInstances{VmName:element.NextLink}
-		rgroup:=*(element.AvailabilitySet.ID)
-		resourcegroupname := strings.Split(rgroup, "/")
-		//drggroup= resourcegroupname[4]
-		user := azurestruct.AzureInstances{VmName:*element.Name, Type:*element.Type, Location:*element.Location,VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState,ResourcegroupName:resourcegroupname[4]}
-		db.Create(&user)
-		db.Model(&user).Updates(&user)
+              for _, ele := range azure_struct {
+                     if *element.Name != ele.VmName {
+                            continue
+                     }else{
+                            rgroup := *(element.AvailabilitySet.ID)
+                            resourcegroupname := strings.Split(rgroup, "/")
+                            user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Tagname:"Nil",Deleted:true}
+                            db.Model(&user).Where("name =?",element.Name).Updates(user)
+                     }
+              }
+       }
+	for _, i := range azure_struct {
+		if len(tag) == 0 {
+			fmt.Println("----Nothing in Tag----")
+			db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
+		} else {
+			for _, el := range tag {
+				if i.VmId != el.InstanceId {
+					fmt.Println("----No Tag for this instance----")
+					db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
+				} else {
+					fmt.Println("----Update Tag for this instance----")
+					fmt.Println("Tagname : ", el.Tagname)
+					db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname",el.Tagname)
+				}
+			}
+		}
 	}
-	//Get dynamic details (i.e. Percent CPU Utilization)
-	// of Azure Virtual Machine
-	/*dc := compute.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
-	dc.Authorizer = spt
 
-	dlist, _ := dc.ListDynamic("testGo",drggroup )
-	fmt.Println(dlist)
+	for _, element := range azure_struct {
+                     for _, ele := range *ls.Value {
+                            if element.VmName != *ele.Name {
+                                   continue
+                            }else{
+                                   db.Table("azure_instances").Where("name = ?",element.VmName).Update("deleted", false)
+                            }
+                     }
+                     }
 
-	_ = json.NewEncoder(os.Stdout).Encode(&dlist)*/
 
+
+	tx.Commit()
 	return nil
 }

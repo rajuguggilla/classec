@@ -1,7 +1,6 @@
 package vmwareinsert
 
 import (
-	"gclassec/confmanagement/readazureconf"
 	"strings"
 	"context"
 	"github.com/vmware/govmomi/vim25/types"
@@ -20,27 +19,31 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/vim25/mo"
 	"gclassec/loggers"
-	
+
+	"gclassec/errorcodes/errcode"
+	"gclassec/structs/tagstruct"
+	"regexp"
+	"gclassec/dbmanagement"
 )
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
 var EnvUserName  string = vmwarecreds.EnvUserName
 var EnvPassword string = vmwarecreds.EnvPassword
 var EnvInsecure string = vmwarecreds.EnvInsecure
-var logger = Loggers.New()
+
 //var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", EnvURL)
 ////var urlFlag = flag.String("url", EnvURL, urlDescription)
 //
 //var insecureDescription = fmt.Sprintf("Don't verify the server's certificate chain [%s]", EnvInsecure)
 ////var insecureFlag = flag.Bool("insecure", true, insecureDescription)
 
-var dbcredentials = readazureconf.Configurtion()
-var dbtype string = dbcredentials.Dbtype
-var dbname  string = dbcredentials.Dbname
-var dbusername string = dbcredentials.Dbusername
-var dbpassword string = dbcredentials.Dbpassword
-var dbhostname string = dbcredentials.Dbhostname
-var dbport string = dbcredentials.Dbport
+var logger = Loggers.New()
+var dbtype string = dbmanagement.ENVdbtype
+var dbname  string = dbmanagement.ENVdbnamegodb
+var dbusername string = dbmanagement.ENVdbusername
+var dbpassword string = dbmanagement.ENVdbpassword
+var dbhostname string = dbmanagement.ENVdbhostname
+var dbport string = dbmanagement.ENVdbport
 
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
@@ -87,28 +90,23 @@ func exit(err error) {
 }
 
 
-/*func VmWareInsertDB(){
-	err := VmwareInsert()
-	if err != nil{
 
-	}
-}*/
 
 func VmwareInsert() error{
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 
-	fmt.Println("dbtype string =", dbcredentials.Dbtype)
-	fmt.Println(" dbname  string =", dbcredentials.Dbname)
-	fmt.Println(" dbusername string =", dbcredentials.Dbusername)
-	fmt.Println(" dbpassword string =", dbcredentials.Dbpassword)
-	fmt.Println(" dbhostname string =", dbcredentials.Dbhostname)
-	fmt.Println("dbport string = ",dbcredentials.Dbport)
-	fmt.Println(" EnvURL string = ",vmwarecreds.EnvURL)
+	fmt.Println("dbtype string =",dbmanagement.ENVdbtype)
+	fmt.Println(" dbname  string =", dbmanagement.ENVdbnamegodb)
+	fmt.Println(" dbusername string =", dbmanagement.ENVdbusername)
+	fmt.Println(" dbpassword string =", dbmanagement.ENVdbpassword)
+	fmt.Println(" dbhostname string =", dbmanagement.ENVdbhostname)
+	fmt.Println("dbport string = ",dbmanagement.ENVdbport)
+	fmt.Println(" EnvURL string = ",EnvURL)
 	fmt.Println(" EnvUserName  string =", vmwarecreds.EnvUserName)
 	fmt.Println(" EnvPassword string =", vmwarecreds.EnvPassword)
-	fmt.Println(" EnvInsecure string =", vmwarecreds.EnvInsecure)
+	fmt.Println(" EnvInsecure string =", EnvInsecure)
 
 
 
@@ -123,7 +121,7 @@ func VmwareInsert() error{
 	u, err := url.Parse(*urlFlag)
 	if err != nil {
 		logger.Error("Error: ",err)
-		//fmt.Println(err)
+		fmt.Println("Error :", err)
 		//exit(err)
 		return err
 	}
@@ -134,11 +132,8 @@ func VmwareInsert() error{
 	// Connect and log in to ESX or vCenter
 	c, err := govmomi.NewClient(ctx, u, *insecureFlag)
 	if err != nil {
-		logger.Error("\n\n Failed to connect VMWare  ")
-		fmt.Println("\n\n Failed to connect VMWare ")
-		logger.Error("Error: ",err)
-		//fmt.Println(err)
-		//exit(err)
+		logger.Error("VMWare : ", errcode.ErrAuth)
+		fmt.Println("VMWare : ", errcode.ErrAuth)
 		return err
 	}
 
@@ -148,7 +143,7 @@ func VmwareInsert() error{
 	dc, err := f.DefaultDatacenter(ctx)
 	if err != nil {
 		logger.Error("Error: ",err)
-		//fmt.Println(err)
+		fmt.Println("Error : ", err)
 		//exit(err)
 		return err
 	}
@@ -177,20 +172,85 @@ func VmwareInsert() error{
 		return err
 	}
 
+	tx := db.Begin()
+	db.SingularTable(true)
+
+	tag := []tagstruct.Providers{}
+
+	//create a regex `(?i)vmware` will match string contains "vmware" case insensitive
+	reg := regexp.MustCompile("(?i)vmware")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
+
+	fmt.Println("Tag : ", tag)
+
+	vmware_struct := []vmwarestructs.VmwareInstances{}
+	er := db.Find(&vmware_struct).Error
+	if er != nil {
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Find(&vmware_struct)
 
 	// Print summary
 	tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
 	logger.Info("Virtual machines found:", len(vmt))
-	for _, vm := range vmt {
 
-		output := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:string(vm.Summary.Runtime.PowerState),NumofCPU:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Guest.GuestFullName,IPaddress:vm.Summary.Guest.IpAddress}
-		//_ = json.NewEncoder(w).Encode(output)
-		db.Create(&output)
-		db.Model(&output).Updates(&output)
+	for _, element := range vmware_struct {
+       		db.Table("vmware_instances").Where("Name = ?",element.Name).Update("deleted", true)
 	}
+
+	for _, vm := range vmt {
+       		for _, ele := range vmware_struct {
+              if vm.Summary.Config.Name != ele.Name {
+                     continue
+              }else {
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,Tagname:"Nil", Deleted:true}
+                     db.Model(&user).Where("Name =?",vm.Summary.Config.Name).Updates(user)
+
+
+              }
+       }
+}
+
+	for _, i := range vmware_struct {
+		if len(tag) == 0 {
+			fmt.Println("----Nothing in Tag----")
+			db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+		}else {
+			for _, el := range tag {
+				if i.Uuid != el.InstanceId{
+					fmt.Println("----No Tag for this instance----")
+					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+				}else {
+					fmt.Println("----Update Tag for this instance----")
+					fmt.Println("el.Tagname : ", el.Tagname)
+					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
+				}
+			}
+		}
+	}
+
+	for _, element := range vmware_struct {
+              for _, ele := range vmt{
+                     if element.Name != ele.Summary.Config.Name {
+                            continue
+                            fmt.Println("insdie  continue")
+                     }else{
+                            db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", false)
+              }
+
+              }
+              }
 	logger.Info("Successful in VmWareInsert.")
 	tw.Flush()
-
+	tx.Commit()
 	return nil
 }

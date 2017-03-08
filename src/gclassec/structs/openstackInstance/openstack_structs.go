@@ -18,6 +18,8 @@ type Instances struct{
 	ImageName string 	`gorm:"column:image_name"`
 	Volumes string 		`gorm:"column:volumes"`
 	InsertionDate string 	`sql:"type:date" gorm:"column:insertion_date"`
+	Tagname string		`gorm:"column:tagname"`
+	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 
 }
 
