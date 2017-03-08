@@ -76,7 +76,7 @@ func (uc UserController) GetDB(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewEncoder(w).Encode(db.Where("CPUUtilization_max < ? AND DatabaseConnections_max = ?", queryValue1, queryValue2).Find(&dbObj))
 
-	// Ping function checks the database connectivity
+	// Ping function checks database connectivity
 	err = db.DB().Ping()
 	if err != nil {
 		logger.Error("Error: ",err)
