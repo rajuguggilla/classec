@@ -1,4 +1,3 @@
-
 CREATE DATABASE IF NOT EXISTS `GO_DB_Testing` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `GO_DB_Testing`;
 
@@ -107,14 +106,11 @@ CREATE TABLE IF NOT EXISTS `vmware_instances` (
   `tagname` varchar(200) NOT NULL,
   `classifier` varchar(100) NOT NULL,
   PRIMARY KEY (`Name`)
-
-
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE DATABASE IF NOT EXISTS `cloud_assessment` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `cloud_assessment`;
-
 
 
 CREATE TABLE IF NOT EXISTS `rds_dynamic` (
