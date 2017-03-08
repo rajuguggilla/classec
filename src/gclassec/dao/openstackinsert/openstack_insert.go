@@ -30,6 +30,8 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
 
+
+//Testi
 func InsertInstances(){
 	//println(examples.ComputeFunc())
 	computeDetails, err:= goclientcompute.FinalCompute()
