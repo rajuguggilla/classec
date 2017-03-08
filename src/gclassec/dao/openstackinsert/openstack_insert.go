@@ -29,6 +29,8 @@ var dbhostname string = dbmanagement.ENVdbhostname
 var dbport string = dbmanagement.ENVdbport
 var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",dbport,")","/",dbname}
 
+//TEST changes
+
 var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
 
