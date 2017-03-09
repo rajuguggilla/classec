@@ -2,6 +2,7 @@ package azureinsert
 
 
 import (
+	//
 	"os"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"fmt"
