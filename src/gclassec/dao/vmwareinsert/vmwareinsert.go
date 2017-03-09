@@ -1,6 +1,7 @@
 package vmwareinsert
 
 import (
+	//"gclassec/confmanagement/readazureconf"
 	"strings"
 	"context"
 	"github.com/vmware/govmomi/vim25/types"
@@ -24,20 +25,21 @@ import (
 	"gclassec/structs/tagstruct"
 	"regexp"
 	"gclassec/dbmanagement"
+	//"github.com/vmware/govmomi/govc/vm"
 )
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
 var EnvUserName  string = vmwarecreds.EnvUserName
 var EnvPassword string = vmwarecreds.EnvPassword
 var EnvInsecure string = vmwarecreds.EnvInsecure
-
+var logger = Loggers.New()
 //var urlDescription = fmt.Sprintf("ESX or vCenter URL [%s]", EnvURL)
 ////var urlFlag = flag.String("url", EnvURL, urlDescription)
 //
 //var insecureDescription = fmt.Sprintf("Don't verify the server's certificate chain [%s]", EnvInsecure)
 ////var insecureFlag = flag.Bool("insecure", true, insecureDescription)
 
-var logger = Loggers.New()
+//var dbcredentials = dbman.Configurtion()
 var dbtype string = dbmanagement.ENVdbtype
 var dbname  string = dbmanagement.ENVdbnamegodb
 var dbusername string = dbmanagement.ENVdbusername
@@ -97,17 +99,17 @@ func VmwareInsert() error{
 	defer cancel()
 
 
-	fmt.Println("dbtype string =",dbmanagement.ENVdbtype)
-	fmt.Println(" dbname  string =", dbmanagement.ENVdbnamegodb)
-	fmt.Println(" dbusername string =", dbmanagement.ENVdbusername)
-	fmt.Println(" dbpassword string =", dbmanagement.ENVdbpassword)
-	fmt.Println(" dbhostname string =", dbmanagement.ENVdbhostname)
-	fmt.Println("dbport string = ",dbmanagement.ENVdbport)
-	fmt.Println(" EnvURL string = ",EnvURL)
+	/*fmt.Println("dbtype string =", dbcredentials.Dbtype)
+	fmt.Println(" dbname  string =", dbcredentials.Dbname)
+	fmt.Println(" dbusername string =", dbcredentials.Dbusername)
+	fmt.Println(" dbpassword string =", dbcredentials.Dbpassword)
+	fmt.Println(" dbhostname string =", dbcredentials.Dbhostname)
+	fmt.Println("dbport string = ",dbcredentials.Dbport)
+	fmt.Println(" EnvURL string = ",vmwarecreds.EnvURL)
 	fmt.Println(" EnvUserName  string =", vmwarecreds.EnvUserName)
 	fmt.Println(" EnvPassword string =", vmwarecreds.EnvPassword)
-	fmt.Println(" EnvInsecure string =", EnvInsecure)
-
+	fmt.Println(" EnvInsecure string =", vmwarecreds.EnvInsecure)
+*/
 
 
 
@@ -196,29 +198,31 @@ func VmwareInsert() error{
 		logger.Error("Error: ",errcode.ErrFindDB)
 		tx.Rollback()
 	}
+	/*for _, element := range vmware_struct {
+       		db.Table("vmware_instances").Where("Name = ?",element.Name).Update("deleted", true)
+	}*/
 	db.Find(&vmware_struct)
-
+	if (len(vmware_struct) == 0) {
+		for _, vm := range vmt {
+			user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress, Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+			db.Create(&user)
+		}
+	}else{
+		for _, vm := range vmt {
+		db.Where("Name = ?",vm.Summary.Config.Name).Find(&vmware_struct)
+		if (len(vmware_struct)==0) {
+			user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress, Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+			db.Create(&user)
+		}else{
+			user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress, Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+			db.Model(&user).Where("Name =?", vm.Summary.Config.Name).Updates(user)
+		}
+	}
+	}
 	// Print summary
 	tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
 	logger.Info("Virtual machines found:", len(vmt))
-
-	for _, element := range vmware_struct {
-       		db.Table("vmware_instances").Where("Name = ?",element.Name).Update("deleted", true)
-	}
-
-	for _, vm := range vmt {
-       		for _, ele := range vmware_struct {
-              if vm.Summary.Config.Name != ele.Name {
-                     continue
-              }else {
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,Tagname:"Nil", Deleted:true}
-                     db.Model(&user).Where("Name =?",vm.Summary.Config.Name).Updates(user)
-
-
-              }
-       }
-}
 
 	for _, i := range vmware_struct {
 		if len(tag) == 0 {
@@ -237,18 +241,18 @@ func VmwareInsert() error{
 			}
 		}
 	}
-
 	for _, element := range vmware_struct {
+		fmt.Println("inside delete")
               for _, ele := range vmt{
                      if element.Name != ele.Summary.Config.Name {
-                            continue
                             fmt.Println("insdie  continue")
+			     continue
+
                      }else{
                             db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", false)
               }
-
-              }
-              }
+	      }
+	}
 	logger.Info("Successful in VmWareInsert.")
 	tw.Flush()
 	tx.Commit()
