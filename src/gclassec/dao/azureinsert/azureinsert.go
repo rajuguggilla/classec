@@ -2,7 +2,6 @@ package azureinsert
 
 
 import (
-	//
 	"os"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"fmt"
@@ -111,30 +110,41 @@ func AzureInsert() error{
 	db.Find(&azure_struct)
 
 	ls, err := ac.ListAll()
+
 	if err != nil{
 		fmt.Println("Azure :", errcode.ErrAuth)
 		logger.Error("Azure :", errcode.ErrAuth)
 		return err
 	}
-
-	_ = json.NewEncoder(os.Stdout).Encode(&ls)
-
-	for _, element := range azure_struct {
-              db.Table("azure_instances").Where("Name = ?",element.VmName).Update("deleted", true)
-       }
-
-	for _, element := range *ls.Value {
-              for _, ele := range azure_struct {
-                     if *element.Name != ele.VmName {
-                            continue
-                     }else{
-                            rgroup := *(element.AvailabilitySet.ID)
+	if (len(azure_struct)==0){
+		for _, element := range *ls.Value {
+		 rgroup := *(element.AvailabilitySet.ID)
                             resourcegroupname := strings.Split(rgroup, "/")
+                            user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Tagname:"Nil",Deleted:false}
+                           db.Create(&user)
+	}
+	}else{
+		for _, element := range *ls.Value {
+		  	db.Where("name = ?",element.Name).Find(&azure_struct)
+			     	if (len(azure_struct)==0){
+				      rgroup := *(element.AvailabilitySet.ID)
+					resourcegroupname := strings.Split(rgroup, "/")
+                            user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Tagname:"Nil",Deleted:false}
+					db.Create(&user)
+			     }else {
+				      rgroup := *(element.AvailabilitySet.ID)
+                            		resourcegroupname := strings.Split(rgroup, "/")
                             user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Tagname:"Nil",Deleted:true}
                             db.Model(&user).Where("name =?",element.Name).Updates(user)
-                     }
-              }
-       }
+			     }
+		}
+	}
+	_ = json.NewEncoder(os.Stdout).Encode(&ls)
+
+	/*for _, element := range azure_struct {
+              db.Table("azure_instances").Where("Name = ?",element.VmName).Update("deleted", true)
+       }*/
+
 	for _, i := range azure_struct {
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
@@ -153,7 +163,7 @@ func AzureInsert() error{
 		}
 	}
 
-	for _, element := range azure_struct {
+	/*for _, element := range azure_struct {
                      for _, ele := range *ls.Value {
                             if element.VmName != *ele.Name {
                                    continue
@@ -161,7 +171,7 @@ func AzureInsert() error{
                                    db.Table("azure_instances").Where("name = ?",element.VmName).Update("deleted", false)
                             }
                      }
-                     }
+                     }*/
 
 
 
