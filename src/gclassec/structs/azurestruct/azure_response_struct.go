@@ -659,7 +659,9 @@ type DynamicUsage struct {
 }
 
 type UsageData struct {
-	TimeStamp    *date.Time   `json:"TimeStamp,omitempty"`
+	TimeStamp    *string   `json:"TimeStamp,omitempty"`
+	Minimum      *float64     `json:"Minimum,omitempty"`
+	Maximum      *float64     `json:"Maximum,omitempty"`
 	Average      *float64     `json:"Average,omitempty"`
 	Total        *float32     `json:"Total,omitempty"`
 }
@@ -844,7 +846,7 @@ type VirtualMachineStaticDynamic struct{
 	AvailabilitySetName string 	`json:"AvailabilitySetName,omitempty"`
 	Provisioningstate string	`json:"Provisioningstate,omitempty"`
 	ResourcegroupName string	`json:"ResourcegroupName,omitempty"`
-	TimeStamp    date.Time   	`json:"TimeStamp,omitempty"`
+	TimeStamp    string   	`json:"TimeStamp,omitempty"`
 	Average      float64     	`json:"Average,omitempty"`
 	Tagname string			`json:"Tagname,omitempty"`
 	/*autorest.Response `json:"-"`
