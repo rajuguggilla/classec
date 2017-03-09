@@ -47,6 +47,7 @@ func HosInsert(){
 
 	db.Find(&hos_compute)
 
+
 	//create a regex `(?i)hos` will match string contains "hos" case insensitive
 	reg := regexp.MustCompile("(?i)hos")
 
@@ -58,21 +59,26 @@ func HosInsert(){
 	}
 	db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag)
 
-	for _, element := range hos_compute {
-       db.Table("hos_instances").Where("Name = ?",element.Vm_Name).Update("deleted", true)
-}
-
-	for _, element := range computeDetails.Servers {
-       for _, ele := range hos_compute {
-              if element.Vm_Name != ele.Vm_Name {
-                     continue
-              }else{
-                     user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:true}
+	if(len(hos_compute)==0){
+		for _,element :=range computeDetails.Servers{
+			 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
+			db.Create(&user)
+		}
+	}else{
+		for _, element := range computeDetails.Servers {
+			db.Where("name =?",element.Vm_Name).Find(&hos_compute)
+			if(len(hos_compute)==0){
+				 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
+			db.Create(&user)
+			}else{
+				  user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
                      db.Model(&user).Where("Name =?",element.Vm_Name).Updates(user)
-              }
-       }
-}
-
+			}
+		}
+	}
+	/*for _, element := range hos_compute {
+       db.Table("hos_instances").Where("Name = ?",element.Vm_Name).Update("deleted", true)
+}*/
 	for _, i := range hos_compute{
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
@@ -90,7 +96,7 @@ func HosInsert(){
 			}
 		}
 	}
-
+/*
 	for _, element := range hos_compute {
               for _, ele := range computeDetails.Servers{
                      if element.Vm_Name != ele.Vm_Name {
@@ -99,7 +105,7 @@ func HosInsert(){
                             db.Table("hos_instances").Where("Name = ?",element.Vm_Name).Update("deleted", false)
               }
               }
-              }
+              }*/
 	logger.Info("Successful in InsertHOSInstance.")
 	tx.Commit()
 }
