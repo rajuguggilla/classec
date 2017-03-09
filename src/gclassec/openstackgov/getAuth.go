@@ -8,12 +8,12 @@ import (
 	//"io/ioutil"
 	"gclassec/confmanagement/readcomputeVM"
 	"io/ioutil"
-
 )
 
 func GetAuth() (string) {
 
 	var openstackcreds = readcomputeVM.Configurtion()
+
 	UserName := openstackcreds.Username
 	Password := openstackcreds.Password
 	Domain := openstackcreds.ProjectName
@@ -53,6 +53,8 @@ func GetAuth() (string) {
 	fmt.Println("X-Subject-Token:===", X_Subject_Token)
 	return X_Subject_Token
 }
+
+
 	/*//payload := strings.NewReader("{\r\n    \"auth\": {\r\n        \"identity\": {\r\n            \"methods\": [\r\n                \"password\"\r\n            ],\r\n            \"password\": {\r\n                \"user\": {\r\n                    \"name\": \"bhanu\",\r\n                    \"domain\": {\r\n                        \"name\": \"Default\"\r\n                    },\r\n                    \"password\": \"bhanu\"\r\n                }\r\n            }\r\n        }\r\n    }\r\n}")
 //	req, _ := http.NewRequest("POST", url, payload)
 //	req.Header.Add("content-type", "application/json")
@@ -64,5 +66,5 @@ func GetAuth() (string) {
 
 	fmt.Println(res.Header.Get("X-Subject-Token"))
 	return res.Header.Get("X-Subject-Token")
-
 	//fmt.Println(string(body))*/
+
