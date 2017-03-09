@@ -21,7 +21,7 @@ func NewUserController() *UserController {
     return &UserController{}
 }
 
-///
+
 var logger = Loggers.New()
 var dbtype string = dbmanagement.ENVdbtype
 var dbname  string = dbmanagement.ENVdbnamegodb
