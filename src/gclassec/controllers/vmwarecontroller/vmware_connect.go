@@ -247,7 +247,7 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 		tx.Rollback()
 	}
 
-	_ = json.NewEncoder(w).Encode(db.Find(&vmware_struct))
+	_ = json.NewEncoder(w).Encode(db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct))
 
 	if err != nil {
 		logger.Error("Error: ",err)
