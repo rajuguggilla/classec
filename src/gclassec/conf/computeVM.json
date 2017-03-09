@@ -1,10 +1,11 @@
 {
-	"Host": "http://110.110.110.5:5000/v2.0",
-	"Username": "ankurtiwari",
-	"Password": "atmecs@123",
-	"ProjectID": "99e1e2d5093446f1b5ae11939272c2df",
-	"ProjectName": "HPE",
+	"IdentityEndpoint": "http://110.110.112.5:5000/v3/",
+	"Username": "bhanu",
+	"Password": "bhanu",
+	"ProjectID": "87ca7d9c50b84b058c4d2b96bed92481",
+	"ProjectName": "Default",
  	"Container": "I♡HPHelion",
 	"ImageRegion": "",
-	"Controller": "110.110.110.5"
+	"Controller": "110.110.112.5" ,
+	"ComputeHost" :"http://110.110.112.5:8774/v2.1/87ca7d9c50b84b058c4d2b96bed92481"
 }
