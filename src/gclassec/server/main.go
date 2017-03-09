@@ -115,7 +115,7 @@ func main() {
 
         //Authentication & authorization service root
         var ATHSROOT = CLAROOT+"/athas"
-
+    //Testing
         // Get a instance resource
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.GetComputeDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/flavors",hoc.GetFlavorsDetails).Methods("GET")
