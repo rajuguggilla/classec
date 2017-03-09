@@ -1,8 +1,8 @@
 {
     "dbtype":"mysql"  ,
     "dbnameforaws": "cloud_assessment",
-    "dbname": "GO-DB-Testing",
+    "dbname": "GO_DB_Testing",
     "dbusername": "root",
     "dbpassword": "root",
-    "dbhostname": "110.110.110.240",
+    "dbhostname": "110.110.110.68",
     "dbport": "3306" }
