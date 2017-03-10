@@ -1,0 +1,13 @@
+{
+    "identityEndpoint": "http://controller:5000/v2.0",
+    "userName": "classecdev",
+    "password": "cl@1234",
+    "tenantName": "CLASSEC",
+    "domain": "Default",
+    "tenantID": "f05a14bb2f8b4be29ad3330eaf6689cb",
+    "projectName": "CLASSEC",
+    "projectID": "f05a14bb2f8b4be29ad3330eaf6689cb",
+    "container": "",
+    "region": "",
+    "controller": "110.110.112.10"
+}
