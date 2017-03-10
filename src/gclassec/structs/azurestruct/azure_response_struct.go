@@ -824,6 +824,7 @@ type VirtualMachineImageResource struct {
 
 // VirtualMachineInstanceView is the instance view of a virtual machine.
 type VirtualMachineInstanceView struct {
+	autorest.Response `json:"-"`
 	PlatformUpdateDomain *int32                                 `json:"platformUpdateDomain,omitempty"`
 	PlatformFaultDomain  *int32                                 `json:"platformFaultDomain,omitempty"`
 	RdpThumbPrint        *string                                `json:"rdpThumbPrint,omitempty"`
@@ -831,7 +832,7 @@ type VirtualMachineInstanceView struct {
 	Disks                *[]DiskInstanceView                    `json:"disks,omitempty"`
 	Extensions           *[]VirtualMachineExtensionInstanceView `json:"extensions,omitempty"`
 	BootDiagnostics      *BootDiagnosticsInstanceView           `json:"bootDiagnostics,omitempty"`
-	Statuses             *[]InstanceViewStatus                  `json:"statuses,omitempty"`
+	Statuses             []InstanceViewStatus                  `json:"statuses,omitempty"`
 }
 
 type VirtualMachineStaticDynamic struct{

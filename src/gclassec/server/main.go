@@ -77,20 +77,41 @@ func main() {
     logger.Info("Interval: ", configuration.Interval)
     logger.Info("Timespec: ", configuration.Timespec)
     logger.Info("UpdateUsingAPI: ", configuration.UpdateUsingAPI)
+    logger.Info("DynamicInterval: ", configuration.DynamicInterval)
+    logger.Info("DynamicTimespec: ", configuration.DynamicTimespec)
 
 
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
+    ticker_dynamic := time.NewTicker(time.Duration(configuration.DynamicInterval) * configuration.DynamicTimespec)
     go func() {
         defer wg.Done()
         for {
             select {
                 case <- ticker.C:
-                    azureinsert.AzureInsert()
+                    errAzure := azureinsert.AzureInsert()
+                    if errAzure != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                     openstackinsert.InsertInstances()
-                    vmwareinsert.VmwareInsert()
-                    vmwareinsert.VmwareDynamicInsert()
+                    errVmware := vmwareinsert.VmwareInsert()
+                    if errVmware != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errVmDynamic := vmwareinsert.VmwareDynamicInsert()
+                    if errVmDynamic != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                     hosinsert.HosInsert()
+                case <- ticker_dynamic.C:
+                    err := azureinsert.AzureDynamicInsert()
+                    if err != nil {
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                 case <- quit:
                     ticker.Stop()
                     return
@@ -180,12 +201,12 @@ func main() {
         http.Handle("/", mx)
         // Fire up the server
         //TODO IMPLEMENT CONFIGURABLE Port
-        logger.Info("Server is on Port 9009")
+        logger.Info("Server is on Port 9000")
         logger.Info("Listening .....")
-        fmt.Println("Server is on Port 9009")
+        fmt.Println("Server is on Port 9000")
         fmt.Println("Listening .....")
         // fmt.Println(os.Getwd())
-        http.ListenAndServe("0.0.0.0:9009", nil)
+        http.ListenAndServe("0.0.0.0:9000", nil)
     }()
 
     fmt.Println("Waiting To Finish")
