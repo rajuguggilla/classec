@@ -2,9 +2,7 @@
   <library name="GOPATH &lt;goclassec&gt;">
     <CLASSES>
       <root url="file://C:/Go/src/go" />
-      <root url="file://C:/Go/src/golang.org" />
       <root url="file://C:/Go/src/container" />
-      <root url="file://C:/Go/src/github.com" />
       <root url="file://C:/Go/src/bytes" />
       <root url="file://C:/Go/src/mime" />
       <root url="file://C:/Go/src/time" />
@@ -46,13 +44,12 @@
       <root url="file://C:/Go/src/vendor" />
       <root url="file://C:/Go/src/debug" />
       <root url="file://C:/Go/src/os" />
+      <root url="file://C:/Go/src/src" />
       <root url="file://C:/Go/src/builtin" />
     </CLASSES>
     <SOURCES>
       <root url="file://C:/Go/src/go" />
-      <root url="file://C:/Go/src/golang.org" />
       <root url="file://C:/Go/src/container" />
-      <root url="file://C:/Go/src/github.com" />
       <root url="file://C:/Go/src/bytes" />
       <root url="file://C:/Go/src/mime" />
       <root url="file://C:/Go/src/time" />
@@ -94,6 +91,7 @@
       <root url="file://C:/Go/src/vendor" />
       <root url="file://C:/Go/src/debug" />
       <root url="file://C:/Go/src/os" />
+      <root url="file://C:/Go/src/src" />
       <root url="file://C:/Go/src/builtin" />
     </SOURCES>
     <excluded>
