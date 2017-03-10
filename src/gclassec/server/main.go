@@ -43,9 +43,9 @@ func main() {
     logger := Loggers.New()
     filename := "server/main.go"
     _, filePath, _, _ := runtime.Caller(0)
-    logger.Debug("CurrentFilePath:==",filePath)
+    logger.Debug("Current file path:==",filePath)
     ConfigFilePath :=(strings.Replace(filePath, filename, "conf/jobconf.json", 1))
-    logger.Debug("ABSPATH:==",ConfigFilePath)
+    logger.Debug("Absolute path:==",ConfigFilePath)
     file, errOpen := os.Open(ConfigFilePath)
 
     if errOpen != nil{
