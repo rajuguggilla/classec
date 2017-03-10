@@ -4,7 +4,7 @@ import (
 	"os"
 	"gclassec/confmanagement/readdbconf"
 
-
+	"gclassec/errorcodes/errcode"
 )
 
 var ENVdbtype string =  dbtype()
@@ -18,7 +18,7 @@ var ENVdbport string = dbport()
 func dbtype() string  {
 	if ( os.Getenv("dbtype") == "") {
 		if(readdbconf.Configurtion().Dbtype == "") {
-			println("EMPTY DBTYPE")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbtype
 		}else{
 			return readdbconf.Configurtion().Dbtype
@@ -31,7 +31,7 @@ func dbtype() string  {
 func dbnamegodb() string{
 	if ( os.Getenv("dbnamegodb") == "") {
 		if(readdbconf.Configurtion().Dbname == "") {
-			println("EMPTY DBNAMEGODB")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbname
 		}else{
 			return readdbconf.Configurtion().Dbname
@@ -45,7 +45,7 @@ func dbnamegodb() string{
 func dbusername() string{
 	if ( os.Getenv("dbusername") == "") {
 		if(readdbconf.Configurtion().Dbusername == "") {
-			println("EMPTY DBUSERNAME")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbusername
 		}else{
 			return readdbconf.Configurtion().Dbusername
@@ -58,7 +58,7 @@ func dbusername() string{
 func dbpassword() string{
 	if ( os.Getenv("dbpassword") == "") {
 		if(readdbconf.Configurtion().Dbname == "") {
-			println("EMPTY DBPASSWORD")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbpassword
 		}else{
 			return readdbconf.Configurtion().Dbpassword
@@ -71,7 +71,7 @@ func dbpassword() string{
 func dbhostname() string{
 	if ( os.Getenv("dbhostname") == "") {
 		if(readdbconf.Configurtion().Dbhostname == "") {
-			println("EMPTY DBHOSTNAME")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbhostname
 		}else{
 			return readdbconf.Configurtion().Dbhostname
@@ -85,7 +85,7 @@ func dbhostname() string{
 func dbport() string{
 	if ( os.Getenv("dbport") == "") {
 		if(readdbconf.Configurtion().Dbport == "") {
-			println("EMPTY DBPORT")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbport
 		}else{
 			return readdbconf.Configurtion().Dbport
@@ -97,7 +97,7 @@ func dbport() string{
 func dbnameforaws() string{
 	if ( os.Getenv("dbnameforaws") == "") {
 		if(readdbconf.Configurtion().Dbport == "") {
-			println("EMPTY DBNAMEFORAWS")
+			println(errcode.CLAERR0001)
 			return readdbconf.Configurtion().Dbnameforaws
 		}else{
 			return readdbconf.Configurtion().Dbnameforaws

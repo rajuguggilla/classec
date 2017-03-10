@@ -6,7 +6,7 @@ import (
 	"os"
 	"gclassec/loggers"
 
-
+	"gclassec/errorcodes/errcode"
 )
 
 type Configuration struct {
@@ -28,7 +28,7 @@ func Configurtion() Configuration{
        logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, err1:= os.Open(ConfigFilePath)
 	if err1 != nil {
-			println("DB conf File is not present")
+			println(errcode.CLAERR0001)
 			}
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/awsconf.json")
@@ -37,7 +37,7 @@ func Configurtion() Configuration{
 	err := decoder.Decode(&configuration)
 	if err != nil {
 		logger.Error("error:", err)
-		println("There is empty field in dbconf file")
+		println(errcode.CLAERR0001)
 	}
 	return configuration
 }

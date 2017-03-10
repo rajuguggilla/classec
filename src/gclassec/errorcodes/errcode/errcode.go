@@ -6,4 +6,5 @@ const (
 	ErrAuth string = "Authentication Error"
 	ErrFindDB string = "Unable to find given structure"
 	ErrInsert string = "Unable to insert/update data into database"
+	CLAERR0001 = "There is empty field in dbconf file"
 )

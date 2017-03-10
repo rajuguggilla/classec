@@ -4,5 +4,5 @@
     "dbname": "GO_DB_Testing",
     "dbusername": "root",
     "dbpassword": "root",
-    "dbhostname": "110.110.110.68",
+    "dbhostname": "110.110.112.203",
     "dbport": "3306" }
