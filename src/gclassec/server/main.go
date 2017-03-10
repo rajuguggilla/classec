@@ -1,52 +1,55 @@
 package main
 
 import (
-    //Standard library packages
-    "encoding/json"
-    "fmt"
+    // Standard library packages
     "net/http"
-    "os"
-    "runtime"
-    "strings"
-    "sync"
-    "time"
-
-    //Classec packages
+    // Third party packages
     "gclassec/controllers/awscontroller"
+    "github.com/gorilla/mux"
+    "fmt"
+    "gclassec/controllers/openstackcontroller"
+    "gclassec/validation"
+   // "gclassec/dao/openstackinsert"
+    //"gclassec/dao/azureinsert"
     "gclassec/controllers/azurecontroller"
+    "os"
     "gclassec/controllers/confcontroller"
     "gclassec/controllers/hoscontroller"
-    "gclassec/controllers/openstackcontroller"
+    "time"
+    "runtime"
+    "strings"
+    "encoding/json"
+    "sync"
+      //"gclassec/dao/hosinsert"
+    //"gclassec/dao/vmwareinsert"
+    //"gclassec/controllers/vmwarecontroller"
+    //"gclassec/dao/vmwareinsert"
     "gclassec/controllers/vmwarecontroller"
-    "gclassec/dao/openstackinsert"
-    "gclassec/dao/azureinsert"
-    "gclassec/dao/hosinsert"
-    "gclassec/dao/vmwareinsert"
     "gclassec/dao/instancetags"
+
     "gclassec/errorcodes/errcode"
     "gclassec/loggers"
-    "gclassec/validation"
-
-    //Third party packages
-    "github.com/gorilla/mux"
+    "gclassec/openstackgov"
+    "gclassec/dao/azureinsert"
+    "gclassec/dao/openstackinsert"
+    "gclassec/dao/vmwareinsert"
+    "gclassec/dao/hosinsert"
+	"gclassec/structs/configurationstruct"
 )
 
-type Configuration struct {
-	Interval int64
-	Timespec time.Duration
-}
-/**
-   CLASSEC STARTER
-   TODO: CONFIGURABLE PORT NO
-   Classec server and Job initiator
- */
+//type Configuration struct {
+//	Interval int64
+//	Timespec time.Duration
+//        UpdateUsingAPI  bool
+//}
+
 func main() {
     logger := Loggers.New()
     filename := "server/main.go"
     _, filePath, _, _ := runtime.Caller(0)
-    logger.Debug("Current file path:==",filePath)
+    logger.Debug("CurrentFilePath:==",filePath)
     ConfigFilePath :=(strings.Replace(filePath, filename, "conf/jobconf.json", 1))
-    logger.Debug("Absolute path:==",ConfigFilePath)
+    logger.Debug("ABSPATH:==",ConfigFilePath)
     file, errOpen := os.Open(ConfigFilePath)
 
     if errOpen != nil{
@@ -56,7 +59,7 @@ func main() {
 
 
     decoder := json.NewDecoder(file)
-    configuration := Configuration{}
+    configuration := configurationstruct.Configuration{}
     errDecode := decoder.Decode(&configuration)
 
     if errDecode != nil {
@@ -73,18 +76,42 @@ func main() {
     logger.Info("Duration for Ticker : ",time.Duration(configuration.Interval) * configuration.Timespec)
     logger.Info("Interval: ", configuration.Interval)
     logger.Info("Timespec: ", configuration.Timespec)
+    logger.Info("UpdateUsingAPI: ", configuration.UpdateUsingAPI)
+    logger.Info("DynamicInterval: ", configuration.DynamicInterval)
+    logger.Info("DynamicTimespec: ", configuration.DynamicTimespec)
+
 
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
+    ticker_dynamic := time.NewTicker(time.Duration(configuration.DynamicInterval) * configuration.DynamicTimespec)
     go func() {
         defer wg.Done()
         for {
             select {
                 case <- ticker.C:
-                    azureinsert.AzureInsert()
+                    errAzure := azureinsert.AzureInsert()
+                    if errAzure != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                     openstackinsert.InsertInstances()
-                    vmwareinsert.VmwareInsert()
+                    errVmware := vmwareinsert.VmwareInsert()
+                    if errVmware != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errVmDynamic := vmwareinsert.VmwareDynamicInsert()
+                    if errVmDynamic != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                     hosinsert.HosInsert()
+                case <- ticker_dynamic.C:
+                    err := azureinsert.AzureDynamicInsert()
+                    if err != nil {
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                 case <- quit:
                     ticker.Stop()
                     return
@@ -116,31 +143,33 @@ func main() {
 
         //Authentication & authorization service root
         var ATHSROOT = CLAROOT+"/athas"
-        //Testing
+
         // Get a instance resource
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.GetComputeDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/flavors",hoc.GetFlavorsDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/utilization/{id}",hoc.CpuUtilDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdynamic",hoc.GetCompleteDetail).Methods("GET")
+        //mux.HandleFunc(HOSROOT+"/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
+	//mux.HandleFunc(HOSROOT+"/ceilometerdetails",GetCeilometerDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/test/index",hoc.Index).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.Compute).Methods("GET")
 
-        mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")
-        mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")
-        mx.HandleFunc(AWSROOT+"/instances/utilization", awc.GetDB).Methods("GET")
-        mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")
+        mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
+        mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")  // 'http://localhost:9009/dbaas/list/dev01-a-tky-customerorderpf'
+        mx.HandleFunc(AWSROOT+"/instances/utilization", awc.GetDB).Methods("GET")  // 'http://localhost:9009/dbaas/get?CPUUtilization_max=5&DatabaseConnections_max=0'
+        mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")  // 'http://localhost:9009/dbaas/pricing'
 
         mx.HandleFunc(OPSROOT+"/instances/staticdata", opc.GetDetailsOpenstack).Methods("GET")
-        //TODO add openstack dynamic services
+        //TODO add openstack dynamic services for HOS
 
-        mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET")
+        mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
         mx.HandleFunc(AZUROOT+"/instances/utilization/{resourceGroup}/{name}", azc.GetDynamicAzureDetails).Methods("GET")
         mx.HandleFunc(AZUROOT+"/instances/staticdynamic", azc.GetAzureStaticDynamic).Methods("GET")
 
         mx.HandleFunc(VMWROOT+"/instances/utilization", vwc.GetDynamicVcenterDetails).Methods("GET")
         mx.HandleFunc(VMWROOT+"/instances/staticdata", vwc.GetVcenterDetails).Methods("GET")
         mx.HandleFunc(VMWROOT+"/vcenterDetail/staticdynamic", vwc.GetStaticDynamicVcenterDetails).Methods("GET")
-
+        mx.HandleFunc(VMWROOT+"/vcenterDetail/dynamicupdate", vwc.GetDynamicVcenterUpdateDetails).Methods("GET")
 
         mx.HandleFunc("/selectProvider", usrc.SelectProvider)
         mx.HandleFunc("/selectedOs", usrc.OpenstackCreds)
@@ -162,20 +191,22 @@ func main() {
         mx.HandleFunc(ATHSROOT+"/vmware/credentials",usrc.UpdateVmwareCredentials).Methods("POST")
         mx.HandleFunc(ATHSROOT+"/vmware/credentials",usrc.GetVmwareCredentials).Methods("GET")
 
-        mx.HandleFunc(ATHSROOT+"/azure/credentials",usrc.UpdateAzureCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT + "/azure/credentials", usrc.UpdateAzureCredentials).Methods("POST")
         mx.HandleFunc(ATHSROOT+"/azure/credentials",usrc.GetAzureCredentials).Methods("GET")
 
         mx.HandleFunc("/instancetag/{instanceid}", instancetags.InstanceProvider).Methods("POST")
+        mx.HandleFunc(OPSROOT+"/v1.0/servers/{instancename}", openstackgov.Createserver).Methods("POST")
+        mx.HandleFunc(OPSROOT+"/v1.0/servers", openstackgov.Getserver).Methods("GET")
 
         http.Handle("/", mx)
         // Fire up the server
         //TODO IMPLEMENT CONFIGURABLE Port
-        logger.Info("Server is on Port 9009")
+        logger.Info("Server is on Port 9000")
         logger.Info("Listening .....")
-        fmt.Println("Server is on Port 9009")
+        fmt.Println("Server is on Port 9000")
         fmt.Println("Listening .....")
         // fmt.Println(os.Getwd())
-        http.ListenAndServe("0.0.0.0:9009", nil)
+        http.ListenAndServe("0.0.0.0:9000", nil)
     }()
 
     fmt.Println("Waiting To Finish")

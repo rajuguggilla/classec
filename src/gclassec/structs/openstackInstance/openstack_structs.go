@@ -23,6 +23,61 @@ type Instances struct{
 
 }
 
+type ComputeResponse struct {
+	Servers       []ServerResponse      `json:"servers"`
+}
+
+type ServerResponse struct {
+	Id	string		`json:"id"`
+	Name	string		`json:"name"`
+	Image	ImageStruct	`json:"image"`
+	Flavor	FlavorsStruct	`json:"flavor"`
+	Status	string		`json:"status"`
+        Updated	string		`json:"updated"`
+        HostId	string		`json:"hostId"`
+	Key_name	string	`json:"key_name"`
+	Security_Groups	SubSecurityGroup `json:"security_groups"`
+	Availability_Zone	string	`json:"OS-EXT-AZ:availability_zone"`
+	Tenant_Id	string	`json:"tenant_id"`
+	Addresses	SubAddr `json:"addresses"`
+}
+
+type SubAddress struct {
+	//MacAddr		string	`json:"OS-EXT-IPS-MAC:mac_addr"`
+	Version		int32	`json:"version"`
+	IpAddress	string	`json:"addr"`
+	//Type		string	`json:"OS-EXT-IPS:type"`
+}
+
+type SubAddr struct {
+	Provider 	[]SubAddress	`json:"provider"`
+}
+
+type AddressesStruct struct{
+	Addresses	SubAddr	`json:"addresses"`
+	//Provider 	[]SubAddress	`json:"provider"`
+}
+
+type SubSecurityGroup struct {
+	Name 	string		`json:"name"`
+}
+
+type ImageStruct struct {
+	ImageID		string		`json:"id"`
+}
+
+type FlavorsStruct struct {
+	FlavorID 	string 		`json:"id"`
+	FlavorName 	string		`json:"name"`
+	Ram		int32		`json:"ram"`
+	VCPUS		int32		`json:"vcpus"`
+	Disk		int32		`json:"disk"`
+}
+
+type FlvRespStruct struct {
+	Flavors []FlavorsStruct		`json:"flavors"`
+}
+
 //---------------------------------Structure for Configuration File in OpenStack------------------------------------//
 type Configuration struct {
     Host    string		`json:"Host"`

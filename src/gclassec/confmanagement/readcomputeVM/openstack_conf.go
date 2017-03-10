@@ -1,34 +1,36 @@
-package readdbconf
+package readcomputeVM
+
 import (
-	"encoding/json"
+	"gclassec/loggers"
 	"runtime"
 	"strings"
 	"os"
-	"gclassec/loggers"
-
-	"gclassec/errorcodes/errcode"
+	"encoding/json"
 )
 
 type Configuration struct {
-    Dbtype    string
-    Dbname   string
-    Dbusername   string
-    Dbpassword   string
-    Dbhostname   string
-    Dbport   string
-    Dbnameforaws string
+    IdentityEndpoint    string
+    Username   string
+    Password   string
+    ProjectID   string
+    ProjectName   string
+    Container   string
+    ImageRegion string
+    Controller string
+    ComputeHost string
+
 }
 
 func Configurtion() Configuration{
 	logger := Loggers.New()
-	filename := "confmanagement/readdbconf/db_conf.go"
+	filename := "confmanagement/readcomputeVM/openstack_conf.go"
        _, filePath, _, _ := runtime.Caller(0)
        logger.Debug("CurrentFilePath:==",filePath)
-       ConfigFilePath :=(strings.Replace(filePath, filename, "conf/dbconf.json", 1))
+       ConfigFilePath :=(strings.Replace(filePath, filename, "conf/computeVM.json", 1))
        logger.Debug("ABSPATH:==",ConfigFilePath)
 	file, err1:= os.Open(ConfigFilePath)
 	if err1 != nil {
-			println(errcode.CLAERR0001)
+			println(" conf File is not present")
 			}
 	//dir, _ := os.Getwd()
 	//file, _ := os.Open(dir + "/src/gclassec/conf/awsconf.json")
@@ -37,7 +39,8 @@ func Configurtion() Configuration{
 	err := decoder.Decode(&configuration)
 	if err != nil {
 		logger.Error("error:", err)
-		println(errcode.CLAERR0001)
+
 	}
 	return configuration
+
 }

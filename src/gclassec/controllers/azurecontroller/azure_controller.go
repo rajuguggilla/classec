@@ -183,7 +183,19 @@ func   (uc UserController) GetDynamicAzureDetails(w http.ResponseWriter, r *http
 	name := vars["name"]
 	resourceGrp := vars["resourceGroup"]
 
-
+	var azureCreds = readazurecreds.Configurtion()
+	os.Setenv("AZURE_CLIENT_ID", azureCreds.ClientId)
+	os.Setenv("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
+	os.Setenv("AZURE_SUBSCRIPTION_ID", azureCreds.SubscriptionId)
+	os.Setenv("AZURE_TENANT_ID", azureCreds.TenantId)
+	println("------------AZURE CLIENT ID--------------")
+	println(azureCreds.ClientId)
+	logger.Debug("AZURE_CLIENT_ID", azureCreds.ClientId)
+	logger.Debug("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
+	logger.Debug("AZURE_SUBSCRIPTION_ID", azureCreds.SubscriptionId)
+	logger.Debug("AZURE_TENANT_ID", azureCreds.TenantId)
+	logger.Info("------------AZURE CLIENT ID--------------")
+	logger.Info(azureCreds.ClientId)
 	//var drggroup string
 
 	c := map[string]string{

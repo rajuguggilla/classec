@@ -659,7 +659,9 @@ type DynamicUsage struct {
 }
 
 type UsageData struct {
-	TimeStamp    *date.Time   `json:"TimeStamp,omitempty"`
+	TimeStamp    *string   `json:"TimeStamp,omitempty"`
+	Minimum      *float64     `json:"Minimum,omitempty"`
+	Maximum      *float64     `json:"Maximum,omitempty"`
 	Average      *float64     `json:"Average,omitempty"`
 	Total        *float32     `json:"Total,omitempty"`
 }
@@ -822,6 +824,7 @@ type VirtualMachineImageResource struct {
 
 // VirtualMachineInstanceView is the instance view of a virtual machine.
 type VirtualMachineInstanceView struct {
+	autorest.Response `json:"-"`
 	PlatformUpdateDomain *int32                                 `json:"platformUpdateDomain,omitempty"`
 	PlatformFaultDomain  *int32                                 `json:"platformFaultDomain,omitempty"`
 	RdpThumbPrint        *string                                `json:"rdpThumbPrint,omitempty"`
@@ -829,7 +832,7 @@ type VirtualMachineInstanceView struct {
 	Disks                *[]DiskInstanceView                    `json:"disks,omitempty"`
 	Extensions           *[]VirtualMachineExtensionInstanceView `json:"extensions,omitempty"`
 	BootDiagnostics      *BootDiagnosticsInstanceView           `json:"bootDiagnostics,omitempty"`
-	Statuses             *[]InstanceViewStatus                  `json:"statuses,omitempty"`
+	Statuses             []InstanceViewStatus                  `json:"statuses,omitempty"`
 }
 
 type VirtualMachineStaticDynamic struct{
@@ -844,7 +847,7 @@ type VirtualMachineStaticDynamic struct{
 	AvailabilitySetName string 	`json:"AvailabilitySetName,omitempty"`
 	Provisioningstate string	`json:"Provisioningstate,omitempty"`
 	ResourcegroupName string	`json:"ResourcegroupName,omitempty"`
-	TimeStamp    date.Time   	`json:"TimeStamp,omitempty"`
+	TimeStamp    string   	`json:"TimeStamp,omitempty"`
 	Average      float64     	`json:"Average,omitempty"`
 	Tagname string			`json:"Tagname,omitempty"`
 	/*autorest.Response `json:"-"`

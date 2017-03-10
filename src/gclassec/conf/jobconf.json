@@ -1,5 +1,9 @@
 {
   "Interval":300,
   "Timespec":1000000000,
-  "_comment":"Timespec value is 'Second'"
+  "UpdateUsingAPI":1,
+  "_comment":"Timespec value is '1 Second'",
+  "DynamicInterval":60,
+  "DynamicTimespec":60000000000,
+  "_comment":"DynamicTimespec value is '1 Minute'"
 }

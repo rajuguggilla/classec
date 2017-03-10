@@ -66,22 +66,32 @@ func InsertInstances(){
 	}
 
 	db.Find(&openstack_struct)
-
-	for _, element := range openstack_struct {
-       db.Table("instances").Where("name = ?",element.Name).Update("deleted", true)
-}
-
-	for _, element := range computeDetails {
-       for _, ele := range openstack_struct {
-              if element.Name != ele.Name {
-                     continue
-              }else{
-                     user := openstackInstance.Instances{Name:element.Name, InstanceID:element.ID, Status:element.Status, RAM:element.Flavor.RAM, VCPU:element.Flavor.VCPU, Flavor:element.Flavor.Name, Storage:element.Flavor.Disk, AvailabilityZone:element.Availability_zone, CreationTime:element.Created,
+	if (len(openstack_struct)==0){
+		for _, element := range computeDetails {
+			user := openstackInstance.Instances{Name:element.Name, InstanceID:element.ID, Status:element.Status, RAM:element.Flavor.RAM, VCPU:element.Flavor.VCPU, Flavor:element.Flavor.Name, Storage:element.Flavor.Disk, AvailabilityZone:element.Availability_zone, CreationTime:element.Created,
+                            FlavorID:element.Flavor.FlavorID, IPAddress:element.IPV4, KeyPairName:element.Key_name, ImageName:element.Image.ID, Tagname:"Nil", Deleted:false}
+                    db.Create(&user)
+		}
+	}else{
+		for _, element := range computeDetails {
+		db.Where("name =?",element.Name).Find(&openstack_struct)
+		if(len(openstack_struct)==0){
+			 user := openstackInstance.Instances{Name:element.Name, InstanceID:element.ID, Status:element.Status, RAM:element.Flavor.RAM, VCPU:element.Flavor.VCPU, Flavor:element.Flavor.Name, Storage:element.Flavor.Disk, AvailabilityZone:element.Availability_zone, CreationTime:element.Created,
+                            FlavorID:element.Flavor.FlavorID, IPAddress:element.IPV4, KeyPairName:element.Key_name, ImageName:element.Image.ID, Tagname:"Nil", Deleted:false}
+                    db.Create(&user)
+		}else{
+			user := openstackInstance.Instances{Name:element.Name, InstanceID:element.ID, Status:element.Status, RAM:element.Flavor.RAM, VCPU:element.Flavor.VCPU, Flavor:element.Flavor.Name, Storage:element.Flavor.Disk, AvailabilityZone:element.Availability_zone, CreationTime:element.Created,
                             FlavorID:element.Flavor.FlavorID, IPAddress:element.IPV4, KeyPairName:element.Key_name, ImageName:element.Image.ID, Tagname:"Nil", Deleted:true}
                      db.Model(&user).Where("name = ?",element.Name).Updates(user)
-              }
-       }
+		}
 }
+	}
+
+	/*for _, element := range openstack_struct {
+       db.Table("instances").Where("name = ?",element.Name).Update("deleted", true)
+}*/
+
+
 
 	for _, i := range openstack_struct{
 		if len(tag) == 0 {
@@ -100,7 +110,7 @@ func InsertInstances(){
 				}
 		}
 	}
-
+/*
 	for _, element := range openstack_struct {
               for _, ele := range computeDetails{
                      if element.Name != ele.Name {
@@ -110,7 +120,7 @@ func InsertInstances(){
                             db.Table("instances").Where("name = ?",element.Name).Update("deleted", false)
               }
               }
-              }
+              }*/
 	logger.Info("Successful in InsertInstances.")
 	tx.Commit()
 }

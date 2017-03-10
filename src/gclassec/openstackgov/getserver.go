@@ -8,21 +8,15 @@ import (
 	"gclassec/confmanagement/readcomputeVM"
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
+	"gclassec/structs/openstackInstance"
 )
 
-type ComputeResponse struct {
-	Servers       []ServerResponse      `json:"Servers"`
-}
 
-type ServerResponse struct {
-	Id	string		`json:"Id"`
-	Name	string		`json:"Name"`
-}
 
 func Getserver(w http.ResponseWriter, r *http.Request)  {
 	var openstackcreds = readcomputeVM.Configurtion()
 
-	url := openstackcreds.ComputeHost
+	url := openstackcreds.ComputeHost + "/servers/detail"
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -46,9 +40,26 @@ func Getserver(w http.ResponseWriter, r *http.Request)  {
 	fmt.Println("string(body) : ", string(body))
 	//_ = json.NewEncoder(w).Encode(res.Body)
 
-	var jsonComputeResponse ComputeResponse
+	var jsonComputeResponse openstackInstance.ComputeResponse
 	if err := json.Unmarshal(body, &jsonComputeResponse); err != nil {
 		fmt.Errorf("Error in Unmarshing:==", err)
+	}
+
+	var FlavorsList openstackInstance.FlvRespStruct
+	FlavorsList = Getflavors()
+
+	fmt.Println("FlavorsList : ", FlavorsList)
+
+	for i:=0; i<len(jsonComputeResponse.Servers);i++{
+		tempFID := jsonComputeResponse.Servers[i].Flavor.FlavorID
+		for j:=0; j<len(FlavorsList.Flavors);j++ {
+			if tempFID == FlavorsList.Flavors[j].FlavorID{
+				jsonComputeResponse.Servers[i].Flavor.FlavorName=FlavorsList.Flavors[j].FlavorName
+				jsonComputeResponse.Servers[i].Flavor.Disk=FlavorsList.Flavors[j].Disk
+				jsonComputeResponse.Servers[i].Flavor.Ram=FlavorsList.Flavors[j].Ram
+				jsonComputeResponse.Servers[i].Flavor.VCPUS=FlavorsList.Flavors[j].VCPUS
+			}
+		}
 	}
 
 	_ = json.NewEncoder(w).Encode(&jsonComputeResponse)

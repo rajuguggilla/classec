@@ -12,6 +12,7 @@ type VmwareInstances struct{
 	IPaddress string        `gorm:"column:IPaddress"`
 	Tagname	string		`gorm:"column:tagname"`
 	Deleted bool     	`sql:"type:varchar" gorm:"column:deleted"`
+	Classifier string        `gorm:"column:classifier"`
 
 }
 
@@ -40,6 +41,15 @@ type StaticDynamicValues struct{
 	Tagname	string	//`json:"Tagname,omitempty"`
 }
 
+type VmwareDynamicDetails struct{
+	Name 			string			`gorm:"column:Name"`
+	Uuid			string			`gorm:"column:Uuid"`
+	Timestamp   		string		        `gorm:"column:Timestamp"`
+	MaxCpuUsage 		int32			`gorm:"column:MaxCpuUsage"`
+	MinCpuUsage 		int32			`gorm:"column:MinCpuUsage"`
+	AvgCpuUsage 		int32			`gorm:"column:AvgCpuUsage"`
+
+}
 
 //---------------------------------Structure for Configuration File in OpenStack------------------------------------//
 type Configuration struct {
