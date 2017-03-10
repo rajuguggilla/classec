@@ -35,9 +35,10 @@ type Configuration struct {
 	Interval int64
 	Timespec time.Duration
 }
-
 /**
+    INITIATOR
     Classec server and Job initiator
+
  */
 func main() {
     logger := Loggers.New()
