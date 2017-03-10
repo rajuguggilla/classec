@@ -25,6 +25,8 @@ import (
 	"gclassec/loggers"
 	"gclassec/structs/azurestruct"
 
+	"time"
+	"fmt"
 )
 
 var logger = Loggers.New()
@@ -66,6 +68,7 @@ func (client DynamicUsageOperationsClient) ListDynamic(name string, resourceGrou
 		logger.Error("Error: ", err)
 		return result, autorest.NewErrorWithError(err, "compute.UsageOperationsClient", "ListDynamic", nil, "Failure preparing request")
 	}
+	fmt.Println("REQUEST : ", req)
 
 	resp, err := client.ListSender(req)
 	if err != nil {
@@ -86,21 +89,25 @@ func (client DynamicUsageOperationsClient) ListDynamic(name string, resourceGrou
 
 // ListPreparer prepares the List request.
 func (client DynamicUsageOperationsClient) ListPreparer(name string, resourceGroupName string) (*http.Request, error) {
+
 	pathParameters := map[string]interface{}{
 		"name":       autorest.Encode("path", name),
 		"resourceGroupName":	autorest.Encode("path", resourceGroupName),
 		"subscriptionId": autorest.Encode("path", client.SubscriptionID),
+		"apiVersion": "2016-09-01",
+		"startTime": time.Now().Add(-7 * time.Hour).UTC().Format("2006-01-02T15:04:05Z07:00"),
+		"endTime": time.Now().Add(-6 * time.Hour).UTC().Format("2006-01-02T15:04:05Z07:00"),
 	}
 
-	queryParameters := map[string]interface{}{
+	/*queryParameters := map[string]interface{}{
 		"api-version": "2016-09-01",
-	}
+	}*/
 
 	preparer := autorest.CreatePreparer(
 		autorest.AsGet(),
 		autorest.WithBaseURL(client.BaseURI),
-		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{name}/providers/microsoft.insights/metrics", pathParameters),
-		autorest.WithQueryParameters(queryParameters))
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{name}/providers/microsoft.insights/metrics?api-version={apiVersion}&$filter=(name.value%20eq%20'Percentage%20CPU')%20and%20(aggregationType%20eq%20'Minimum'%20or%20aggregationType%20eq%20'Maximum'%20or%20aggregationType%20eq%20'Average')%20and%20startTime%20eq%20{startTime}%20and%20endTime%20eq%20{endTime}", pathParameters))
+		//autorest.WithQueryParameters(queryParameters))
 	return preparer.Prepare(&http.Request{})
 }
 

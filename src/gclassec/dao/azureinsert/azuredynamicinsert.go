@@ -49,10 +49,11 @@ func AzureDynamicInsert() error{
 	if err != nil{
 		fmt.Println("Azure : ",errcode.ErrAuth)
 		logger.Error("Azure :", errcode.ErrAuth)
-		//return
+		return err
 	}
 
 	for _, element := range *ls.Value {
+		name := *(element.Name)
 		rgroup := *(element.AvailabilitySet.ID)
 		resourcegroupname := strings.Split(rgroup, "/")
 		rsgroup := resourcegroupname[4]
@@ -62,22 +63,30 @@ func AzureDynamicInsert() error{
 		dc := goclientazure.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
 		dc.Authorizer = spt
 
-		dlist, er := dc.ListDynamic(vmName, rsgroup)
-		if er != nil{
-			fmt.Println("Azure : ",errcode.ErrAuth)
-			logger.Error("Azure :", errcode.ErrAuth)
+		//Get current Status of instance
+		instanceView, _ := ac.GetInstanceView(name, resourcegroupname[4])
+		if *instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus != "VM running" {
+			fmt.Println("Azure : ", errcode.ErrAzureDynamic)
+			logger.Error("Azure :", errcode.ErrAzureDynamic)
 			//return
+		}else {
+		dlist, er := dc.ListDynamic(vmName, rsgroup)
+		if er != nil {
+			fmt.Println("Azure : ", errcode.ErrAuth)
+			logger.Error("Azure :", errcode.ErrAuth)
+			return er
 		}
 		fmt.Println(dlist)
 		logger.Info(dlist)
 		for _, element1 := range *dlist.Value {
-			if *(element1.Data[len(element1.Data) - 1].Average) != 0.0 {
-				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:*(element1.Data[len(element1.Data) - 1].Minimum), Maximum:*(element1.Data[len(element1.Data) - 1].Maximum), Average:*(element1.Data[len(element1.Data) - 1].Average)}
-				db.Create(&azure_dynamic)
-			}else {
+			if element1.Data[len(element1.Data) - 1].Average == nil{
 				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:0.0, Maximum:0.0, Average:0.0}
 				db.Create(&azure_dynamic)
+			}else{
+				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:*(element1.Data[len(element1.Data) - 1].Minimum), Maximum:*(element1.Data[len(element1.Data) - 1].Maximum), Average:*(element1.Data[len(element1.Data) - 1].Average)}
+				db.Create(&azure_dynamic)
 			}
+		}
 		}
 
 	}
