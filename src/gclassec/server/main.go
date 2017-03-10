@@ -201,12 +201,12 @@ func main() {
         http.Handle("/", mx)
         // Fire up the server
         //TODO IMPLEMENT CONFIGURABLE Port
-        logger.Info("Server is on Port 9009")
+        logger.Info("Server is on Port 9000")
         logger.Info("Listening .....")
-        fmt.Println("Server is on Port 9009")
+        fmt.Println("Server is on Port 9000")
         fmt.Println("Listening .....")
         // fmt.Println(os.Getwd())
-        http.ListenAndServe("0.0.0.0:9009", nil)
+        http.ListenAndServe("0.0.0.0:9000", nil)
     }()
 
     fmt.Println("Waiting To Finish")

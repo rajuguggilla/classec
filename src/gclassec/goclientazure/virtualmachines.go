@@ -984,3 +984,63 @@ func (client VirtualMachinesClient) StartResponder(resp *http.Response) (result 
 	result.Response = resp
 	return
 }
+
+//Get information of InstanceView of the specified instance
+func (client VirtualMachinesClient) GetInstanceView(name string, resourceGroupName string) (result azurestruct.VirtualMachineInstanceView, err error) {
+	req, err := client.InstanceViewPreparer(name, resourceGroupName)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "InstanceView", nil, "Failure preparing request")
+	}
+
+	resp, err := client.InstanceViewSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "InstanceView", resp, "Failure sending request")
+	}
+
+	result, err = client.InstanceViewResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "compute.VirtualMachinesClient", "InstanceView", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// ListAllPreparer prepares the ListAll request.
+func (client VirtualMachinesClient) InstanceViewPreparer(name string, resourceGroupName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"subscriptionId": autorest.Encode("path", client.SubscriptionID),
+		"resourceGroupName": resourceGroupName,
+		"vmName": name,
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": "2016-04-30-preview",
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsGet(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/InstanceView", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare(&http.Request{})
+}
+
+// ListAllSender sends the ListAll request. The method will close the
+// http.Response Body if it receives an error.
+func (client VirtualMachinesClient) InstanceViewSender(req *http.Request) (*http.Response, error) {
+	return autorest.SendWithSender(client, req)
+}
+
+// ListAllResponder handles the response to the ListAll request. The method always
+// closes the http.Response Body.
+func (client VirtualMachinesClient) InstanceViewResponder(resp *http.Response) (result azurestruct.VirtualMachineInstanceView, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK),
+		autorest.ByUnmarshallingJSON(&result),
+		autorest.ByClosing())
+	result.Response = autorest.Response{Response: resp}
+	return
+}
