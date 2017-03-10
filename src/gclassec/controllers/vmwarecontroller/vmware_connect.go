@@ -358,72 +358,22 @@ func   (uc UserController) GetDynamicVcenterDetails(w http.ResponseWriter, r *ht
 
        tw.Flush()
 }
-//func VmwareInsert(){
-//	ctx, cancel := context.WithCancel(context.Background())
-//	defer cancel()
-//	fmt.Println(*ENVinsecureFlag)
-//
-//	flag.Parse()
-//
-//	// Parse URL from string
-//	u, err := url.Parse(*ENVurlFlag)
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//
-//	// Override username and/or password as required
-//	ProcessOverride(u)
-//
-//	// Connect and log in to ESX or vCenter
-//	c, err := govmomi.NewClient(ctx, u, *ENVinsecureFlag)
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//
-//	f := find.NewFinder(c.Client, true)
-//
-//	// Find one and only datacenter
-//	dc, err := f.DefaultDatacenter(ctx)
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//
-//	// Make future calls local to this datacenter
-//	f.SetDatacenter(dc)
-//
-//	// Find virtual machines in datacenter
-//	vms, err := f.VirtualMachineList(ctx, "*")
-//	fmt.Println(vms)
-//
-//	pc := property.DefaultCollector(c.Client)
-//
-//	var refv []types.ManagedObjectReference
-//	for _, ds := range vms {
-//		refv = append(refv, ds.Reference())
-//	}
-//
-//	// Retrieve name property for all vms
-//	var vmt []mo.VirtualMachine
-//	err = pc.Retrieve(ctx, refv, []string{"summary"}, &vmt)
-//	if err != nil {
-//  		fmt.Println(err)
-//	}
-//
-//
-//	// Print summary
-//	tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
-//
-//	fmt.Println("Virtual machines found:", len(vmt))
-//	for _, vm := range vmt {
-//
-//		output := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name,Uuid:vm.Summary.Config.Uuid,MemorySizeMB:vm.Summary.Config.MemorySizeMB,PowerState:vm.Summary.Runtime.PowerState,NumofCPU:vm.Summary.Config.NumCpu,GuestFullName:vm.Summary.Guest.GuestFullName,IPaddress:vm.Summary.Guest.IpAddress}
-//		//_ = json.NewEncoder(w).Encode(output)
-//		db.Create(&output)
-//	}
-//
-//	tw.Flush()
-//}
-//
-//
-//
-////vm.Summary.Runtime.PowerState
+func   (uc UserController) GetDynamicVcenterUpdateDetails(w http.ResponseWriter, r *http.Request)() {
+	tx := db.Begin()
+	db.SingularTable(true)
+	vmware_struct := []vmwarestructs.VmwareDynamicDetails{}
+	errFind := db.Find(&vmware_struct).Error
+	if errFind != nil {
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+
+	_ = json.NewEncoder(w).Encode(db.Find(&vmware_struct))
+
+	if err != nil {
+		logger.Error("Error: ",err)
+		println(err)
+	}
+	logger.Info("Successful in GetVcenterDetails.")
+	tx.Commit()
+}
