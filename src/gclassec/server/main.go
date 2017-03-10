@@ -39,9 +39,7 @@ type Configuration struct {
 /**
     Classec server and Job initiator
  */
-//HOOKED TEST
 func main() {
-    //
     logger := Loggers.New()
     filename := "server/main.go"
     _, filePath, _, _ := runtime.Caller(0)
