@@ -36,9 +36,9 @@ type Configuration struct {
 	Timespec time.Duration
 }
 /**
-    INITIATOR
-    Classec server and Job initiator
-
+   CLASSEC STARTER
+   TODO: CONFIGURABLE PORT NO
+   Classec server and Job initiator
  */
 func main() {
     logger := Loggers.New()
@@ -116,7 +116,7 @@ func main() {
 
         //Authentication & authorization service root
         var ATHSROOT = CLAROOT+"/athas"
-    //Testing
+        //Testing
         // Get a instance resource
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.GetComputeDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/flavors",hoc.GetFlavorsDetails).Methods("GET")
