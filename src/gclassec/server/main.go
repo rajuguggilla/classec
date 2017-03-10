@@ -138,7 +138,7 @@ func main() {
         mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")  // 'http://localhost:9009/dbaas/pricing'
 
         mx.HandleFunc(OPSROOT+"/instances/staticdata", opc.GetDetailsOpenstack).Methods("GET")
-        //TODO add openstack dynamic services
+        //TODO add openstack dynamic services for HOS
 
         mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
         mx.HandleFunc(AZUROOT+"/instances/utilization/{resourceGroup}/{name}", azc.GetDynamicAzureDetails).Methods("GET")
