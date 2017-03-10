@@ -1,5 +1,6 @@
 {
   "Interval":300,
   "Timespec":1000000000,
+  "UpdateUsingAPI":1,
   "_comment":"Timespec value is 'Second'"
 }

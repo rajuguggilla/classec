@@ -34,12 +34,14 @@ import (
     "gclassec/dao/openstackinsert"
     "gclassec/dao/vmwareinsert"
     "gclassec/dao/hosinsert"
+	"gclassec/structs/configurationstruct"
 )
 
-type Configuration struct {
-	Interval int64
-	Timespec time.Duration
-}
+//type Configuration struct {
+//	Interval int64
+//	Timespec time.Duration
+//        UpdateUsingAPI  bool
+//}
 
 func main() {
     logger := Loggers.New()
@@ -57,7 +59,7 @@ func main() {
 
 
     decoder := json.NewDecoder(file)
-    configuration := Configuration{}
+    configuration := configurationstruct.Configuration{}
     errDecode := decoder.Decode(&configuration)
 
     if errDecode != nil {
@@ -74,6 +76,8 @@ func main() {
     logger.Info("Duration for Ticker : ",time.Duration(configuration.Interval) * configuration.Timespec)
     logger.Info("Interval: ", configuration.Interval)
     logger.Info("Timespec: ", configuration.Timespec)
+    logger.Info("UpdateUsingAPI: ", configuration.UpdateUsingAPI)
+
 
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
@@ -166,7 +170,7 @@ func main() {
         mx.HandleFunc(ATHSROOT+"/vmware/credentials",usrc.UpdateVmwareCredentials).Methods("POST")
         mx.HandleFunc(ATHSROOT+"/vmware/credentials",usrc.GetVmwareCredentials).Methods("GET")
 
-        mx.HandleFunc(ATHSROOT+"/azure/credentials",usrc.UpdateAzureCredentials).Methods("POST")
+        mx.HandleFunc(ATHSROOT + "/azure/credentials", usrc.UpdateAzureCredentials).Methods("POST")
         mx.HandleFunc(ATHSROOT+"/azure/credentials",usrc.GetAzureCredentials).Methods("GET")
 
         mx.HandleFunc("/instancetag/{instanceid}", instancetags.InstanceProvider).Methods("POST")
