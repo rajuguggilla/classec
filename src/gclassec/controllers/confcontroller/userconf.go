@@ -12,6 +12,8 @@ import (
 	"gclassec/authmanagment"
 	"gclassec/loggers"
 	"encoding/json"
+	"gclassec/errorcodes/errcode"
+	"gclassec/structs/configurationstruct"
 )
 
 var redirectTarget string
@@ -218,8 +220,11 @@ func (uc UserController) ProviderAzure(w http.ResponseWriter, r *http.Request) {
 
 func (uc UserController) UpdateAwsCredentials(w http.ResponseWriter, r *http.Request){
 
-	authmanagment.AwsCredentials(w, r)
-
+	if ReadJobConfigFile()!=0{
+		authmanagment.AwsCredentials(w, r)
+	}else{
+		fmt.Fprintf(w, "You Were Not Allowed To Change User Configuration Through API")
+	}
 }
 
 func (uc UserController) GetAwsCredentials(w http.ResponseWriter, r *http.Request){
@@ -232,7 +237,11 @@ func (uc UserController) GetAwsCredentials(w http.ResponseWriter, r *http.Reques
 
 func (uc UserController) UpdateAzureCredentials(w http.ResponseWriter, r *http.Request){
 
-	authmanagment.AzureCredentials(w, r)
+	if ReadJobConfigFile()!=0{
+		authmanagment.AzureCredentials(w, r)
+	}else{
+		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+	}
 
 }
 
@@ -244,7 +253,11 @@ func (uc UserController) GetAzureCredentials(w http.ResponseWriter, r *http.Requ
 
 func (uc UserController) UpdateOsCredentials(w http.ResponseWriter, r *http.Request){
 
-	authmanagment.OpenstackCredentials(w, r)
+	if ReadJobConfigFile()!=0{
+		authmanagment.OpenstackCredentials(w, r)
+	}else{
+		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+	}
 
 }
 
@@ -258,7 +271,11 @@ func (uc UserController) GetOsCredentials(w http.ResponseWriter, r *http.Request
 
 func (uc UserController) UpdateHosCredentials(w http.ResponseWriter, r *http.Request){
 
-	authmanagment.HosCredentials(w, r)
+	if ReadJobConfigFile()!=0{
+		authmanagment.HosCredentials(w, r)
+	}else{
+		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+	}
 
 }
 
@@ -271,7 +288,11 @@ func (uc UserController) GetHosCredentials(w http.ResponseWriter, r *http.Reques
 
 func (uc UserController) UpdateVmwareCredentials(w http.ResponseWriter, r *http.Request){
 
-	authmanagment.VmwareCredentials(w, r)
+	if ReadJobConfigFile()!=0{
+		authmanagment.VmwareCredentials(w, r)
+	}else{
+		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+	}
 
 }
 
@@ -279,4 +300,30 @@ func (uc UserController) GetVmwareCredentials(w http.ResponseWriter, r *http.Req
 
 	resp := authmanagment.ReadVmwareCredentials()
 	_ = json.NewEncoder(w).Encode(&resp)
+}
+
+func ReadJobConfigFile() int64{
+    filename := "controllers/confcontroller/userconf.go"
+    _, filePath, _, _ := runtime.Caller(0)
+    //logger.Debug("CurrentFilePath:==",filePath)
+	fmt.Println("CurrentFilePath:==",filePath)
+    ConfigFilePath :=(strings.Replace(filePath, filename, "conf/jobconf.json", 1))
+    //logger.Debug("ABSPATH:==",ConfigFilePath)
+	fmt.Println("ABSPATH:==",ConfigFilePath)
+    file, errOpen := os.Open(ConfigFilePath)
+    if errOpen != nil{
+        fmt.Println("Error : ", errcode.ErrFileOpen)
+        logger.Error("Error : ", errcode.ErrFileOpen)
+	return 0
+    }
+    decoder := json.NewDecoder(file)
+    configuration := configurationstruct.Configuration{}
+    errDecode := decoder.Decode(&configuration)
+    if errDecode != nil {
+        fmt.Println("Error : ", errcode.ErrDecode)
+        logger.Error("Error : ",errcode.ErrDecode)
+        return 0
+    }
+    return configuration.UpdateUsingAPI
+
 }
