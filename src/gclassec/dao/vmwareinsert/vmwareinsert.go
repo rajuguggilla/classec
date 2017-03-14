@@ -227,16 +227,19 @@ func VmwareInsert() error{
 	for _, i := range vmware_struct {
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
-			db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+			db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname","Nil")
+			//db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
 		}else {
 			for _, el := range tag {
 				if i.Uuid != el.InstanceId{
 					fmt.Println("----No Tag for this instance----")
-					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+					db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname","Nil")
+					//db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
 				}else {
 					fmt.Println("----Update Tag for this instance----")
 					fmt.Println("el.Tagname : ", el.Tagname)
-					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
+					db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname",el.Tagname)
+					//db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
 				}
 			}
 		}
