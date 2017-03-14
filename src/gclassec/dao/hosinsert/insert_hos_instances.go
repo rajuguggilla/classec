@@ -82,16 +82,19 @@ func HosInsert(){
 	for _, i := range hos_compute{
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
-			db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
+			db.Model(hosstruct.HosInstances{}).Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
+			//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
 		}else {
 			for _, el := range tag {
 				if i.InstanceID != el.InstanceId {
 					fmt.Println("----No Tag for this instance----")
-					db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
+					db.Model(hosstruct.HosInstances{}).Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
+					//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
 				}else {
 					fmt.Println("----Update Tag for this instance----")
 					fmt.Println("el.Tagname : ", el.Tagname)
-					db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
+					db.Model(hosstruct.HosInstances{}).Where("Instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
+					//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
 				}
 			}
 		}
