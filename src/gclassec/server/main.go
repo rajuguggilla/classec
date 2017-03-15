@@ -107,6 +107,12 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
+                    errHOS := hosinsert.HOSDynamicInsert()
+                    if errHOS != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                     errVmDynamic := vmwareinsert.VmwareDynamicInsert()
                     if errVmDynamic != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)

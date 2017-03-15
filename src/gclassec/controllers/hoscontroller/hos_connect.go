@@ -16,6 +16,7 @@ import (
 	"gclassec/loggers"
 	"gclassec/goclienthos/hosstaticdynamic"
 	"gclassec/dbmanagement"
+	"gclassec/errorcodes/errcode"
 )
 
 type (
@@ -112,5 +113,40 @@ func (uc UserController) GetCompleteDetail(w http.ResponseWriter, r *http.Reques
 
 	res := hosstaticdynamic.ComputeWithCPU()
 	_ = json.NewEncoder(w).Encode(&res)
+
+}
+
+func (uc UserController) GetCompleteDynamicDetail(w http.ResponseWriter, r *http.Request){
+
+	/*res, err := dynamicdetails.DynamicDetails()
+	_ = json.NewEncoder(w).Encode(&res)
+
+	if err != nil{
+		return
+	}*/
+
+
+	tx := db.Begin()
+	db.SingularTable(true)
+	logger := Loggers.New()
+	logger.Info("We are Fetching Static Data from Database.")
+	hos_struct := []hosstruct.HosDynamicInstances{}
+
+	errFind := db.Find(&hos_struct).Error
+
+	if errFind != nil{
+		logger.Error("Error: ", errcode.ErrFindDB)
+		tx.Rollback()
+	}
+
+	_ = json.NewEncoder(w).Encode(db.Find(&hos_struct))
+
+		if err != nil {
+			logger.Error("Error :", err)
+			println(err)
+		}
+
+	tx.Commit()
+	logger.Info("Successful in Fetching Data from Database.")
 
 }

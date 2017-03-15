@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
+	"gclassec/goclienthos/dynamicdetails"
 )
 
 var logger = Loggers.New()
@@ -113,4 +114,29 @@ func HosInsert(){
               }*/
 	logger.Info("Successful in InsertHOSInstance.")
 	tx.Commit()
+}
+
+
+
+// Inserting Dynamic Data into database
+
+func HOSDynamicInsert() error{
+
+	dynamicDetails, err := dynamicdetails.DynamicDetails()
+
+	if err != nil{
+		return err
+	}
+	logger.Info(dynamicDetails)
+
+
+	// Inserting Dynamic Data into Database
+	for _, element := range dynamicDetails.Servers{
+		user := hosstruct.HosDynamicInstances{Vm_Name:element.Vm_Name, InstanceID:element.InstanceID, Count:element.Count, DurationStart:element.DurationStart, Min:element.Min,DurationEnd:element.DurationEnd, Max:element.Max, Sum:element.Sum, Period:element.Period, PeriodEnd:element.PeriodEnd, Duration:element.Duration, PeriodStart:element.PeriodStart, Avg:element.Avg, Groupby:element.Groupby, Unit:element.Unit}
+		db.Create(&user)
+		//db.Model(&user).Updates(&user)
+	}
+
+	logger.Info("Successful in InsertHOSDynamicInstance")
+	return nil
 }
