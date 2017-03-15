@@ -100,15 +100,15 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
-                    errVmDynamic := vmwareinsert.VmwareDynamicInsert()
-                    if errVmDynamic != nil{
-                        fmt.Println("Error : ", errcode.ErrInsert)
-                        logger.Error("Error : ",errcode.ErrInsert)
-                    }
                     hosinsert.HosInsert()
                 case <- ticker_dynamic.C:
                     err := azureinsert.AzureDynamicInsert()
                     if err != nil {
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errVmDynamic := vmwareinsert.VmwareDynamicInsert()
+                    if errVmDynamic != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
