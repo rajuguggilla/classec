@@ -5,10 +5,10 @@ Pre-requisite
     GO setup
     Latest go code from master branch
     Setting up GOPATH and GOROOT
-    Install Libraries from dependancies.env file . "classec\src\gclassec\conf\dependencies.env"
+    Install Libraries from dependencies.env file . "classec\src\gclassec\conf\dependencies.env"
 
 -DB setup
-    Set Mysql
+    Setup Mysql
     import .sql file into db.   "classec\src\gclassec\classec.sql"
 
 -Configuration Files
