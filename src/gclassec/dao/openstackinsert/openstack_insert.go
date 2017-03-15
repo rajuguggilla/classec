@@ -52,7 +52,8 @@ func InsertInstances(){
 	er1 := db.Where("Cloud = ?", reg.FindString("Openstack")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return
 	}
 	db.Where("Cloud = ?", reg.FindString("Openstack")).Find(&tag)
 
@@ -62,7 +63,8 @@ func InsertInstances(){
 
 	if er != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return
 	}
 
 	db.Find(&openstack_struct)

@@ -1,11 +1,11 @@
 {
-	"IdentityEndpoint": "http://110.110.112.5:5000/v3/",
-	"Username": "bhanu",
-	"Password": "bhanu",
-	"ProjectID": "87ca7d9c50b84b058c4d2b96bed92481",
+	"IdentityEndpoint": "http://110.110.112.10:5000/v3/",
+	"Username": "classecdev",
+	"Password": "cl@1234",
+	"ProjectID": "f05a14bb2f8b4be29ad3330eaf6689cb",
 	"ProjectName": "Default",
  	"Container": "I♡HPHelion",
 	"ImageRegion": "",
-	"Controller": "110.110.112.5" ,
-	"ComputeHost" :"http://110.110.112.5:8774/v2.1/87ca7d9c50b84b058c4d2b96bed92481"
+	"Controller": "110.110.112.10" ,
+	"ComputeHost" :"http://110.110.112.10:8774/v2.1/f05a14bb2f8b4be29ad3330eaf6689cb"
 }
