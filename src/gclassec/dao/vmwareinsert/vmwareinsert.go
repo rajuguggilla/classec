@@ -186,7 +186,8 @@ func VmwareInsert() error{
 	er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er1
 	}
 	db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
 
@@ -196,7 +197,8 @@ func VmwareInsert() error{
 	er := db.Find(&vmware_struct).Error
 	if er != nil {
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er
 	}
 	/*for _, element := range vmware_struct {
        		db.Table("vmware_instances").Where("Name = ?",element.Name).Update("deleted", true)
