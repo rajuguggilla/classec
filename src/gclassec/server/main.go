@@ -165,6 +165,7 @@ func main() {
         mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
         mx.HandleFunc(AZUROOT+"/instances/utilization/{resourceGroup}/{name}", azc.GetDynamicAzureDetails).Methods("GET")
         mx.HandleFunc(AZUROOT+"/instances/staticdynamic", azc.GetAzureStaticDynamic).Methods("GET")
+	mx.HandleFunc(AZUROOT+"/instances/dynamicdata", azc.GetAzureDynamic).Methods("GET") // get azure dynamic details from database
 
         mx.HandleFunc(VMWROOT+"/instances/utilization", vwc.GetDynamicVcenterDetails).Methods("GET")
         mx.HandleFunc(VMWROOT+"/instances/staticdata", vwc.GetVcenterDetails).Methods("GET")
