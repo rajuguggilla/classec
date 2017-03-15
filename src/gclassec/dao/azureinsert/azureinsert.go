@@ -97,7 +97,8 @@ func AzureInsert() error{
 	er1 := db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er1
 	}
 	db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag)
 
@@ -105,7 +106,8 @@ func AzureInsert() error{
 
 	if er != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er
 	}
 	db.Find(&azure_struct)
 
@@ -148,16 +150,19 @@ func AzureInsert() error{
 	for _, i := range azure_struct {
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
-			db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
+			db.Model(azurestruct.AzureInstances{}).Where("vmid = ?",i.VmId).Update("tagname","Nil")
+			//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
 		} else {
 			for _, el := range tag {
 				if i.VmId != el.InstanceId {
 					fmt.Println("----No Tag for this instance----")
-					db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
+					db.Model(azurestruct.AzureInstances{}).Where("vmid = ?",i.VmId).Update("tagname","Nil")
+					//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
 				} else {
 					fmt.Println("----Update Tag for this instance----")
 					fmt.Println("Tagname : ", el.Tagname)
-					db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname",el.Tagname)
+					db.Model(azurestruct.AzureInstances{}).Where("vmid = ?",i.VmId).Update("tagname",el.Tagname)
+					//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname",el.Tagname)
 				}
 			}
 		}

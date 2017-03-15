@@ -52,7 +52,8 @@ func InsertInstances(){
 	er1 := db.Where("Cloud = ?", reg.FindString("Openstack")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return
 	}
 	db.Where("Cloud = ?", reg.FindString("Openstack")).Find(&tag)
 
@@ -62,7 +63,8 @@ func InsertInstances(){
 
 	if er != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return
 	}
 
 	db.Find(&openstack_struct)
@@ -96,16 +98,19 @@ func InsertInstances(){
 	for _, i := range openstack_struct{
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
-			db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
+			db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
+			//db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
 		}else {
 			for _, el := range tag {
 					if i.InstanceID != el.InstanceId{
 						fmt.Println("----No Tag for this instance----")
-						db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
+						db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
+						//db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
 					}else {
 						fmt.Println("----Update Tag for this instance----")
 						fmt.Println("el.Tagname : ", el.Tagname)
-						db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
+						db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
+						//db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
 					}
 				}
 		}

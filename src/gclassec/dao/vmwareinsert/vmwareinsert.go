@@ -186,7 +186,8 @@ func VmwareInsert() error{
 	er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er1
 	}
 	db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
 
@@ -196,7 +197,8 @@ func VmwareInsert() error{
 	er := db.Find(&vmware_struct).Error
 	if er != nil {
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er
 	}
 	/*for _, element := range vmware_struct {
        		db.Table("vmware_instances").Where("Name = ?",element.Name).Update("deleted", true)
@@ -227,16 +229,19 @@ func VmwareInsert() error{
 	for _, i := range vmware_struct {
 		if len(tag) == 0 {
 			fmt.Println("----Nothing in Tag----")
-			db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+			db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname","Nil")
+			//db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
 		}else {
 			for _, el := range tag {
 				if i.Uuid != el.InstanceId{
 					fmt.Println("----No Tag for this instance----")
-					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
+					db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname","Nil")
+					//db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
 				}else {
 					fmt.Println("----Update Tag for this instance----")
 					fmt.Println("el.Tagname : ", el.Tagname)
-					db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
+					db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname",el.Tagname)
+					//db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
 				}
 			}
 		}
