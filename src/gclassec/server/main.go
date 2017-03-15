@@ -159,6 +159,7 @@ func main() {
 	//mux.HandleFunc(HOSROOT+"/ceilometerdetails",GetCeilometerDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/test/index",hoc.Index).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.Compute).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/instances/dynamicdata",hoc.GetCompleteDynamicDetail).Methods("GET")
 
         mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
         mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")  // 'http://localhost:9009/dbaas/list/dev01-a-tky-customerorderpf'
