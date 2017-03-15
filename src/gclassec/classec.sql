@@ -173,3 +173,12 @@ CREATE TABLE IF NOT EXISTS `rds_dynamic` (
   `NetworkTransmitThroughput_max` double DEFAULT NULL,
   `NetworkTransmitThroughput_avg` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE IF NOT EXISTS `vw_rds` (
+`API_Name` varchar(30)
+,`Linux_On_Demand_cost` varchar(30)
+,`Linux_Reserved_cost` varchar(30)
+,`Windows_On_Demand_cost` varchar(30)
+,`Windows_Reserved_cost` varchar(30)
+);
