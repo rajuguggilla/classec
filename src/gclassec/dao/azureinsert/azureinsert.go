@@ -97,7 +97,8 @@ func AzureInsert() error{
 	er1 := db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er1
 	}
 	db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag)
 
@@ -105,7 +106,8 @@ func AzureInsert() error{
 
 	if er != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return er
 	}
 	db.Find(&azure_struct)
 

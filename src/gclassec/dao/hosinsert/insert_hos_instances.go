@@ -42,7 +42,8 @@ func HosInsert(){
 
 	if err != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return
 	}
 
 	db.Find(&hos_compute)
@@ -55,7 +56,8 @@ func HosInsert(){
 	er1 := db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag).Error
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
-		tx.Rollback()
+		//tx.Rollback()
+		return
 	}
 	db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag)
 
