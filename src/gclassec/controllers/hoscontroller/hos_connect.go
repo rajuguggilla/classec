@@ -50,7 +50,10 @@ func (uc UserController) CpuUtilDetails(w http.ResponseWriter, r *http.Request){
 }
 func (uc UserController) GetComputeDetails(w http.ResponseWriter, r *http.Request){
 
-	res := compute.Compute()
+	res, err := compute.Compute()
+	if err != nil{
+		logger.Error("Error: ", errcode.ErrFindDB)
+	}
         _ = json.NewEncoder(w).Encode(&res)
 	//fmt.Fprintf(w,res)
 

@@ -14,7 +14,7 @@ import (
 
 
 
-func Compute() hosstruct.ComputeResponse {
+func Compute() (hosstruct.ComputeResponse, error) {
 
 
 	//fmt.Println("This to get Nothing")
@@ -24,7 +24,7 @@ func Compute() hosstruct.ComputeResponse {
 		if err != nil{
 			fmt.Println("HOS : ", errcode.ErrAuth)
 			logger.Error("HOS :", errcode.ErrAuth)
-			return hosstruct.ComputeResponse{}
+			return hosstruct.ComputeResponse{}, err
 		}
 	logger.Debug("HOS AuthToken:=====\n", auth)
 	logger.Debug("HOS Configuration:=====\n %+v", hosConfig)
@@ -90,7 +90,7 @@ func Compute() hosstruct.ComputeResponse {
 	logger.Info("%+v\n\n", jsonComputeResponse)
 	TempStr, _ := json.Marshal(&jsonComputeResponse)
 	logger.Info("Printing Final jsonComputeResponse in string:===\n\n ",string(TempStr))
-	return jsonComputeResponse
+	return jsonComputeResponse, nil
 	//return string(TempStr)
 
 }

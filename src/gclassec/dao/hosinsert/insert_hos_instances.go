@@ -31,7 +31,12 @@ var db,err  = gorm.Open(dbtype, c)
 func HosInsert(){
 	logger := Loggers.New()
 	//println(examples.ComputeFunc())
-	computeDetails:= compute.Compute()
+	computeDetails, err1 := compute.Compute()
+	if err1 != nil{
+		logger.Error("Error: ",errcode.ErrAuth)
+		//tx.Rollback()
+		return
+	}
 
 	tx := db.Begin()
 	db.SingularTable(true)
