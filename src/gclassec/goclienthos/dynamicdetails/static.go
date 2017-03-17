@@ -1,5 +1,6 @@
 package dynamicdetails
 
+
 import (
 	"fmt"
 	"gclassec/loggers"
@@ -11,6 +12,7 @@ import (
 	"encoding/json"
 //	"gclassec/goclienthos/compute"
 	"gclassec/structs/hosstruct"
+	"gclassec/goclienthos/util"
 )
 
 func DynamicDetails()(hosstruct.CompleteDynamicResponse,error) {
@@ -40,14 +42,34 @@ func DynamicDetails()(hosstruct.CompleteDynamicResponse,error) {
 	var reqURL string =  computeEndpoint + "/servers/detail"
 	//var reqURL string = "http://" + hosConfiguration.KeystoneEndpointIP + ":8774/v2.1/" + hosConfiguration.TenantId + "/servers/detail"
 	fmt.Println("Request Body:==",reqURL)
-	req, _ := http.NewRequest("GET", reqURL, nil)
+
+	req, errReq := http.NewRequest("GET", reqURL, nil)
+	if errReq != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.CompleteDynamicResponse{}, err
+		}
+
+
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
-	res, _ := http.DefaultClient.Do(req)
+	res, errClient := http.DefaultClient.Do(req)
+	if errClient != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.CompleteDynamicResponse{}, err
+		}
+
+
 	fmt.Println("Status:======== ", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, errResp := ioutil.ReadAll(res.Body)
+		if errResp != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+		return hosstruct.CompleteDynamicResponse{}, err
+		}
 
 
 
@@ -77,16 +99,44 @@ func DynamicDetails()(hosstruct.CompleteDynamicResponse,error) {
 
 	fmt.Println("\n\n ++++++++++++++++++++++++++++++ End of Static +++++++++++++++++++++++++++++\n\n")
 
-	for k:=0; k<len(jsonDynamicResponse.Servers);k++{
+	for k:=0; k<len(jsonDynamicResponse.Servers);k++ {
 		temID := jsonDynamicResponse.Servers[k].InstanceID
-		DynamicData := CpuUtil(temID)
+		DynamicData, err := util.GetCpuUtilDetails(temID)
+		if err != nil {
+			fmt.Println("Error", err)
+		}
+		for element1:=0;element1<len(DynamicData);element1++ {
+			if element1 == len(DynamicData) - 1 {
+				element := DynamicData[element1]
+
+
+				jsonDynamicResponse.Servers[k].Count = element.Count
+				jsonDynamicResponse.Servers[k].DurationStart = element.DurationStart
+				jsonDynamicResponse.Servers[k].Min = element.Min
+				jsonDynamicResponse.Servers[k].DurationEnd = element.DurationEnd
+				jsonDynamicResponse.Servers[k].Max = element.Max
+				jsonDynamicResponse.Servers[k].Sum = element.Sum
+				jsonDynamicResponse.Servers[k].Period = element.Period
+				jsonDynamicResponse.Servers[k].PeriodEnd = element.PeriodEnd
+				jsonDynamicResponse.Servers[k].Duration = element.Duration
+				jsonDynamicResponse.Servers[k].PeriodStart = element.PeriodStart
+				jsonDynamicResponse.Servers[k].Avg = element.Avg
+				jsonDynamicResponse.Servers[k].Groupby = element.Groupby
+				jsonDynamicResponse.Servers[k].Unit = element.Unit
+			}
+		}
+	}
+
+
+
+
 		//fmt.Println("dynamicData)
-		fmt.Println("\n\n--------------------------------------------\n\n")
-		fmt.Println("@@@@@@@@@@@@@@@@@@---  DYNAMIC @@@@@@@@@@@@@",DynamicData)
+		//fmt.Println("\n\n--------------------------------------------\n\n")
+		//fmt.Println("@@@@@@@@@@@@@@@@@@---  DYNAMIC @@@@@@@@@@@@@",DynamicData)
 		//var jsonStaticResponse MyStruct
 		//jsonStaticResponse.ServersResp = jsonStaticResponse1.Servers[k]
 		//jsonStaticResponse.Cpu_Util = dynamicData
-		//jsonStaticResponses = append(jsonStaticResponses,jsonStaticResponse)
+		/*//jsonStaticResponses = append(jsonStaticResponses,jsonStaticResponse)
 		jsonDynamicResponse.Servers[k].Count = DynamicData.Count
 		jsonDynamicResponse.Servers[k].DurationStart = DynamicData.DurationStart
 		jsonDynamicResponse.Servers[k].Min = DynamicData.Min
@@ -99,12 +149,12 @@ func DynamicDetails()(hosstruct.CompleteDynamicResponse,error) {
 		jsonDynamicResponse.Servers[k].PeriodStart = DynamicData.PeriodStart
 		jsonDynamicResponse.Servers[k].Avg = DynamicData.Avg
 		jsonDynamicResponse.Servers[k].Groupby = DynamicData.Groupby
-		jsonDynamicResponse.Servers[k].Unit = DynamicData.Unit
+		jsonDynamicResponse.Servers[k].Unit = DynamicData.Unit*/
 
 
 
 
-	}
+	//}
 
 
 	fmt.Println("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")

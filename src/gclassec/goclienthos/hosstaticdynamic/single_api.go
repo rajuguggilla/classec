@@ -4,14 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
-//	"hos/HOSAuthToken"
-//	"hos/HOS_API_Function/comp/flavor"
 	"encoding/json"
-
-//	"HOS_API_Function"
-	//"hos/HOS_API_Function/comp/flavor"
-//"hos/HOSAuthToken"
-
 	"gclassec/goclienthos/authtoken"
 	"gclassec/goclienthos/compute"
 	"gclassec/structs/hosstruct"
@@ -19,10 +12,10 @@ import (
 	"gclassec/loggers"
 	"gclassec/structs/tagstruct"
 	"regexp"
-
 	"strings"
 	"github.com/jinzhu/gorm"
 	"gclassec/dbmanagement"
+	"gclassec/goclienthos/util"
 )
 
 
@@ -83,14 +76,31 @@ func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 	var reqURL string =  computeEndpoint + "/servers/detail"
 	//var reqURL string = "http://" + hosConfiguration.KeystoneEndpointIP + ":8774/v2.1/" + hosConfiguration.TenantId + "/servers/detail"
 	fmt.Println("Request Body:==",reqURL)
-	req, _ := http.NewRequest("GET", reqURL, nil)
+	req, errReq := http.NewRequest("GET", reqURL, nil)
+	if errReq != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.CompleteComputeResponse{}
+		}
+
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
-	res, _ := http.DefaultClient.Do(req)
+	res, errClient := http.DefaultClient.Do(req)
+		if errClient != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.CompleteComputeResponse{}
+		}
+
 	fmt.Println("Status:======== ", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, errResp := ioutil.ReadAll(res.Body)
+		if errResp != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+		return hosstruct.CompleteComputeResponse{}
+		}
 
 	var jsonComputeResponse hosstruct.CompleteComputeResponse
 
@@ -127,7 +137,7 @@ func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 
 
 	fmt.Println("\n\n ++++++++++++++++++++++++++++++ End of Static +++++++++++++++++++++++++++++\n\n")
-
+/*
 	for k:=0; k<len(jsonComputeResponse.Servers);k++{
 		temID := jsonComputeResponse.Servers[k].InstanceID
 		dynamicData := AvgCpuUtil(temID)
@@ -139,6 +149,24 @@ func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 		//jsonStaticResponse.Cpu_Util = dynamicData
 		//jsonStaticResponses = append(jsonStaticResponses,jsonStaticResponse)
 		jsonComputeResponse.Servers[k].Cpu_Util=dynamicData
+	}*/
+
+
+	for k:=0; k<len(jsonComputeResponse.Servers);k++ {
+		temID := jsonComputeResponse.Servers[k].InstanceID
+		DynamicData, err := util.GetCpuUtilDetails(temID)
+		if err != nil {
+			fmt.Println("Error", err)
+		}
+		for element1:=0;element1<len(DynamicData);element1++ {
+			if element1 == len(DynamicData) - 1 {
+				element := DynamicData[element1]
+
+
+				jsonComputeResponse.Servers[k].Cpu_Util = element.Avg
+
+			}
+		}
 	}
 
 	for j := 0; j < len(jsonComputeResponse.Servers); j++{
@@ -154,7 +182,6 @@ func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 			}
 		}
 	}
-
 
 
 	fmt.Println("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n")

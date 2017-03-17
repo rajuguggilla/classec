@@ -240,7 +240,7 @@ func (uc UserController) UpdateAzureCredentials(w http.ResponseWriter, r *http.R
 	if ReadJobConfigFile()!=0{
 		authmanagment.AzureCredentials(w, r)
 	}else{
-		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+		fmt.Fprintf(w, "Not Allowed To Change User Configuration Through API")
 	}
 
 }
@@ -256,7 +256,7 @@ func (uc UserController) UpdateOsCredentials(w http.ResponseWriter, r *http.Requ
 	if ReadJobConfigFile()!=0{
 		authmanagment.OpenstackCredentials(w, r)
 	}else{
-		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+		fmt.Fprintf(w, "Not Allowed To Change User Configuration Through API")
 	}
 
 }
@@ -274,7 +274,7 @@ func (uc UserController) UpdateHosCredentials(w http.ResponseWriter, r *http.Req
 	if ReadJobConfigFile()!=0{
 		authmanagment.HosCredentials(w, r)
 	}else{
-		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+		fmt.Fprintf(w, "Not Allowed To Change User Configuration Through API")
 	}
 
 }
@@ -291,7 +291,7 @@ func (uc UserController) UpdateVmwareCredentials(w http.ResponseWriter, r *http.
 	if ReadJobConfigFile()!=0{
 		authmanagment.VmwareCredentials(w, r)
 	}else{
-		fmt.Fprintf(w, "You Are Not Allowed To Change User Configuration Through API")
+		fmt.Fprintf(w, "Not Allowed To Change User Configuration Through API")
 	}
 
 }

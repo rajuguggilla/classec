@@ -137,7 +137,7 @@ func HOSDynamicInsert() error{
 
 	// Inserting Dynamic Data into Database
 	for _, element := range dynamicDetails.Servers{
-		user := hosstruct.HosDynamicInstances{Vm_Name:element.Vm_Name, InstanceID:element.InstanceID, Count:element.Count, DurationStart:element.DurationStart, Min:element.Min,DurationEnd:element.DurationEnd, Max:element.Max, Sum:element.Sum, Period:element.Period, PeriodEnd:element.PeriodEnd, Duration:element.Duration, PeriodStart:element.PeriodStart, Avg:element.Avg, Groupby:element.Groupby, Unit:element.Unit}
+		user := hosstruct.HosDynamicInstances{Vm_Name:element.Vm_Name, InstanceID:element.InstanceID, Count:element.Count, DurationStart:element.DurationStart, Min:element.Min,DurationEnd:element.DurationEnd, Max:element.Max, Sum:element.Sum, Period:element.Period, PeriodEnd:element.PeriodEnd, Duration:element.Duration, PeriodStart:element.PeriodStart, Avg:element.Avg, Unit:element.Unit}
 		db.Create(&user)
 		//db.Model(&user).Updates(&user)
 	}
