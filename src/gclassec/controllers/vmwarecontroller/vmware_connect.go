@@ -26,6 +26,7 @@ import (
 	"gclassec/structs/tagstruct"
 	"regexp"
 	"gclassec/dbmanagement"
+	"gclassec/confmanagement/readstructconf"
 )
 
 //const (
@@ -247,7 +248,75 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 		tx.Rollback()
 	}
 
-	_ = json.NewEncoder(w).Encode(db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct))
+	db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct)
+
+	//_ = json.NewEncoder(w).Encode(db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct))
+
+	if readstructconf.ReadStructConfigFile()!=0{
+		//var standardresponse azurestruct.StandardizedAzure
+		standardresponse := []vmwarestructs.StandardizedVmware{}
+		/*byte, _ := json.Marshal(&vmware_struct)
+		fmt.Println(string(byte))
+		if err := json.Unmarshal(byte, &standardresponse); err != nil {
+			fmt.Println("Error in Unmarshing:==", err)
+		}*/
+		fmt.Println(len(vmware_struct))
+		fmt.Println(&vmware_struct)
+		//fmt.Println(&standardresponse)
+		for i:=0; i<len(vmware_struct);i++{
+			response := vmwarestructs.StandardizedVmware{}
+			response.Name = vmware_struct[i].Name
+			response.Uuid = vmware_struct[i].Uuid
+			response.GuestFullName = vmware_struct[i].GuestFullName
+			response.PowerState = vmware_struct[i].PowerState
+			response.IPaddress = vmware_struct[i].IPaddress
+			response.MemorySizeMB = vmware_struct[i].MemorySizeMB
+			response.Classifier = vmware_struct[i].Classifier
+			response.Deleted = vmware_struct[i].Deleted
+			response.Tagname = vmware_struct[i].Tagname
+			response.NumofCPU = vmware_struct[i].NumofCPU
+			/*fmt.Println("In for loop")
+				fmt.Println("vmware_struct: ", vmware_struct[i].Name)
+				standardresponse[i].Name = vmware_struct[i].Name
+				standardresponse.Uuid = vmware_struct[i].Uuid
+				standardresponse.GuestFullName = vmware_struct[i].GuestFullName
+				standardresponse.PowerState = vmware_struct[i].PowerState
+				standardresponse.IPaddress = vmware_struct[i].IPaddress
+				standardresponse.MemorySizeMB = vmware_struct[i].MemorySizeMB
+				standardresponse.Classifier = vmware_struct[i].Classifier
+				standardresponse.Deleted = vmware_struct[i].Deleted
+				standardresponse.Tagname = vmware_struct[i].Tagname
+				standardresponse.NumofCPU = vmware_struct[i].NumofCPU
+				fmt.Println("vmware_struct: ", vmware_struct[i].Name)
+				fmt.Println("standardresponse: ", standardresponse.Name)*/
+				//_ = json.NewEncoder(w).Encode(&standardresponse)
+			standardresponse = append(standardresponse, response)
+		}
+		/*for i:=0;i<len(vmware_struct);i++{
+			for _, element := range vmware_struct{
+				//standardresponse = vmwarestructs.StandardizedVmware{Name:element.Name, Uuid:element.Uuid, MemorySizeMB:element.MemorySizeMB, NumofCPU:element.NumofCPU, IPaddress:element.IPaddress, Classifier:element.Classifier, GuestFullName:element.GuestFullName, PowerState:element.PowerState, Tagname:element.Tagname, Deleted:element.Deleted}
+				standardresponse = []vmwarestructs.StandardizedVmware{
+					vmwarestructs.StandardizedVmware{
+						Name:element.Name,
+						Uuid:element.Uuid,
+						MemorySizeMB:element.MemorySizeMB,
+						NumofCPU:element.NumofCPU,
+						IPaddress:element.IPaddress,
+						Classifier:element.Classifier,
+						GuestFullName:element.GuestFullName,
+						PowerState:element.PowerState,
+						Tagname:element.Tagname,
+						Deleted:element.Deleted,
+					},
+				}
+				_ = json.NewEncoder(w).Encode(&standardresponse)
+			}
+		}*/
+		fmt.Println(&standardresponse)
+		_ = json.NewEncoder(w).Encode(&standardresponse)
+	}else {
+		_ = json.NewEncoder(w).Encode(&vmware_struct)
+	}
 
 	if err != nil {
 		logger.Error("Error: ",err)

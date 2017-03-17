@@ -16,6 +16,9 @@ type AzureInstances struct{
 	Tagname string			`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 	Status string `gorm:"column:status"`
+	Storage int32			`gorm:"column:storage"`
+	RAM int32			`gorm:"column:ram"`
+	NumCPU	int32			`gorm:"column:numcpu"`
 
 }
 
@@ -34,4 +37,32 @@ type Configuration struct {
     Clientsecret	string		`json:"clientsecret"`
     Subscriptionid	string		`json:"subscriptionid"`
     Tenantid		string		`json:"tenantid"`
+}
+
+
+//--------------------------Standardized struct------------------------------------//
+type AzureStandardResponse struct {
+	Servers       []StandardizedAzure      `json:"servers"`
+}
+
+type StandardizedAzure struct{
+	SubscriptionId	string		`json:"Classifier"`
+	VmName string 			`json:"Name"`
+	Type string 			`json:"Type"`
+	Location string 		`json:"Location"`
+	VmSize string           	`json:"VmSize"`
+	Publisher string 		`json:"Publisher"`
+	Offer string 			`json:"Offer"`
+	SKU string 			`json:"SKU"`
+	VmId string			`json:"InstanceId"`
+	AvailabilitySetName string 	`json:"AvailabilitySetName"`
+	Provisioningstate string	`json:"Provisioningstate"`
+	ResourcegroupName string	`json:"ResourcegroupName"`
+	Status string			`json:"Status"`
+	Storage int32			`json:"Storage"`
+	RAM int32			`json:"RAM"`
+	NumCPU	int32			`json:"CPU"`
+	Tagname string			`json:"Tagname"`
+	Deleted bool     `json:"Deleted"`
+
 }

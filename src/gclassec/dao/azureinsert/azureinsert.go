@@ -56,6 +56,9 @@ func checkEnvVar(envVars *map[string]string) error {
 }
 
 func AzureInsert() (error,int,int){
+	var storage int32
+	var ram int32
+	var numCPU int32
 	var azureCreds = readazurecreds.Configurtion()
 	os.Setenv("AZURE_CLIENT_ID", azureCreds.ClientId)
 	os.Setenv("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
@@ -135,6 +138,27 @@ func AzureInsert() (error,int,int){
 		logger.Error("Azure :", errcode.ErrAuth)
 		return err,0,0
 	}
+	for _, element := range *ls.Value{
+		name := *(element.Name)
+		rgroup := *(element.AvailabilitySet.ID)
+                resourcegroupname := strings.Split(rgroup, "/")
+		//Get Storage, RAM and CPU count for instance
+		size, errSize := ac.ListAvailableSizes(resourcegroupname[4], name)
+		if errSize != nil{
+			fmt.Println("Error : ", errSize)
+			return errSize, 0, 0
+		}
+		fmt.Println("Size : ", size.Value)
+		for _, ele := range *size.Value {
+			if *ele.Name == element.VirtualMachineProperties.HardwareProfile.VMSize {
+				storage = (*ele.ResourceDiskSizeInMB)/1024
+				ram = *ele.MemoryInMB
+				numCPU = *ele.NumberOfCores
+			}
+		}
+	}
+	fmt.Println("storage : ", storage)
+
 	if (len(azure_struct)==0){
 		for _, element := range *ls.Value {
 			name := *(element.Name)
@@ -142,7 +166,7 @@ func AzureInsert() (error,int,int){
                         resourcegroupname := strings.Split(rgroup, "/")
 			//Get current Status of instance
 			instanceView, _ := ac.GetInstanceView(name,resourcegroupname[4])
-			user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4], Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, Tagname:"Nil",Deleted:false}
+			user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4], Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, Storage:storage, RAM:ram, NumCPU:numCPU, Tagname:"Nil",Deleted:false}
                         db.Create(&user)
 		}
 	}else{
@@ -156,12 +180,12 @@ func AzureInsert() (error,int,int){
 			if (len(azure_struct)==0){
 			        rgroup := *(element.AvailabilitySet.ID)
 				resourcegroupname := strings.Split(rgroup, "/")
-                        	user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, Tagname:"Nil",Deleted:false}
+                        	user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, Storage:storage, RAM:ram, NumCPU:numCPU, Tagname:"Nil",Deleted:false}
 				db.Create(&user)
 			}else {
 				rgroup := *(element.AvailabilitySet.ID)
                         	resourcegroupname := strings.Split(rgroup, "/")
-                                user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus,Tagname:"Nil",Deleted:true}
+                                user := azurestruct.AzureInstances{SubscriptionId:subscriptionid,VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*(element.StorageProfile.ImageReference.Publisher), Offer:*(element.StorageProfile.ImageReference.Offer), SKU:*(element.StorageProfile.ImageReference.Sku), AvailabilitySetName:*(element.AvailabilitySet.ID), Provisioningstate:*element.ProvisioningState, ResourcegroupName:resourcegroupname[4],Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, Storage:storage, RAM:ram, NumCPU:numCPU, Tagname:"Nil",Deleted:true}
 				db.Model(&user).Where("name =?",element.Name).Updates(user)
 			}
 		}

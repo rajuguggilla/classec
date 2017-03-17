@@ -89,3 +89,28 @@ type Configuration struct {
     ImageRegion string		`json:"ImageRegion"`
     Controller string		`json:"Controller"`
 }
+
+//--------------------------Standardized struct------------------------------------//
+
+type StandardizedOpenstack struct{
+	//Id int 			`gorm:"column:id"`
+	Name string 		`json:"Name"`
+	InstanceID string 	`json:"InstanceId"`
+	Status string 		`json:"Status"`
+	AvailabilityZone string `json:"AvailabilityZone"`
+	Flavor string            `json:"VmSize"`
+	CreationTime string 	`json:"CreationTime"`
+	FlavorID string 		`json:"FlavorID"`
+	RAM int64 		`json:"RAM"`
+	VCPU int64 		`json:"CPU"`
+	Storage int64 		`json:"Storage"`
+	IPAddress string	`json:"IPAddress"`
+	SecurityGroup string 	`json:"SecurityGroup"`
+	KeyPairName string 	`json:"KeyPairName"`
+	ImageName string 	`json:"Image"`
+	Volumes string 		`json:"Volumes"`
+	InsertionDate string 	`json:"InsertionDate"`
+	Tagname string		`json:"Tagname"`
+	Deleted bool     `json:"Deleted"`
+
+}

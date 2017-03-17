@@ -310,3 +310,25 @@ type LatestDynamicData struct {
         Groupby Group `json:"Groupby"`
         Unit string `json:"Unit"`
  }
+
+
+//--------------------------Standardized struct------------------------------------//
+
+type StandardizedHos struct {
+	Vm_Name	string		`json:"Name"`
+	InstanceID	string	`json:"InstanceId"`
+	FlavorID	string	`json:"FlavorID"`
+	FlavorName	string	`json:"VmSize"`
+	Status	string		`json:"Status"`
+	Image	string		`json:"Image"`
+	SecurityGroups	string	`json:"SecurityGroup"`
+	AvailabilityZone	string	`json:"AvailabilityZone"`
+	//IPAddress	string	`json:"IPAddress"`
+	KeypairName	string	`json:"KeyPairName"`
+	Ram	int32	`json:"RAM"`
+	VCPU	int32	`json:"CPU"`
+	Disk	int32	`json:"Storage"`
+	//Volumes_Attached	string	`json:"Volumes"`
+	Tagname	string	`json:"Tagname"`
+	Deleted bool     `json:"Deleted"`
+}
