@@ -39,14 +39,30 @@ func GetCpuUtilStatistics() string {
 	//var reqURL string =  "https://120.120.120.4:8777/v2/meters/cpu_util?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value=01171fa0-8d7a-4c16-870c-011ee2732bd9&q.value=2016-12-12T13%3A10%3A00&limit=10"
 
 
-	req, _ := http.NewRequest("GET", reqURL, nil)
+	req, errReq := http.NewRequest("GET", reqURL, nil)
+	if errReq != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+			return ""
+		}
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
-	res, _ := http.DefaultClient.Do(req)
+	res, errClient := http.DefaultClient.Do(req)
+	if errClient != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+			return ""
+		}
+
 	logger.Info("Status:======== ", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, errResp := ioutil.ReadAll(res.Body)
+		if errResp != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+			return ""
+		}
 
 	logger.Info("respBody:==\n",respBody)
 	respBodyInString:= string(respBody)

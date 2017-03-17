@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
+	"gclassec/goclienthos/dynamicdetails"
 )
 
 var logger = Loggers.New()
@@ -30,7 +31,12 @@ var db,err  = gorm.Open(dbtype, c)
 func HosInsert(){
 	logger := Loggers.New()
 	//println(examples.ComputeFunc())
-	computeDetails:= compute.Compute()
+	computeDetails, err1 := compute.Compute()
+	if err1 != nil{
+		logger.Error("Error: ",errcode.ErrAuth)
+		//tx.Rollback()
+		return
+	}
 
 	tx := db.Begin()
 	db.SingularTable(true)
@@ -113,4 +119,29 @@ func HosInsert(){
               }*/
 	logger.Info("Successful in InsertHOSInstance.")
 	tx.Commit()
+}
+
+
+
+// Inserting Dynamic Data into database
+
+func HOSDynamicInsert() error{
+
+	dynamicDetails, err := dynamicdetails.DynamicDetails()
+
+	if err != nil{
+		return err
+	}
+	logger.Info(dynamicDetails)
+
+
+	// Inserting Dynamic Data into Database
+	for _, element := range dynamicDetails.Servers{
+		user := hosstruct.HosDynamicInstances{Vm_Name:element.Vm_Name, InstanceID:element.InstanceID, Count:element.Count, DurationStart:element.DurationStart, Min:element.Min,DurationEnd:element.DurationEnd, Max:element.Max, Sum:element.Sum, Period:element.Period, PeriodEnd:element.PeriodEnd, Duration:element.Duration, PeriodStart:element.PeriodStart, Avg:element.Avg, Unit:element.Unit}
+		db.Create(&user)
+		//db.Model(&user).Updates(&user)
+	}
+
+	logger.Info("Successful in InsertHOSDynamicInstance")
+	return nil
 }

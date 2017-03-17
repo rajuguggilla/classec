@@ -18,6 +18,27 @@ type HosInstances struct {
 	Tagname	string	`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 }
+
+
+type HosDynamicInstances struct {
+        Vm_Name string          `gorm:"column:Name"`
+        InstanceID      string  `gorm:"column:Instance_id"`
+        Count int `gorm:"column:Count"`
+        DurationStart string `sql:"type:timestamp" gorm:"column:Duration_start"`
+        Min float64 `gorm:"column:Min"`
+        DurationEnd string `sql:"type:timestamp" gorm:"column:Duration_end"`
+        Max float64 `gorm:"column:Max"`
+        Sum float64 `gorm:"column:Sum"`
+        Period int `gorm:"column:Period"`
+        PeriodEnd string `sql:"type:timestamp" gorm:"column:Period_end"`
+        Duration float64 `gorm:"column:Duration"`
+        PeriodStart string `sql:"type:timestamp" gorm:"column:Period_start"`
+        Avg float64 `gorm:"column:Avg"`
+        Unit string `gorm:"column:Unit"`
+
+}
+
+
 //-------------------------------- Structure to get AuthToken-----------------------------------------//
 
 type HOSAutToken struct{
@@ -208,6 +229,37 @@ type Group struct{
 type DynamicDataResponse struct {
         Data []DynamicData
 }
+
+
+//-------------------------------- Structure for Complete Dynamic Data --------------------------
+
+
+type CompleteDynamicResponse struct {
+      Servers       []CompleteDynamicData      `json:"servers"`
+}
+
+type CompleteDynamicData struct {
+	InstanceID             string `json:"id"`
+	Vm_Name               string `json:"name"`
+        Count int `json:"Count"`
+        DurationStart string `json:"Duration_start"`
+        Min float64 `json:"Min"`
+        DurationEnd string `json:"Duration_end"`
+        Max float64 `json:"Max"`
+        Sum float64 `json:"Sum"`
+        Period int `json:"Period"`
+        PeriodEnd string `json:"Period_end"`
+        Duration float64 `json:"Duration"`
+        PeriodStart string `json:"Period_start"`
+        Avg float64 `json:"Avg"`
+        Groupby Group `json:"Groupby"`
+        Unit string `json:"Unit"`
+ }
+
+
+
+
+
 
 ///----------------------------------Structure for Complete Data(static data with avg cpu_util--------//
 

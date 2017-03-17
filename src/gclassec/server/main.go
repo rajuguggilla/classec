@@ -9,8 +9,6 @@ import (
     "fmt"
     "gclassec/controllers/openstackcontroller"
     "gclassec/validation"
-   // "gclassec/dao/openstackinsert"
-    //"gclassec/dao/azureinsert"
     "gclassec/controllers/azurecontroller"
     "os"
     "gclassec/controllers/confcontroller"
@@ -20,13 +18,8 @@ import (
     "strings"
     "encoding/json"
     "sync"
-      //"gclassec/dao/hosinsert"
-    //"gclassec/dao/vmwareinsert"
-    //"gclassec/controllers/vmwarecontroller"
-    //"gclassec/dao/vmwareinsert"
     "gclassec/controllers/vmwarecontroller"
     "gclassec/dao/instancetags"
-
     "gclassec/errorcodes/errcode"
     "gclassec/loggers"
     "gclassec/openstackgov"
@@ -34,7 +27,7 @@ import (
     "gclassec/dao/openstackinsert"
     "gclassec/dao/vmwareinsert"
     "gclassec/dao/hosinsert"
-	"gclassec/structs/configurationstruct"
+    "gclassec/structs/configurationstruct"
 )
 
 //type Configuration struct {
@@ -107,6 +100,12 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
+                    errHOS := hosinsert.HOSDynamicInsert()
+                    if errHOS != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                     errVmDynamic := vmwareinsert.VmwareDynamicInsert()
                     if errVmDynamic != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
@@ -153,6 +152,7 @@ func main() {
 	//mux.HandleFunc(HOSROOT+"/ceilometerdetails",GetCeilometerDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/test/index",hoc.Index).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.Compute).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/instances/dynamicdata",hoc.GetCompleteDynamicDetail).Methods("GET")
 
         mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
         mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")  // 'http://localhost:9009/dbaas/list/dev01-a-tky-customerorderpf'

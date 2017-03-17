@@ -1,21 +1,17 @@
-package hosstaticdynamic
+package dynamicdetails
+
 import (
-	"fmt"
 	"encoding/json"
-	"net/http"
-	"io/ioutil"
-	//"hos/HOSAuthToken"
-//	"hos/HOS_API_Function/comp"
+	"fmt"
+	"gclassec/loggers"
 	"gclassec/goclienthos/authtoken"
 	"gclassec/errorcodes/errcode"
-	"gclassec/loggers"
+	"net/http"
+	"io/ioutil"
 	"gclassec/structs/hosstruct"
 )
 
-
-
-
-func AvgCpuUtil(id string) float64{
+func CpuUtil(id string) hosstruct.LatestDynamicData{
 	logger := Loggers.New()
 	fmt.Println("\n\n================================================== for Id ::::::::::::    %s ======================",id)
 	//fmt.Println("This to get Nothing")
@@ -27,7 +23,7 @@ func AvgCpuUtil(id string) float64{
 		if err != nil{
 			fmt.Println("HOS : ", errcode.ErrAuth)
 			logger.Error("HOS : ", errcode.ErrAuth)
-			return 0
+			return hosstruct.LatestDynamicData{}
 		}
 //	fmt.Println("HOS AuthToken:=====\n", auth)
 //	fmt.Println("HOS Configuration:=====\n %+v", hosConfig)
@@ -50,30 +46,27 @@ func AvgCpuUtil(id string) float64{
 	if errReq != nil{
 		fmt.Println("HOS: ", errcode.ErrReq)
 		logger.Error("HOS : ", errcode.ErrReq)
-		return 0
+		return hosstruct.LatestDynamicData{}
 		}
-
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
 	res, errClient := http.DefaultClient.Do(req)
-		if errClient != nil{
+			if errClient != nil{
 		fmt.Println("HOS: ", errcode.ErrReq)
 		logger.Error("HOS : ", errcode.ErrReq)
-		return 0
+		return hosstruct.LatestDynamicData{}
 		}
-
 
 //	fmt.Println("Status:======== ", res.Status)
 	defer res.Body.Close()
 	respBody, errResp := ioutil.ReadAll(res.Body)
-		if errResp != nil{
+	if errResp != nil{
 		fmt.Println("HOS: ", errcode.ErrResp)
 		logger.Error("HOS : ", errcode.ErrResp)
-		return 0
+		return hosstruct.LatestDynamicData{}
 		}
 
- 
 //	fmt.Print("respBody:==\n",respBody)
 //	respBodyInString:= string(respBody)
 //	fmt.Println("\nrespBodyInString:==\n",respBodyInString)
@@ -91,6 +84,7 @@ func AvgCpuUtil(id string) float64{
         //fmt.Printf("%+v\n\n", jsonComputeResponse)
         var cpu_util hosstruct.LatestDynamicData
         for i:=0; i<len(jsonComputeResponse); i++{
+		// To get latest data (last)
                         if i == len(jsonComputeResponse)-1{
 
 //                                fmt.Println("\n----------------Latest Record",jsonComputeResponse[i])
@@ -101,11 +95,7 @@ func AvgCpuUtil(id string) float64{
 
                 }
 
-	return cpu_util.Avg
+	return cpu_util
 
-//       res1 := HOS.Compute()
-  //    fmt.Println("\n\n===Compute =====",res1)
-
-// return jsonComputeResponse
 
 }
