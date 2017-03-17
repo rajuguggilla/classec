@@ -56,14 +56,30 @@ func GetCeilometerDetail() string{
 
 	var reqURL string =  meteringEndpoint + "v2/meters"
 	//var reqURL string =  "https://120.120.120.4:8777/v2/meters"
-	req, _ := http.NewRequest("GET", reqURL, nil)
+	req, errReq := http.NewRequest("GET", reqURL, nil)
+		if errReq != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+			return ""
+		}
+
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
-	res, _ := http.DefaultClient.Do(req)
+	res, errClient := http.DefaultClient.Do(req)
+		if errClient != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+			return ""
+		}
 	logger.Info("Status:======== ", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, errResp := ioutil.ReadAll(res.Body)
+		if errResp != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+			return ""
+		}
 
 	logger.Info("respBody:==\n",respBody)
 	respBodyInString:= string(respBody)

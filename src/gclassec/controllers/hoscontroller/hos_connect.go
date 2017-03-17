@@ -40,14 +40,22 @@ var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
 
+
 func (uc UserController) CpuUtilDetails(w http.ResponseWriter, r *http.Request){
         vars := mux.Vars(r)
         id := vars["id"]
-        res := util.GetCpuUtilDetails(id)
+        res, err := util.GetCpuUtilDetails(id)
+	if err != nil{
+		fmt.Println("Error:", err)
+		return
+	}
+
 	logger.Info(res)
-        fmt.Fprintf(w,res)
+	  _ = json.NewEncoder(w).Encode(&res)
+     //   fmt.Fprintf(w,res)
 
 }
+
 func (uc UserController) GetComputeDetails(w http.ResponseWriter, r *http.Request){
 
 	res, err := compute.Compute()

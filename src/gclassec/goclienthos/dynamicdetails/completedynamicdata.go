@@ -42,14 +42,30 @@ func CpuUtil(id string) hosstruct.LatestDynamicData{
 	//var reqURL string =  "https://120.120.120.4:8777/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
 
 
-	req, _ := http.NewRequest("GET", reqURL, nil)
+	req, errReq := http.NewRequest("GET", reqURL, nil)
+	if errReq != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.LatestDynamicData{}
+		}
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
-	res, _ := http.DefaultClient.Do(req)
+	res, errClient := http.DefaultClient.Do(req)
+			if errClient != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.LatestDynamicData{}
+		}
+
 //	fmt.Println("Status:======== ", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, errResp := ioutil.ReadAll(res.Body)
+	if errResp != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+		return hosstruct.LatestDynamicData{}
+		}
 
 //	fmt.Print("respBody:==\n",respBody)
 //	respBodyInString:= string(respBody)
@@ -81,9 +97,5 @@ func CpuUtil(id string) hosstruct.LatestDynamicData{
 
 	return cpu_util
 
-//       res1 := HOS.Compute()
-  //    fmt.Println("\n\n===Compute =====",res1)
-
-// return jsonComputeResponse
 
 }

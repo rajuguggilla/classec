@@ -20,25 +20,24 @@ type HosInstances struct {
 }
 
 
-
 type HosDynamicInstances struct {
-	Vm_Name	string		`gorm:"column:Name"`
-	InstanceID	string	`gorm:"column:Instance_id"`
-	Count int `gorm:"column:Count"`
-        DurationStart string `gorm:"column:Duration_start"`
+        Vm_Name string          `gorm:"column:Name"`
+        InstanceID      string  `gorm:"column:Instance_id"`
+        Count int `gorm:"column:Count"`
+        DurationStart string `sql:"type:timestamp" gorm:"column:Duration_start"`
         Min float64 `gorm:"column:Min"`
-        DurationEnd string `gorm:"column:"Duration_end"`
-        Max float64 `gorm:"column:"Max"`
-        Sum float64 `gorm:"column:"Sum"`
-        Period int `gorm:"column:"Period"`
-        PeriodEnd string `gorm:"column:"Period_end"`
-        Duration float64 `gorm:"column:"Duration"`
-        PeriodStart string `gorm:"column:"Period_start"`
-        Avg float64 `gorm:"column:"Avg"`
-        Groupby Group `gorm:"column:"Groupby"`
-        Unit string `gorm:"column:"Unit"`
+        DurationEnd string `sql:"type:timestamp" gorm:"column:Duration_end"`
+        Max float64 `gorm:"column:Max"`
+        Sum float64 `gorm:"column:Sum"`
+        Period int `gorm:"column:Period"`
+        PeriodEnd string `sql:"type:timestamp" gorm:"column:Period_end"`
+        Duration float64 `gorm:"column:Duration"`
+        PeriodStart string `sql:"type:timestamp" gorm:"column:Period_start"`
+        Avg float64 `gorm:"column:Avg"`
+        Unit string `gorm:"column:Unit"`
 
 }
+
 
 //-------------------------------- Structure to get AuthToken-----------------------------------------//
 

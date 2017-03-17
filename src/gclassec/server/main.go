@@ -9,8 +9,6 @@ import (
     "fmt"
     "gclassec/controllers/openstackcontroller"
     "gclassec/validation"
-   // "gclassec/dao/openstackinsert"
-    //"gclassec/dao/azureinsert"
     "gclassec/controllers/azurecontroller"
     "os"
     "gclassec/controllers/confcontroller"
@@ -20,13 +18,8 @@ import (
     "strings"
     "encoding/json"
     "sync"
-      //"gclassec/dao/hosinsert"
-    //"gclassec/dao/vmwareinsert"
-    //"gclassec/controllers/vmwarecontroller"
-    //"gclassec/dao/vmwareinsert"
     "gclassec/controllers/vmwarecontroller"
     "gclassec/dao/instancetags"
-
     "gclassec/errorcodes/errcode"
     "gclassec/loggers"
     "gclassec/openstackgov"
@@ -34,7 +27,7 @@ import (
     "gclassec/dao/openstackinsert"
     "gclassec/dao/vmwareinsert"
     "gclassec/dao/hosinsert"
-	"gclassec/structs/configurationstruct"
+    "gclassec/structs/configurationstruct"
 )
 
 //type Configuration struct {

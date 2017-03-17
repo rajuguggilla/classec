@@ -41,14 +41,33 @@ func Compute() (hosstruct.ComputeResponse, error) {
 	var reqURL string =  computeEndpoint + "/servers/detail"
 	//var reqURL string = "http://" + hosConfiguration.KeystoneEndpointIP + ":8774/v2.1/" + hosConfiguration.TenantId + "/servers/detail"
 	logger.Info("Request Body:==",reqURL)
-	req, _ := http.NewRequest("GET", reqURL, nil)
+	req, errReq := http.NewRequest("GET", reqURL, nil)
+			if errReq != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.ComputeResponse{}, err
+		}
+
+
 	req.Header.Add("x-auth-token", auth)
 	req.Header.Add("content-type", "application/json")
 
-	res, _ := http.DefaultClient.Do(req)
+	res, errClient := http.DefaultClient.Do(req)
+		if errClient != nil{
+		fmt.Println("HOS: ", errcode.ErrReq)
+		logger.Error("HOS : ", errcode.ErrReq)
+		return hosstruct.ComputeResponse{}, err
+		}
+
 	logger.Info("Status:======== ", res.Status)
 	defer res.Body.Close()
-	respBody, _ := ioutil.ReadAll(res.Body)
+	respBody, errResp := ioutil.ReadAll(res.Body)
+	if errResp != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+		return hosstruct.ComputeResponse{}, err
+		}
+
 
 	//fmt.Print("respBody:==\n",respBody)
 	respBodyInString:= string(respBody)
@@ -88,7 +107,12 @@ func Compute() (hosstruct.ComputeResponse, error) {
 	}
 	logger.Info("Printing Final jsonComputeResponse ")
 	logger.Info("%+v\n\n", jsonComputeResponse)
-	TempStr, _ := json.Marshal(&jsonComputeResponse)
+	TempStr, errT := json.Marshal(&jsonComputeResponse)
+		if errT != nil{
+		fmt.Println("HOS: ", errcode.ErrResp)
+		logger.Error("HOS : ", errcode.ErrResp)
+		return hosstruct.ComputeResponse{}, err
+		}
 	logger.Info("Printing Final jsonComputeResponse in string:===\n\n ",string(TempStr))
 	return jsonComputeResponse, nil
 	//return string(TempStr)
