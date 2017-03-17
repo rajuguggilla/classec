@@ -28,6 +28,7 @@ import (
     "gclassec/dao/vmwareinsert"
     "gclassec/dao/hosinsert"
     "gclassec/structs/configurationstruct"
+    "gclassec/instancestatus"
 )
 
 //type Configuration struct {
@@ -82,13 +83,13 @@ func main() {
         for {
             select {
                 case <- ticker.C:
-                    errAzure := azureinsert.AzureInsert()
+                    errAzure,_,_ := azureinsert.AzureInsert()
                     if errAzure != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
                     openstackinsert.InsertInstances()
-                    errVmware := vmwareinsert.VmwareInsert()
+                    errVmware,_,_ := vmwareinsert.VmwareInsert()
                     if errVmware != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
@@ -198,6 +199,7 @@ func main() {
         mx.HandleFunc("/instancetag/{instanceid}", instancetags.InstanceProvider).Methods("POST")
         mx.HandleFunc(OPSROOT+"/v1.0/servers/{instancename}", openstackgov.Createserver).Methods("POST")
         mx.HandleFunc(OPSROOT+"/v1.0/servers", openstackgov.Getserver).Methods("GET")
+        mx.HandleFunc("/instances/countonoff",instancestatus.Getinstancestatus).Methods("GET")
 
         http.Handle("/", mx)
         // Fire up the server

@@ -15,6 +15,7 @@ type AzureInstances struct{
 	ResourcegroupName string	`gorm:"column:resourcegroupname"`
 	Tagname string			`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
+	Status string `gorm:"column:status"`
 
 }
 

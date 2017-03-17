@@ -10,10 +10,11 @@ import (
 
 	"gclassec/structs/tagstruct"
 	"regexp"
-	"fmt"
+	//"fmt"
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
 	"gclassec/goclienthos/dynamicdetails"
+	"fmt"
 )
 
 var logger = Loggers.New()
@@ -28,14 +29,14 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
 
-func HosInsert(){
+func HosInsert() (int,int){
 	logger := Loggers.New()
 	//println(examples.ComputeFunc())
 	computeDetails, err1 := compute.Compute()
 	if err1 != nil{
 		logger.Error("Error: ",errcode.ErrAuth)
 		//tx.Rollback()
-		return
+		return 0,0
 	}
 
 	tx := db.Begin()
@@ -49,7 +50,7 @@ func HosInsert(){
 	if err != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
 		//tx.Rollback()
-		return
+		return 0,0
 	}
 
 	db.Find(&hos_compute)
@@ -63,10 +64,19 @@ func HosInsert(){
 	if er1 != nil{
 		logger.Error("Error: ",errcode.ErrFindDB)
 		//tx.Rollback()
-		return
+		return 0,0
 	}
 	db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag)
 
+	poweredoncount := 0
+	poweredoffcount := 0
+	for _,element1 := range computeDetails.Servers {
+		if element1.Power_State == 1 {
+			poweredoncount++
+		} else {
+			poweredoffcount++
+		}
+	}
 	if(len(hos_compute)==0){
 		for _,element :=range computeDetails.Servers{
 			 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
@@ -119,6 +129,9 @@ func HosInsert(){
               }*/
 	logger.Info("Successful in InsertHOSInstance.")
 	tx.Commit()
+	fmt.Println("asas",poweredoncount)
+	fmt.Println("asidhi",poweredoffcount)
+	return poweredoncount,poweredoffcount
 }
 
 

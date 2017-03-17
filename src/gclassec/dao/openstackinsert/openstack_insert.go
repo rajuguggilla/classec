@@ -20,6 +20,7 @@ type (
 func NewUserController() *UserController {
     return &UserController{}
 }
+var ENVcount = 0
 var logger = Loggers.New()
 var dbtype string = dbmanagement.ENVdbtype
 var dbname  string = dbmanagement.ENVdbnamegodb
@@ -87,6 +88,12 @@ func InsertInstances(){
                      db.Model(&user).Where("name = ?",element.Name).Updates(user)
 		}
 }
+	}
+	//ENVcount:= 0
+	for _,element1 := range computeDetails{
+		if element1.Status =="ACTIVE"{
+			ENVcount++
+		}
 	}
 
 	/*for _, element := range openstack_struct {
