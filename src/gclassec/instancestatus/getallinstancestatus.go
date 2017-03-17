@@ -36,6 +36,7 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 
 var c string = (strings.Join(b,""))
 
+
 var db,err  = gorm.Open(dbtype, c)
 type GetstatusInstances struct {
 	Provider string
