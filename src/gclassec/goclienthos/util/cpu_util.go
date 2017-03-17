@@ -10,9 +10,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"gclassec/errorcodes/errcode"
+	"time"
+	"strconv"
 )
 
 func GetCpuUtilDetails(id string) (hosstruct.DynamicData,error) {
+
+
 
 	//fmt.Println("This to get Nothing")
 	//var auth,_ = authtoken.GetHOSAuthToken()
@@ -38,8 +42,10 @@ func GetCpuUtilDetails(id string) (hosstruct.DynamicData,error) {
 			}
 		}
 
-	var reqURL string =  meteringEndpoint + "v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
+	t := time.Now()
 
+	var reqURL string =  meteringEndpoint + "v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value="+strconv.Itoa(t.Year())+"-"+strconv.Itoa(int(t.Month()))+"-"+strconv.Itoa(t.Day())
+	//      var reqURL string =  meteringEndpoint + "v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
 	//var reqURL string =  "https://120.120.120.4:8777/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
 
 
