@@ -83,37 +83,22 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 	db.Find(&hos_compute)
 
 	if readstructconf.ReadStructConfigFile()!=0{
-		//var standardresponse azurestruct.StandardizedAzure
 		standardresponse := []hosstruct.StandardizedHos{}
-		/*byte, _ := json.Marshal(&hos_compute)
-		fmt.Println(string(byte))
-		if err := json.Unmarshal(byte, &standardresponse); err != nil {
-			fmt.Println("Error in Unmarshing:==", err)
-		}*/
-		fmt.Println(len(hos_compute))
-		fmt.Println(&hos_compute)
-		//fmt.Println(&standardresponse)
+
 		for i:=0; i<len(hos_compute);i++{
 			response := hosstruct.StandardizedHos{}
 			response.Vm_Name = hos_compute[i].Vm_Name
 			response.InstanceID = hos_compute[i].InstanceID
-			response.FlavorID = hos_compute[i].FlavorID
 			response.FlavorName = hos_compute[i].FlavorName
 			response.Disk = hos_compute[i].Disk
-			response.KeypairName = hos_compute[i].KeypairName
-			response.Image = hos_compute[i].Image
 			response.Ram = hos_compute[i].Ram
-			response.SecurityGroups = hos_compute[i].SecurityGroups
 			response.VCPU = hos_compute[i].VCPU
-			response.Deleted = hos_compute[i].Deleted
 			response.Tagname = hos_compute[i].Tagname
-			response.AvailabilityZone = hos_compute[i].AvailabilityZone
 			response.Status = hos_compute[i].Status
 
 			standardresponse = append(standardresponse, response)
 		}
 
-		fmt.Println(&standardresponse)
 		_ = json.NewEncoder(w).Encode(&standardresponse)
 	}else {
 		_ = json.NewEncoder(w).Encode(&hos_compute)

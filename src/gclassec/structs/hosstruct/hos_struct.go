@@ -317,18 +317,18 @@ type LatestDynamicData struct {
 type StandardizedHos struct {
 	Vm_Name	string		`json:"Name"`
 	InstanceID	string	`json:"InstanceId"`
-	FlavorID	string	`json:"FlavorID"`
-	FlavorName	string	`json:"VmSize"`
 	Status	string		`json:"Status"`
-	Image	string		`json:"Image"`
-	SecurityGroups	string	`json:"SecurityGroup"`
-	AvailabilityZone	string	`json:"AvailabilityZone"`
-	//IPAddress	string	`json:"IPAddress"`
-	KeypairName	string	`json:"KeyPairName"`
+	FlavorName	string	`json:"VmSize"`
 	Ram	int32	`json:"RAM"`
 	VCPU	int32	`json:"CPU"`
 	Disk	int32	`json:"Storage"`
-	//Volumes_Attached	string	`json:"Volumes"`
 	Tagname	string	`json:"Tagname"`
-	Deleted bool     `json:"Deleted"`
+	//FlavorID	string	`json:"FlavorID"`
+	//Image	string		`json:"Image"`
+	//SecurityGroups	string	`json:"SecurityGroup"`
+	//AvailabilityZone	string	`json:"AvailabilityZone"`
+	//IPAddress	string	`json:"IPAddress"`
+	//KeypairName	string	`json:"KeyPairName"`
+	//Volumes_Attached	string	`json:"Volumes"`
+	//Deleted bool     `json:"Deleted"`
 }

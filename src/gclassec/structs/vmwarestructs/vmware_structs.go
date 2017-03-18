@@ -61,21 +61,18 @@ type Configuration struct {
 
 //-------------------------------Standardized struct----------------------------------------//
 
-type VmwareStandardResponse struct {
-	Servers       []StandardizedVmware      `json:"servers"`
-}
 
 type StandardizedVmware struct{
 
 	Name string 		`json:"Name"`
 	Uuid string 	        `json:"InstanceId"`
-	MemorySizeMB int32 	`json:"RAM"`
 	PowerState  string	`json:"Status"`
+	MemorySizeMB int32 	`json:"RAM"`
 	NumofCPU int32          `json:"CPU"`
-	GuestFullName string 	`json:"GuestFullName"`
-	IPaddress string        `json:"IPAddress"`
 	Tagname	string		`json:"Tagname"`
-	Deleted bool     	`json:"Deleted"`
-	Classifier string       `json:"Classifier"`
+	//GuestFullName string 	`json:"GuestFullName"`
+	//IPaddress string        `json:"IPAddress"`
+	//Deleted bool     	`json:"Deleted"`
+	//Classifier string       `json:"Classifier"`
 
 }

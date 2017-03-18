@@ -41,28 +41,25 @@ type Configuration struct {
 
 
 //--------------------------Standardized struct------------------------------------//
-type AzureStandardResponse struct {
-	Servers       []StandardizedAzure      `json:"servers"`
-}
 
 type StandardizedAzure struct{
-	SubscriptionId	string		`json:"Classifier"`
 	VmName string 			`json:"Name"`
-	Type string 			`json:"Type"`
-	Location string 		`json:"Location"`
-	VmSize string           	`json:"VmSize"`
-	Publisher string 		`json:"Publisher"`
-	Offer string 			`json:"Offer"`
-	SKU string 			`json:"SKU"`
 	VmId string			`json:"InstanceId"`
-	AvailabilitySetName string 	`json:"AvailabilitySetName"`
-	Provisioningstate string	`json:"Provisioningstate"`
-	ResourcegroupName string	`json:"ResourcegroupName"`
 	Status string			`json:"Status"`
-	Storage int32			`json:"Storage"`
+	VmSize string           	`json:"VmSize"`
 	RAM int32			`json:"RAM"`
 	NumCPU	int32			`json:"CPU"`
+	Storage int32			`json:"Storage"`
 	Tagname string			`json:"Tagname"`
-	Deleted bool     `json:"Deleted"`
+	//SubscriptionId	string		`json:"Classifier"`
+	//Type string 			`json:"Type"`
+	//Location string 		`json:"Location"`
+	//Publisher string 		`json:"Publisher"`
+	//Offer string 			`json:"Offer"`
+	//SKU string 			`json:"SKU"`
+	//AvailabilitySetName string 	`json:"AvailabilitySetName"`
+	//Provisioningstate string	`json:"Provisioningstate"`
+	//ResourcegroupName string	`json:"ResourcegroupName"`
+	//Deleted bool     `json:"Deleted"`
 
 }

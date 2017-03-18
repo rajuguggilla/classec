@@ -189,68 +189,21 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 	db.Where("subscriptionid =?",azurecreds.SubscriptionId).Find(&azure_struct)
 
 	if readstructconf.ReadStructConfigFile()!=0{
-		//var standardresponse azurestruct.StandardizedAzure
 		standardresponse := []azurestruct.StandardizedAzure{}
-		/*byte, _ := json.Marshal(&azure_struct)
-		fmt.Println(string(byte))
-		if err := json.Unmarshal(byte, &standardresponse); err != nil {
-			fmt.Println("Error in Unmarshing:==", err)
-		}*/
-		fmt.Println(len(azure_struct))
-		fmt.Println(&azure_struct)
-		//fmt.Println(&standardresponse)
 		for i:=0; i<len(azure_struct);i++{
 			response := azurestruct.StandardizedAzure{}
 			response.VmName = azure_struct[i].VmName
 			response.VmId = azure_struct[i].VmId
-			response.Location = azure_struct[i].Location
-			response.AvailabilitySetName = azure_struct[i].AvailabilitySetName
-			response.SubscriptionId = azure_struct[i].SubscriptionId
-			response.Offer = azure_struct[i].Offer
-			response.Publisher = azure_struct[i].Publisher
-			response.SKU = azure_struct[i].SKU
-			response.ResourcegroupName = azure_struct[i].ResourcegroupName
-			response.Provisioningstate = azure_struct[i].Provisioningstate
-			response.Deleted = azure_struct[i].Deleted
 			response.Status = azure_struct[i].Status
 			response.RAM = azure_struct[i].RAM
 			response.NumCPU = azure_struct[i].NumCPU
 			response.Storage = azure_struct[i].Storage
 			response.Tagname = azure_struct[i].Tagname
-			response.Type = azure_struct[i].Type
 			response.VmSize = azure_struct[i].VmSize
 
 			standardresponse = append(standardresponse, response)
 		}
 
-		/*for i:=0; i<len(azure_struct);i++{
-			fmt.Println("In for loop")
-			fmt.Println("azure_struct: ", azure_struct[i].VmName)
-			fmt.Println("standardresponse: ", standardresponse.Servers[i].VmName)
-			standardresponse.Servers[i].VmName = azure_struct[i].VmName
-			standardresponse.Servers[i].VmId = azure_struct[i].VmId
-			standardresponse.Servers[i].Location = azure_struct[i].Location
-			standardresponse.Servers[i].AvailabilitySetName = azure_struct[i].AvailabilitySetName
-			standardresponse.Servers[i].SubscriptionId = azure_struct[i].SubscriptionId
-			standardresponse.Servers[i].Offer = azure_struct[i].Offer
-			standardresponse.Servers[i].Publisher = azure_struct[i].Publisher
-			standardresponse.Servers[i].SKU = azure_struct[i].SKU
-			standardresponse.Servers[i].ResourcegroupName = azure_struct[i].ResourcegroupName
-			standardresponse.Servers[i].Provisioningstate = azure_struct[i].Provisioningstate
-			standardresponse.Servers[i].Deleted = azure_struct[i].Deleted
-			standardresponse.Servers[i].Tagname = azure_struct[i].Tagname
-			standardresponse.Servers[i].Type = azure_struct[i].Type
-			standardresponse.Servers[i].VmSize = azure_struct[i].VmSize
-			fmt.Println("azure_struct: ", azure_struct[i].VmName)
-			fmt.Println("standardresponse: ", standardresponse.Servers[i].VmName)
-
-		}*/
-		/*for i:=0;i<len(azure_struct);i++{
-			for _, element := range azure_struct{
-				standardresponse = azurestruct.StandardizedAzure{VmName:element.VmName, VmId:element.VmId, VmSize:element.VmSize, AvailabilitySetName:element.AvailabilitySetName, Deleted:element.Deleted, Location:element.Location, Offer:element.Offer, Provisioningstate:element.Provisioningstate, Publisher:element.Publisher, ResourcegroupName:element.ResourcegroupName, SKU:element.SKU, SubscriptionId:element.SubscriptionId, Tagname:element.Tagname, Type:element.Type}
-			}
-		}*/
-		fmt.Println(&standardresponse)
 		_ = json.NewEncoder(w).Encode(&standardresponse)
 	}else {
 		_ = json.NewEncoder(w).Encode(&azure_struct)
