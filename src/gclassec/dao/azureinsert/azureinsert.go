@@ -219,24 +219,17 @@ func AzureInsert() (error,int,int){
               db.Table("azure_instances").Where("Name = ?",element.VmName).Update("deleted", true)
        }*/
 
+	db.Find(&azure_struct)
 	for _, i := range azure_struct {
-		if len(tag) == 0 {
-			fmt.Println("----Nothing in Tag----")
-			db.Model(azurestruct.AzureInstances{}).Where("vmid = ?",i.VmId).Update("tagname","Nil")
-			//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
-		} else {
+		if len(tag) != 0 {
 			for _, el := range tag {
-				if i.VmId != el.InstanceId {
-					fmt.Println("----No Tag for this instance----")
-					db.Model(azurestruct.AzureInstances{}).Where("vmid = ?",i.VmId).Update("tagname","Nil")
-					//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
-				} else {
+				if i.VmId == el.InstanceId {
 					fmt.Println("----Update Tag for this instance----")
 					fmt.Println("Tagname : ", el.Tagname)
 					db.Model(azurestruct.AzureInstances{}).Where("vmid = ?",i.VmId).Update("tagname",el.Tagname)
-					//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname",el.Tagname)
 				}
 			}
+			//db.Table("azure_instances").Where("vmid = ?",i.VmId).Update("tagname","Nil")
 		}
 	}
 

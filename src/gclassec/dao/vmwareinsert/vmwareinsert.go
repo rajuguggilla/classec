@@ -234,25 +234,18 @@ func VmwareInsert() (error,int,int){
        tw := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 
        logger.Info("Virtual machines found:", len(vmt))
-
+       db.Find(&vmware_struct)
        for _, i := range vmware_struct {
-              if len(tag) == 0 {
-                     fmt.Println("----Nothing in Tag----")
-                     db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname","Nil")
-                     //db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
-              }else {
+              if len(tag) != 0 {
                      for _, el := range tag {
-                            if i.Uuid != el.InstanceId{
-                                   fmt.Println("----No Tag for this instance----")
-                                   db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname","Nil")
-                                   //db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname","Nil")
-                            }else {
+                            if i.Uuid == el.InstanceId{
                                    fmt.Println("----Update Tag for this instance----")
-                                   fmt.Println("el.Tagname : ", el.Tagname)
+                                   fmt.Println("el.InstanceId: ", el.InstanceId)
                                    db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname",el.Tagname)
                                    //db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
                             }
                      }
+
               }
        }
        for _, element := range vmware_struct {

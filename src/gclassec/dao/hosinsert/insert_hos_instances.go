@@ -97,24 +97,17 @@ func HosInsert() (int,int){
 	/*for _, element := range hos_compute {
        db.Table("hos_instances").Where("Name = ?",element.Vm_Name).Update("deleted", true)
 }*/
+	db.Find(&hos_compute)
 	for _, i := range hos_compute{
-		if len(tag) == 0 {
-			fmt.Println("----Nothing in Tag----")
-			db.Model(hosstruct.HosInstances{}).Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
-			//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
-		}else {
+		if len(tag) != 0 {
 			for _, el := range tag {
-				if i.InstanceID != el.InstanceId {
-					fmt.Println("----No Tag for this instance----")
-					db.Model(hosstruct.HosInstances{}).Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
-					//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
-				}else {
+				if i.InstanceID == el.InstanceId {
 					fmt.Println("----Update Tag for this instance----")
 					fmt.Println("el.Tagname : ", el.Tagname)
 					db.Model(hosstruct.HosInstances{}).Where("Instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
-					//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
 				}
 			}
+			//db.Table("hos_instances").Where("Instance_id = ?", i.InstanceID).Update("tagname","Nil")
 		}
 	}
 /*

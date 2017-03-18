@@ -99,27 +99,17 @@ func InsertInstances(){
 	/*for _, element := range openstack_struct {
        db.Table("instances").Where("name = ?",element.Name).Update("deleted", true)
 }*/
-
-
-
+	db.Find(&openstack_struct)
 	for _, i := range openstack_struct{
-		if len(tag) == 0 {
-			fmt.Println("----Nothing in Tag----")
-			db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
-			//db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
-		}else {
+		if len(tag) != 0 {
 			for _, el := range tag {
-					if i.InstanceID != el.InstanceId{
-						fmt.Println("----No Tag for this instance----")
-						db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
-						//db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname","Nil")
-					}else {
-						fmt.Println("----Update Tag for this instance----")
-						fmt.Println("el.Tagname : ", el.Tagname)
-						db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
-						//db.Table("instances").Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
-					}
+				if i.InstanceID == el.InstanceId{
+					fmt.Println("----Update Tag for this instance----")
+					fmt.Println("el.Tagname : ", el.Tagname)
+					db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
 				}
+
+			}
 		}
 	}
 /*
