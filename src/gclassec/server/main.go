@@ -145,7 +145,7 @@ func main() {
         var ATHSROOT = CLAROOT+"/athas"
 
         // Get a instance resource
-        mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.GetComputeDetails).Methods("GET")
+        //mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.GetComputeDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/flavors",hoc.GetFlavorsDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/utilization/{id}",hoc.CpuUtilDetails).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdynamic",hoc.GetCompleteDetail).Methods("GET")
