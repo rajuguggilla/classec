@@ -11,7 +11,7 @@ import(
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
 	"gclassec/confmanagement/readstructconf"
-	"gclassec/confmanagement/readcomputeVM"
+	"gclassec/confmanagement/readopenstackconfig"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -32,7 +32,7 @@ var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
 
-var oscreds = readcomputeVM.Configurtion()
+var oscreds = readopenstackconfig.OpenStackConfigReader()
 
 func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Request){
 
