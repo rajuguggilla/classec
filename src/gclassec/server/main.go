@@ -89,7 +89,7 @@ func main() {
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
                     openstackinsert.InsertInstances()
-                    errVmware:= vmwareinsert.VmwareInsert()
+                    errVmware,_,_:= vmwareinsert.VmwareInsert()
                     if errVmware != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
