@@ -44,10 +44,17 @@ func InstanceProvider(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Type of res : %T", res)
 	res.Decode(&inst)
 	fmt.Printf("instance",inst)
-	for _,r := range inst{
-		fmt.Println(r.InstanceId)
-		user := tagstruct.Providers{InstanceId:r.InstanceId, Cloud:r.Cloud, Tagname:r.Tagname}
-		db.Create(&user)
-		db.Model(&user).Updates(&user)
+	dbresponse := []tagstruct.Providers{}
+	db.Find(&dbresponse)
+	for _,element := range  dbresponse{
+		for _,r := range inst{
+			fmt.Println("r.InstanceId: ", r.InstanceId)
+			user := tagstruct.Providers{InstanceId:r.InstanceId, Cloud:r.Cloud, Tagname:r.Tagname}
+			if r.InstanceId == element.InstanceId{
+				db.Model(&user).Where("InstanceId = ?",element.InstanceId).Updates(user)
+			}else {
+				db.Create(&user)
+			}
+		}
 	}
 }
