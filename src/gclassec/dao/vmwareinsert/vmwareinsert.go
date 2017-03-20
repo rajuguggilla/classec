@@ -215,17 +215,17 @@ func VmwareInsert() (error,int,int){
        db.Find(&vmware_struct)
        if (len(vmware_struct) == 0) {
               for _, vm := range vmt {
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress, Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
                      db.Create(&user)
               }
        }else{
               for _, vm := range vmt {
               db.Where("Name = ?",vm.Summary.Config.Name).Find(&vmware_struct)
               if (len(vmware_struct)==0) {
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress, Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
                      db.Create(&user)
               }else{
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress, Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
                      db.Model(&user).Where("Name =?", vm.Summary.Config.Name).Updates(user)
               }
        }

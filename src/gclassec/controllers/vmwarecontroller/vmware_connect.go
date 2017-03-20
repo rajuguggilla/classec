@@ -263,6 +263,7 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 			response.MemorySizeMB = vmware_struct[i].MemorySizeMB
 			response.Tagname = vmware_struct[i].Tagname
 			response.NumofCPU = vmware_struct[i].NumofCPU
+			response.StorageCommitted = vmware_struct[i].StorageCommitted
 
 			standardresponse = append(standardresponse, response)
 		}
