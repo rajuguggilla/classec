@@ -70,6 +70,7 @@ type StandardizedVmware struct{
 	PowerState  string	`json:"Status"`
 	MemorySizeMB int32 	`json:"RAM"`
 	NumofCPU int32          `json:"CPU"`
+	StorageCommitted float32 `json:"Storage"`
 	Tagname	string		`json:"Tagname"`
 	//GuestFullName string 	`json:"GuestFullName"`
 	//IPaddress string        `json:"IPAddress"`
