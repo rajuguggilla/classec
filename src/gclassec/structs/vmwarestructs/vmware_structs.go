@@ -10,6 +10,7 @@ type VmwareInstances struct{
 	NumofCPU int32          `gorm:"column:NumofCPU"`
 	GuestFullName string 	`gorm:"column:GuestFullName"`
 	IPaddress string        `gorm:"column:IPaddress"`
+	StorageCommitted float32 `gorm:"column:StorageCommitted"`
 	Tagname	string		`gorm:"column:tagname"`
 	Deleted bool     	`sql:"type:varchar" gorm:"column:deleted"`
 	Classifier string        `gorm:"column:classifier"`
@@ -59,3 +60,21 @@ type Configuration struct {
     EnvInsecure		string		`json:"EnvInsecure"`
 }
 
+//-------------------------------Standardized struct----------------------------------------//
+
+
+type StandardizedVmware struct{
+
+	Name string 		`json:"Name"`
+	Uuid string 	        `json:"InstanceId"`
+	PowerState  string	`json:"Status"`
+	MemorySizeMB int32 	`json:"RAM"`
+	NumofCPU int32          `json:"CPU"`
+	StorageCommitted float32 `json:"Storage"`
+	Tagname	string		`json:"Tagname"`
+	//GuestFullName string 	`json:"GuestFullName"`
+	//IPaddress string        `json:"IPAddress"`
+	//Deleted bool     	`json:"Deleted"`
+	//Classifier string       `json:"Classifier"`
+
+}

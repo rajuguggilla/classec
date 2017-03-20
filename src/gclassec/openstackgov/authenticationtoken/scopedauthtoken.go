@@ -75,13 +75,20 @@ func ScopedAuthToken() (string, openstackInstance.OpenStackEndpoints, string){
 	}else{
 		return sAuthToken, sApiEndpointsStruct, "Please provide a valid IdentityEndPoint of type v3 or v2.0"
 	}
-
-	if sAuthError != "" {
-		for i := 0; i < len(sApiEndpointsStruct.ApiEndpoints); i++ {
+	//fmt.Println("Len Of sAuthError:===",len(sAuthError))
+	//fmt.Println("Len Of sApiEndpointsStruct:===",len(sApiEndpointsStruct.ApiEndpoints))
+	if sAuthError == ""{
+		for i := 0; i< len(sApiEndpointsStruct.ApiEndpoints); i++ {
+			//fmt.Println("Before Replacing sApiEndpointsStruct.ApiEndpoints[i].EndpointURL:====",sApiEndpointsStruct.ApiEndpoints[i].EndpointURL)
 			sApiEndpointsStruct.ApiEndpoints[i].EndpointURL = strings.Replace(sApiEndpointsStruct.ApiEndpoints[i].EndpointURL, "controller", tempConfig.Controller, -1)
 			sApiEndpointsStruct.ApiEndpoints[i].EndpointURL = strings.Replace(sApiEndpointsStruct.ApiEndpoints[i].EndpointURL, "monasca", tempConfig.Controller, -1)
+			//fmt.Println("After Replacing sApiEndpointsStruct.ApiEndpoints[i].EndpointURL:====",sApiEndpointsStruct.ApiEndpoints[i].EndpointURL)
 		}
 	}
+	//fmt.Println("sAuthToken:====", sAuthToken)
+	//fmt.Println("sAuthError:====",sAuthError)
+	//fmt.Println("sApiEndpointsStruct:====",sApiEndpointsStruct)
+	//fmt.Println("returning form ScopedAuthToken()")
 	return  sAuthToken, sApiEndpointsStruct, sAuthError
 
 }

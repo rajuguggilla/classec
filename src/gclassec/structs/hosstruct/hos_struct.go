@@ -17,6 +17,7 @@ type HosInstances struct {
 	//Volumes_Attached	string	`gorm:"column:volumes_attached"`
 	Tagname	string	`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
+	Classifier string	`gorm:"column:classifier"`
 }
 
 
@@ -310,3 +311,25 @@ type LatestDynamicData struct {
         Groupby Group `json:"Groupby"`
         Unit string `json:"Unit"`
  }
+
+
+//--------------------------Standardized struct------------------------------------//
+
+type StandardizedHos struct {
+	Vm_Name	string		`json:"Name"`
+	InstanceID	string	`json:"InstanceId"`
+	Status	string		`json:"Status"`
+	FlavorName	string	`json:"VmSize"`
+	Ram	int32	`json:"RAM"`
+	VCPU	int32	`json:"CPU"`
+	Disk	int32	`json:"Storage"`
+	Tagname	string	`json:"Tagname"`
+	//FlavorID	string	`json:"FlavorID"`
+	//Image	string		`json:"Image"`
+	//SecurityGroups	string	`json:"SecurityGroup"`
+	//AvailabilityZone	string	`json:"AvailabilityZone"`
+	//IPAddress	string	`json:"IPAddress"`
+	//KeypairName	string	`json:"KeyPairName"`
+	//Volumes_Attached	string	`json:"Volumes"`
+	//Deleted bool     `json:"Deleted"`
+}

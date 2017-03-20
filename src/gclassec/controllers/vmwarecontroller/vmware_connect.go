@@ -26,6 +26,7 @@ import (
 	"gclassec/structs/tagstruct"
 	"regexp"
 	"gclassec/dbmanagement"
+	"gclassec/confmanagement/readstructconf"
 )
 
 //const (
@@ -247,7 +248,29 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 		tx.Rollback()
 	}
 
-	_ = json.NewEncoder(w).Encode(db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct))
+	db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct)
+
+	//_ = json.NewEncoder(w).Encode(db.Where("classifier = ?",vmwarecreds.EnvUserName).Find(&vmware_struct))
+
+	if readstructconf.ReadStructConfigFile()!=0{
+		standardresponse := []vmwarestructs.StandardizedVmware{}
+
+		for i:=0; i<len(vmware_struct);i++{
+			response := vmwarestructs.StandardizedVmware{}
+			response.Name = vmware_struct[i].Name
+			response.Uuid = vmware_struct[i].Uuid
+			response.PowerState = vmware_struct[i].PowerState
+			response.MemorySizeMB = vmware_struct[i].MemorySizeMB
+			response.Tagname = vmware_struct[i].Tagname
+			response.NumofCPU = vmware_struct[i].NumofCPU
+			response.StorageCommitted = vmware_struct[i].StorageCommitted
+
+			standardresponse = append(standardresponse, response)
+		}
+		_ = json.NewEncoder(w).Encode(&standardresponse)
+	}else {
+		_ = json.NewEncoder(w).Encode(&vmware_struct)
+	}
 
 	if err != nil {
 		logger.Error("Error: ",err)

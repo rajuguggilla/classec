@@ -10,6 +10,8 @@ import(
 	"gclassec/loggers"
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
+	"gclassec/confmanagement/readstructconf"
+	"gclassec/confmanagement/readopenstackconfig"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -30,6 +32,8 @@ var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
 
+var oscreds = readopenstackconfig.OpenStackConfigReader()
+
 func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Request){
 
 	tx := db.Begin()
@@ -45,7 +49,31 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 		tx.Rollback()
 	}
 
-	_ = json.NewEncoder(w).Encode(db.Find(&openstack_struct))
+	db.Where("classifier = ?", oscreds.ProjectName).Find(&openstack_struct)
+
+	if readstructconf.ReadStructConfigFile()!=0{
+		standardresponse := []openstackInstance.StandardizedOpenstack{}
+
+		for i:=0; i<len(openstack_struct);i++{
+			response := openstackInstance.StandardizedOpenstack{}
+			response.Name = openstack_struct[i].Name
+			response.InstanceID = openstack_struct[i].InstanceID
+			response.Flavor = openstack_struct[i].Flavor
+			response.Storage = openstack_struct[i].Storage
+			response.RAM = openstack_struct[i].RAM
+			response.VCPU = openstack_struct[i].VCPU
+			response.Tagname = openstack_struct[i].Tagname
+			response.Status = openstack_struct[i].Status
+
+			standardresponse = append(standardresponse, response)
+		}
+
+		_ = json.NewEncoder(w).Encode(&standardresponse)
+	}else {
+		_ = json.NewEncoder(w).Encode(&openstack_struct)
+	}
+
+	//_ = json.NewEncoder(w).Encode(db.Find(&openstack_struct))
 
 		if err != nil {
 			logger.Error("Error :", err)

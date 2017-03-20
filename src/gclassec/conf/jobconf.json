@@ -5,5 +5,6 @@
   "_comment":"Timespec value is '1 Second'",
   "DynamicInterval":60,
   "DynamicTimespec":60000000000,
-  "_comment":"DynamicTimespec value is '1 Minute'"
+  "_comment":"DynamicTimespec value is '1 Minute'",
+  "StandardizedStruct":1
 }

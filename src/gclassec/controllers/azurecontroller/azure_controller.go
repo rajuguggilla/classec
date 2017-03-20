@@ -20,6 +20,7 @@ import(
 	"gclassec/errorcodes/errcode"
 	"regexp"
 	"gclassec/dbmanagement"
+	"gclassec/confmanagement/readstructconf"
 )
 type (
 
@@ -185,7 +186,30 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 		tx.Rollback()
 	}
 
-	_ = json.NewEncoder(w).Encode(db.Where("subscriptionid =?",azurecreds.SubscriptionId).Find(&azure_struct))
+	db.Where("subscriptionid =?",azurecreds.SubscriptionId).Find(&azure_struct)
+
+	if readstructconf.ReadStructConfigFile()!=0{
+		standardresponse := []azurestruct.StandardizedAzure{}
+		for i:=0; i<len(azure_struct);i++{
+			response := azurestruct.StandardizedAzure{}
+			response.VmName = azure_struct[i].VmName
+			response.VmId = azure_struct[i].VmId
+			response.Status = azure_struct[i].Status
+			response.RAM = azure_struct[i].RAM
+			response.NumCPU = azure_struct[i].NumCPU
+			response.Storage = azure_struct[i].Storage
+			response.Tagname = azure_struct[i].Tagname
+			response.VmSize = azure_struct[i].VmSize
+
+			standardresponse = append(standardresponse, response)
+		}
+
+		_ = json.NewEncoder(w).Encode(&standardresponse)
+	}else {
+		_ = json.NewEncoder(w).Encode(&azure_struct)
+	}
+
+	//_ = json.NewEncoder(w).Encode(db.Where("subscriptionid =?",azurecreds.SubscriptionId).Find(&azure_struct))
 
 		if err != nil {
 			logger.Error("Error: ",err)

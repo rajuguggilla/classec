@@ -17,6 +17,8 @@ import (
 	"gclassec/goclienthos/hosstaticdynamic"
 	"gclassec/dbmanagement"
 	"gclassec/errorcodes/errcode"
+	"gclassec/confmanagement/readstructconf"
+	"gclassec/confmanagement/readhosconf"
 )
 
 type (
@@ -39,7 +41,7 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
-
+var hoscreds = readhosconf.Configurtion()
 
 func (uc UserController) CpuUtilDetails(w http.ResponseWriter, r *http.Request){
         vars := mux.Vars(r)
@@ -74,13 +76,36 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 	hos_compute := []hosstruct.HosInstances{}
 
 	err := db.Find(&hos_compute).Error
-
 	if err != nil{
 		logger.Error("Error: ",err)
 		tx.Rollback()
 	}
 
-	_ = json.NewEncoder(w).Encode(db.Find(&hos_compute))
+	db.Where("classifier = ?", hoscreds.ProjectName).Find(&hos_compute)
+
+	if readstructconf.ReadStructConfigFile()!=0{
+		standardresponse := []hosstruct.StandardizedHos{}
+
+		for i:=0; i<len(hos_compute);i++{
+			response := hosstruct.StandardizedHos{}
+			response.Vm_Name = hos_compute[i].Vm_Name
+			response.InstanceID = hos_compute[i].InstanceID
+			response.FlavorName = hos_compute[i].FlavorName
+			response.Disk = hos_compute[i].Disk
+			response.Ram = hos_compute[i].Ram
+			response.VCPU = hos_compute[i].VCPU
+			response.Tagname = hos_compute[i].Tagname
+			response.Status = hos_compute[i].Status
+
+			standardresponse = append(standardresponse, response)
+		}
+
+		_ = json.NewEncoder(w).Encode(&standardresponse)
+	}else {
+		_ = json.NewEncoder(w).Encode(&hos_compute)
+	}
+
+	//_ = json.NewEncoder(w).Encode(db.Find(&hos_compute))
 
 		if err != nil {
 			logger.Error("Error: ",err)

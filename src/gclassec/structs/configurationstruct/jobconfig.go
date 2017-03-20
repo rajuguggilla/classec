@@ -8,4 +8,5 @@ type Configuration struct {
         UpdateUsingAPI  int64	`json:"UpdateUsingAPI"`
 	DynamicInterval int64	`json:"DynamicInterval"`
         DynamicTimespec time.Duration	`json:"DynamicTimespec"`
+	StandardizedStruct int64	`json:"StandardizedStruct"`
 }
