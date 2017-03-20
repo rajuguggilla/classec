@@ -15,6 +15,7 @@ import (
 	"gclassec/dbmanagement"
 	"gclassec/goclienthos/dynamicdetails"
 	"fmt"
+	"gclassec/confmanagement/readhosconf"
 )
 
 var logger = Loggers.New()
@@ -28,6 +29,9 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 
 var c string = (strings.Join(b,""))
 var db,err  = gorm.Open(dbtype, c)
+
+var hoscreds = readhosconf.Configurtion()
+var classifier = hoscreds.ProjectName
 
 func HosInsert() (int,int){
 	logger := Loggers.New()
@@ -79,17 +83,17 @@ func HosInsert() (int,int){
 	}
 	if(len(hos_compute)==0){
 		for _,element :=range computeDetails.Servers{
-			 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
+			 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false, Classifier:classifier}
 			db.Create(&user)
 		}
 	}else{
 		for _, element := range computeDetails.Servers {
 			db.Where("name =?",element.Vm_Name).Find(&hos_compute)
 			if(len(hos_compute)==0){
-				 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
+				 user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false, Classifier:classifier}
 			db.Create(&user)
 			}else{
-				  user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false}
+				  user := hosstruct.HosInstances{Vm_Name:element.Vm_Name,InstanceID:element.InstanceID,FlavorID:element.Flavor.FlavorID,FlavorName:element.Flavor.FlavorName,Status:element.Status,Image:element.Image.ImageID,SecurityGroups:element.Security_Groups.Name,AvailabilityZone:element.Availability_Zone,KeypairName:element.Key_name,Ram:element.Flavor.Ram,VCPU:element.Flavor.VCPUS,Disk:element.Flavor.Disk, Tagname:"Nil", Deleted:false, Classifier:classifier}
                      db.Model(&user).Where("Name =?",element.Vm_Name).Updates(user)
 			}
 		}
@@ -122,8 +126,6 @@ func HosInsert() (int,int){
               }*/
 	logger.Info("Successful in InsertHOSInstance.")
 	tx.Commit()
-	fmt.Println("asas",poweredoncount)
-	fmt.Println("asidhi",poweredoffcount)
 	return poweredoncount,poweredoffcount
 }
 
