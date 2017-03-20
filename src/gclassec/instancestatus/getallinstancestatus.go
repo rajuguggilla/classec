@@ -24,15 +24,15 @@ import (
 	"gclassec/readcredentials"
 	//"gclassec/authmanagment"
 	//"gclassec/goclientopenstack/openstack"
-	"gclassec/structs/hosstruct"
+	//"gclassec/structs/hosstruct"
 	//"gclassec/structs/openstackInstance"
 	//"gclassec/structs/azurestruct"
 	/*"encoding/json"
 	"os"*/
 	"fmt"
-	"gclassec/structs/vmwarestructs"
-	"gclassec/structs/azurestruct"
-	"gclassec/structs/openstackInstance"
+	//"gclassec/structs/vmwarestructs"
+	//"gclassec/structs/azurestruct"
+	//"gclassec/structs/openstackInstance"
 	"gclassec/authmanagment"
 	"encoding/json"
 	"net/http"
@@ -42,7 +42,12 @@ import (
 	"gclassec/dao/hosinsert"
 	"gclassec/openstackgov"
 	"gclassec/dao/azureinsert"
-*/)
+*/
+	"gclassec/dao/vmwareinsert"
+	"gclassec/dao/hosinsert"
+	"gclassec/openstackgov"
+	"gclassec/dao/azureinsert"
+)
 
 
 var logger = Loggers.New()
@@ -72,7 +77,7 @@ type GetstatusInstances struct {
 func Getinstancestatus(w http.ResponseWriter, r *http.Request) {
 
 	db.SingularTable(true)
-	count1 := 0
+	/*count1 := 0
 	count2 := 0
 	hos_struct := []hosstruct.HosInstances{}
 	//db.Find(&hos_struct)
@@ -106,7 +111,7 @@ func Getinstancestatus(w http.ResponseWriter, r *http.Request) {
 	db.Where("Status = ?","ACTIVE").Find(&openstack_struct).Count(&poweredoncount2)
 	db.Where("Status = ?","SHUTDOWN").Find(&openstack_struct).Count(&poweredoffcount2)
 	fmt.Println(poweredoffcount2)
-	fmt.Println(poweredoncount2)
+	fmt.Println(poweredoncount2)*/
 
 	//getstatusinstances := []GetstatusInstances{}
 
@@ -171,7 +176,7 @@ if errFind != nil {
 
 	//openstackinsert.ENVcount
 	//fmt.Print(*(&count))
-/*
+
 err,count1,count2 :=vmwareinsert.VmwareInsert()
 fmt.Println(count1)
 	fmt.Print(count2)
@@ -188,7 +193,7 @@ fmt.Println(count1)
 	err,poweredoncount2,poweredoffcount2 := azureinsert.AzureInsert()
 	fmt.Println("Azure poweron count",poweredoncount2)
 	fmt.Println("Azure poweroff count",poweredoffcount2)
-*/
+
 
 
 	var basenameOpts = []GetstatusInstances {
