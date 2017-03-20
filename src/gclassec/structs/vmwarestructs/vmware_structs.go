@@ -10,6 +10,7 @@ type VmwareInstances struct{
 	NumofCPU int32          `gorm:"column:NumofCPU"`
 	GuestFullName string 	`gorm:"column:GuestFullName"`
 	IPaddress string        `gorm:"column:IPaddress"`
+	StorageCommitted float32 `gorm:"column:StorageCommitted"`
 	Tagname	string		`gorm:"column:tagname"`
 	Deleted bool     	`sql:"type:varchar" gorm:"column:deleted"`
 	Classifier string        `gorm:"column:classifier"`
