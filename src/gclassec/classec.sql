@@ -67,7 +67,6 @@ CREATE TABLE IF NOT EXISTS `instances` (
   `security_group` varchar(255) NOT NULL,
   `keypair_name` varchar(255) NOT NULL,
   `image_name` varchar(255) DEFAULT NULL,
-  `volumes` int(4) DEFAULT NULL,
   `insertion_date` date NOT NULL,
   `CreationTime` varchar(255) DEFAULT NULL,
   `deleted` tinyint(1) NOT NULL,
