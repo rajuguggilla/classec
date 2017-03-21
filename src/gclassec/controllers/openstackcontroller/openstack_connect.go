@@ -16,17 +16,13 @@ import(
 	"fmt"
 	"gclassec/openstackgov/ceilometer"
 )
-
 type (
     // UserController represents the controller for operating on the User resource
     UserController struct{}
 )
-
 func NewUserController() *UserController {
     return &UserController{}
 }
-
-
 var dbtype string = dbmanagement.ENVdbtype
 var dbname  string = dbmanagement.ENVdbnamegodb
 var dbusername string = dbmanagement.ENVdbusername
@@ -69,7 +65,7 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 			response.Storage = openstack_struct[i].Storage
 			response.RAM = openstack_struct[i].RAM
 			response.VCPU = openstack_struct[i].VCPU
-			response.Tagname = openstack_struct[i].Tagname
+			//response.Tagname = openstack_struct[i].Tagname
 			response.Status = openstack_struct[i].Status
 
 			standardresponse = append(standardresponse, response)
@@ -90,9 +86,6 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 	tx.Commit()
 	logger.Info("Successful in Fetching Data from Database.")
 }
-
-
-
 func (uc UserController) GetDynamicDetails(w http.ResponseWriter, r *http.Request){
         vars := mux.Vars(r)
         id := vars["id"]
@@ -108,9 +101,6 @@ func (uc UserController) GetDynamicDetails(w http.ResponseWriter, r *http.Reques
 
 
 }
-
-
-
 func (uc UserController) GetOSDynamicDetail(w http.ResponseWriter, r *http.Request){
 
 	/*res, err := dynamicdetails.DynamicDetails()
@@ -125,7 +115,7 @@ func (uc UserController) GetOSDynamicDetail(w http.ResponseWriter, r *http.Reque
 	db.SingularTable(true)
 	logger := Loggers.New()
 	logger.Info("We are Fetching Static Data from Database.")
-	os_struct := []openstackInstance.DynamicInstances{}
+	os_struct := []openstackInstance.MeterStruct{}
 
 	errFind := db.Find(&os_struct).Error
 
