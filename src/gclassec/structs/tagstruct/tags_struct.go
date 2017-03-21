@@ -1,6 +1,6 @@
 package tagstruct
 
-type Providers struct {
+type Tags struct {
 	InstanceId string `gorm:"column:InstanceId"`
 	InstanceName	string	`gorm:"column:InstanceName"`
 	Cloud string `gorm:"column:Cloud"`
