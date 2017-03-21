@@ -6,9 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/openstackInstance"
 	"gclassec/loggers"
-	"regexp"
 	"fmt"
-	"gclassec/structs/tagstruct"
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
 	"gclassec/openstackgov"
@@ -58,20 +56,6 @@ func InsertInstances(){
 	tx := db.Begin()
 	db.SingularTable(true)
 
-	tag := []tagstruct.Tags{}
-
-	//create a regex `(?i)openstack` will match string contains "openstack" case insensitive
-	reg := regexp.MustCompile("(?i)openstack")
-
-	//Do the match operation using FindString() function
-	er1 := db.Where("Cloud = ?", reg.FindString("Openstack")).Find(&tag).Error
-	if er1 != nil{
-		logger.Error("Error: ",errcode.ErrFindDB)
-		//tx.Rollback()
-		return
-	}
-	db.Where("Cloud = ?", reg.FindString("Openstack")).Find(&tag)
-
 	openstack_struct := []openstackInstance.Instances{}
 
 	er := db.Find(&openstack_struct).Error
@@ -86,7 +70,7 @@ func InsertInstances(){
 
 	for _, element := range computeDetails.Servers {
 			user := openstackInstance.Instances{Name:element.ServerName, InstanceID:element.ServerId, Status:element.Status, RAM:element.Flavor.Ram, VCPU:element.Flavor.VCPUS, Flavor:element.Flavor.FlavorName, Storage:element.Flavor.Disk, AvailabilityZone:element.AvailabilityZone, CreationTime:element.CreatedAt,
-                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Tagname:"Nil", Deleted:false, Classifier: temp.ProjectName }
+                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Deleted:false, Classifier: temp.ProjectName }
                     db.Create(&user)
 		}
 
@@ -95,7 +79,7 @@ func InsertInstances(){
 	if (len(openstack_struct)==0){
 		for _, element := range computeDetails.Servers {
 			user := openstackInstance.Instances{Name:element.ServerName, InstanceID:element.ServerId, Status:element.Status, RAM:element.Flavor.Ram, VCPU:element.Flavor.VCPUS, Flavor:element.Flavor.FlavorName, Storage:element.Flavor.Disk, AvailabilityZone:element.AvailabilityZone, CreationTime:element.CreatedAt,
-                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Tagname:"Nil", Deleted:false, Classifier: temp.ProjectName }
+                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Deleted:false, Classifier: temp.ProjectName }
                     db.Create(&user)
 		}
 	}else{
@@ -103,11 +87,11 @@ func InsertInstances(){
 		db.Where("name =?",element.ServerName).Find(&openstack_struct)
 		if(len(openstack_struct)==0){
 			 user := openstackInstance.Instances{Name:element.ServerName, InstanceID:element.ServerId, Status:element.Status, RAM:element.Flavor.Ram, VCPU:element.Flavor.VCPUS, Flavor:element.Flavor.FlavorName, Storage:element.Flavor.Disk, AvailabilityZone:element.AvailabilityZone, CreationTime:element.CreatedAt,
-                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Tagname:"Nil", Deleted:false, Classifier: temp.ProjectName }
+                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Deleted:false, Classifier: temp.ProjectName }
                     db.Create(&user)
 		}else{
 			user := openstackInstance.Instances{Name:element.ServerName, InstanceID:element.ServerId, Status:element.Status, RAM:element.Flavor.Ram, VCPU:element.Flavor.VCPUS, Flavor:element.Flavor.FlavorName, Storage:element.Flavor.Disk, AvailabilityZone:element.AvailabilityZone, CreationTime:element.CreatedAt,
-                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Tagname:"Nil", Deleted:true, Classifier: temp.ProjectName }
+                            FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Deleted:true, Classifier: temp.ProjectName }
                      db.Model(&user).Where("name = ?",element.ServerName).Updates(user)
 		}
 }
@@ -122,30 +106,18 @@ func InsertInstances(){
 	/*for _, element := range openstack_struct {
        db.Table("instances").Where("name = ?",element.Name).Update("deleted", true)
 }*/
-	db.Find(&openstack_struct)
-	for _, i := range openstack_struct{
-		if len(tag) != 0 {
-			for _, el := range tag {
-				if i.InstanceID == el.InstanceId{
-					fmt.Println("----Update Tag for this instance----")
-					fmt.Println("el.Tagname : ", el.Tagname)
-					db.Model(openstackInstance.Instances{}).Where("instance_id = ?", i.InstanceID).Update("tagname",el.Tagname)
-				}
 
-			}
-		}
-	}
-/*
+	db.Find(&openstack_struct)
 	for _, element := range openstack_struct {
-              for _, ele := range computeDetails{
-                     if element.Name != ele.Name {
+              for _, ele := range computeDetails.Servers{
+                     if element.Name != ele.ServerName {
                      continue
                      fmt.Println("insdie  continue")
                      }else{
                             db.Table("instances").Where("name = ?",element.Name).Update("deleted", false)
               }
               }
-              }*/
+              }
 	logger.Info("Successful in InsertInstances.")
 	tx.Commit()
 }

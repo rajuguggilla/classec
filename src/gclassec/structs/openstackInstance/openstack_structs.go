@@ -18,7 +18,6 @@ type Instances struct{
 	ImageName string 	`gorm:"column:image_name"`
 	//Volumes string 		`gorm:"column:volumes"`
 	InsertionDate string 	`sql:"type:date" gorm:"column:insertion_date"`
-	Tagname string		`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 	Classifier	string	`gorm:"column:classifier"`
 
@@ -90,6 +89,31 @@ type Configuration struct {
     Container   string		`json:"Container"`
     ImageRegion string		`json:"ImageRegion"`
     Controller string		`json:"Controller"`
+}
+
+//--------------------------Response struct------------------------------------//
+type OpenstackResponse struct{
+	//Id int 			`gorm:"column:id"`
+	Name string 		`json:"Name"`
+	InstanceID string 	`json:"InstanceID"`
+	Status string 		`json:"Status"`
+	AvailabilityZone string `json:"AvailabilityZone"`
+	Flavor string            `json:"Flavor"`
+	CreationTime string 	`json:"CreationTime"`
+	FlavorID string 		`json:"FlavorID"`
+	RAM int64 		`json:"RAM"`
+	VCPU int64 		`json:"VCPU"`
+	Storage int64 		`json:"Storage"`
+	IPAddress string	`json:"IPAddress"`
+	SecurityGroup string 	`json:"SecurityGroup"`
+	KeyPairName string 	`json:"KeyPairName"`
+	ImageName string 	`json:"ImageName"`
+	//Volumes string 		`gorm:"column:volumes"`
+	InsertionDate string 	`json:"InsertionDate"`
+	Tagname string		`json:"Tagname"`
+	Deleted bool     `json:"Deleted"`
+	Classifier	string	`json:"Classifier"`
+
 }
 
 //--------------------------Standardized struct------------------------------------//
