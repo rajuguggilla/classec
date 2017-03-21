@@ -46,7 +46,7 @@ func HosInsert() (int,int){
 	tx := db.Begin()
 	db.SingularTable(true)
 
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 	hos_compute := []hosstruct.HosInstances{}
 
 	err := db.Find(&hos_compute).Error

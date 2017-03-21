@@ -90,7 +90,7 @@ func AzureInsert() (error,int,int){
 	tx := db.Begin()
 	db.SingularTable(true)
 
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 	azure_struct := []azurestruct.AzureInstances{}
 
 	//create a regex `(?i)azure` will match string contains "azure" case insensitive

@@ -38,10 +38,10 @@ func InsertInstances(){
 	//println(examples.ComputeFunc())
 	//computeDetails, err:= goclientcompute.FinalCompute()
 	temp := readopenstackconfig.OpenStackConfigReader()
-	var flvError string
+	var flvError error
 	var computeDetails openstackInstance.ComputeListStruct
 	computeDetails,flvError=openstackgov.ListComputeInstances()
-	if flvError != ""{
+	if flvError != nil{
 		fmt.Println("Error In getting Compute Details:==",flvError)
 	}else{
 		fmt.Println("-----------------------------------------Compute Details-----------------------------------------------------")
@@ -55,7 +55,7 @@ func InsertInstances(){
 	tx := db.Begin()
 	db.SingularTable(true)
 
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)openstack` will match string contains "openstack" case insensitive
 	reg := regexp.MustCompile("(?i)openstack")

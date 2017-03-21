@@ -170,8 +170,8 @@ func main() {
 
         mx.HandleFunc(VMWROOT+"/instances/utilization", vwc.GetDynamicVcenterDetails).Methods("GET")
         mx.HandleFunc(VMWROOT+"/instances/staticdata", vwc.GetVcenterDetails).Methods("GET")
-        mx.HandleFunc(VMWROOT+"/vcenterDetail/staticdynamic", vwc.GetStaticDynamicVcenterDetails).Methods("GET")
-        mx.HandleFunc(VMWROOT+"/vcenterDetail/dynamicupdate", vwc.GetDynamicVcenterUpdateDetails).Methods("GET")
+        mx.HandleFunc(VMWROOT+"/instances/staticdynamic", vwc.GetStaticDynamicVcenterDetails).Methods("GET")
+        mx.HandleFunc(VMWROOT+"/instances/dynamicdata", vwc.GetDynamicVcenterUpdateDetails).Methods("GET")
 
         mx.HandleFunc("/selectProvider", usrc.SelectProvider)
         mx.HandleFunc("/selectedOs", usrc.OpenstackCreds)
