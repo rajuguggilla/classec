@@ -80,10 +80,10 @@ func AzureDynamicInsert() error{
 		logger.Info(dlist)
 		for _, element1 := range *dlist.Value {
 			if element1.Data[len(element1.Data) - 1].Average == nil{
-				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:0.0, Maximum:0.0, Average:0.0}
+				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:0.0, Maximum:0.0, Average:0.0, Unit:*element1.Unit}
 				db.Create(&azure_dynamic)
 			}else{
-				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:*(element1.Data[len(element1.Data) - 1].Minimum), Maximum:*(element1.Data[len(element1.Data) - 1].Maximum), Average:*(element1.Data[len(element1.Data) - 1].Average)}
+				azure_dynamic := azurestruct.AzureDynamic{Name:*element.Name, Timestamp:*(element1.Data[len(element1.Data) - 1].TimeStamp), Minimum:*(element1.Data[len(element1.Data) - 1].Minimum), Maximum:*(element1.Data[len(element1.Data) - 1].Maximum), Average:*(element1.Data[len(element1.Data) - 1].Average), Unit:*element1.Unit}
 				db.Create(&azure_dynamic)
 			}
 		}

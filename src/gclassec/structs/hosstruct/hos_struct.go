@@ -17,6 +17,7 @@ type HosInstances struct {
 	//Volumes_Attached	string	`gorm:"column:volumes_attached"`
 	Tagname	string	`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
+	Classifier string	`gorm:"column:classifier"`
 }
 
 

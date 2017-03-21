@@ -11,6 +11,7 @@ import(
 	"gclassec/errorcodes/errcode"
 	"gclassec/dbmanagement"
 	"gclassec/confmanagement/readstructconf"
+	"gclassec/confmanagement/readopenstackconfig"
 )
 type (
     // UserController represents the controller for operating on the User resource
@@ -31,6 +32,8 @@ var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
 
+var oscreds = readopenstackconfig.OpenStackConfigReader()
+
 func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Request){
 
 	tx := db.Begin()
@@ -46,7 +49,7 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 		tx.Rollback()
 	}
 
-	db.Find(&openstack_struct)
+	db.Where("classifier = ?", oscreds.ProjectName).Find(&openstack_struct)
 
 	if readstructconf.ReadStructConfigFile()!=0{
 		standardresponse := []openstackInstance.StandardizedOpenstack{}

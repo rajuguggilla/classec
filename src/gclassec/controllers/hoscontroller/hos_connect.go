@@ -18,6 +18,7 @@ import (
 	"gclassec/dbmanagement"
 	"gclassec/errorcodes/errcode"
 	"gclassec/confmanagement/readstructconf"
+	"gclassec/confmanagement/readhosconf"
 )
 
 type (
@@ -40,7 +41,7 @@ var b []string = []string{dbusername,":",dbpassword,"@tcp","(",dbhostname,":",db
 var c string = (strings.Join(b,""))
 
 var db,err  = gorm.Open(dbtype, c)
-
+var hoscreds = readhosconf.Configurtion()
 
 func (uc UserController) CpuUtilDetails(w http.ResponseWriter, r *http.Request){
         vars := mux.Vars(r)
@@ -80,7 +81,7 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 		tx.Rollback()
 	}
 
-	db.Find(&hos_compute)
+	db.Where("classifier = ?", hoscreds.ProjectName).Find(&hos_compute)
 
 	if readstructconf.ReadStructConfigFile()!=0{
 		standardresponse := []hosstruct.StandardizedHos{}

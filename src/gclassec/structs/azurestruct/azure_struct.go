@@ -28,6 +28,7 @@ type AzureDynamic struct {
 	Minimum		float64		`sql:"type:varchar" gorm:"column:minimum"`
 	Maximum		float64		`sql:"type:varchar" gorm:"column:maximum"`
 	Average		float64		`sql:"type:varchar" gorm:"column:average"`
+	Unit	string			`gorm:"column:unit"`
 }
 
 
