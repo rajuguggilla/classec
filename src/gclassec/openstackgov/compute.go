@@ -1,66 +1,64 @@
 package openstackgov
 
-import (
-	"gclassec/structs/openstackInstance"
-	"fmt"
-	"gclassec/openstackgov/authenticationtoken"
-)
-
-
 
 import (
 	"io/ioutil"
 	"gclassec/errorcodes/errcode"
 	"net/http"
 	"encoding/json"
-
+	"gclassec/structs/openstackInstance"
+	"gclassec/openstackgov/authenticationtoken"
+	"errors"
+	"gclassec/loggers"
 )
 
-func ListComputeInstances() (openstackInstance.ComputeListStruct,string){
+func ListComputeInstances() (openstackInstance.ComputeListStruct,error){
+	logger := Loggers.New()
 	var tempFlvStruct openstackInstance.FlavorsListStruct
-	var flvError string
+	var flvError error
+	//logger.Info("---------------------------------------Flavours Details in Compute Start------------------------------------------------------")
 	tempFlvStruct,flvError=ListFlavors()
-	if flvError != ""{
-		fmt.Println("Error In getting Flavours Details:==",flvError)
+	if flvError != nil{
+		logger.Error("Error In getting Flavours Details:==",flvError)
 	}else{
-		fmt.Println("---------------------------------------Flavours Details------------------------------------------------------")
-		fmt.Println(tempFlvStruct)
-	}
 
+		logger.Info(tempFlvStruct)
+	}
+	//logger.Info("---------------------------------------Flavours Details in Compute End------------------------------------------------------")
 	var computeEndpoint string
 	var authToken string
-	var authError string
+	var authError error
 	var endpointsStruct openstackInstance.OpenStackEndpoints
 	var jsonCompStruct openstackInstance.ComputeListStruct
 
-	fmt.Println("=====================Scoped Authentication Token====================")
+	//logger.Info("=====================Scoped Authentication Token====================")
 	authToken, endpointsStruct, authError = authenticationtoken.GetAuthToken(false)
-	fmt.Println("authToken:==", authToken)
-	fmt.Println("endpointsStruct:==",endpointsStruct)
-	fmt.Println("authError:==",authError)
+	logger.Info("authToken:==", authToken)
+	logger.Info("endpointsStruct:==",endpointsStruct)
+	logger.Info("authError:==",authError)
 
-	if authError!="" {
-		fmt.Println("authError:==",authError)
+	if authError != nil {
+		logger.Error("authError:==",authError)
 		return jsonCompStruct,authError
 	}else{
-		fmt.Println("authToken:==", authToken)
-		fmt.Println("endpointsStruct:==", endpointsStruct)
+		logger.Info("authToken:==", authToken)
+		logger.Info("endpointsStruct:==", endpointsStruct)
 	}
 	for i := 0; i < len(endpointsStruct.ApiEndpoints); i++ {
 		if endpointsStruct.ApiEndpoints[i].EndpointType =="compute"{
 			computeEndpoint = endpointsStruct.ApiEndpoints[i].EndpointURL
-			fmt.Println("ComputeEndPoint:====",computeEndpoint)
+			logger.Info("ComputeEndPoint:====",computeEndpoint)
 			//https://120.120.120.4:8774/v2.1/cf5489c2c0d040c6907eeae1d7d2614c
 			}
 		}
 
 	var reqURL string =  computeEndpoint + "/servers/detail"
-	fmt.Println("reqURL:====",reqURL)
+	logger.Info("reqURL:====",reqURL)
 	//var reqURL string = "https://120.120.120.4:8774/v2.1/cf5489c2c0d040c6907eeae1d7d2614c/flavors/detail"
 	req, errReq := http.NewRequest("GET", reqURL, nil)
 	if errReq != nil{
-		fmt.Println("HOS: ", errcode.ErrReq)
-		return jsonCompStruct,errcode.ErrReq
+		logger.Error("HOS: ", errcode.ErrReq)
+		return jsonCompStruct,errors.New(errcode.ErrReq)
 	}
 
 	req.Header.Add("x-auth-token", authToken)
@@ -68,26 +66,26 @@ func ListComputeInstances() (openstackInstance.ComputeListStruct,string){
 
 	res, errClient := http.DefaultClient.Do(req)
 	if errClient != nil{
-		fmt.Println("HOS: ", errcode.ErrReq)
-		return jsonCompStruct, errcode.ErrReq
+		logger.Error("HOS: ", errcode.ErrReq)
+		return jsonCompStruct, errors.New(errcode.ErrReq)
 	}
 
-	fmt.Println("Status:======== ", res.Status)
+	logger.Info("Status:======== ", res.Status)
 	defer res.Body.Close()
 	respBody, errResp := ioutil.ReadAll(res.Body)
 	if errResp != nil{
-		fmt.Println("HOS: ", errcode.ErrResp)
-		return jsonCompStruct, errcode.ErrResp
+		logger.Info("HOS: ", errcode.ErrResp)
+		return jsonCompStruct, errors.New(errcode.ErrResp)
 	}
 
 	respBodyInString:= string(respBody)
-	fmt.Println("\nrespBodyInString:==\n",respBodyInString)
+	logger.Info("\nrespBodyInString:==\n",respBodyInString)
 	unmError := json.Unmarshal(respBody, &jsonCompStruct)
 	if unmError != nil {
-		fmt.Println("Error in Unmarshing:==", unmError)
+		logger.Error("Error in Unmarshing:==", unmError)
 	}
 
-	fmt.Printf("\n%+v\n", jsonCompStruct)
+	logger.Info("jsonCompStruct Before Updating Flavors:===", jsonCompStruct)
 
 	for i:=0; i<len(jsonCompStruct.Servers);i++{
 		tempFID := jsonCompStruct.Servers[i].Flavor.FlavorID
@@ -100,8 +98,8 @@ func ListComputeInstances() (openstackInstance.ComputeListStruct,string){
 			}
 		}
 	}
-	fmt.Printf("\n%+v\n", jsonCompStruct)
-	return jsonCompStruct,""
+	logger.Info("jsonCompStruct After Updating Flavors:===", jsonCompStruct)
+	return jsonCompStruct,nil
 }
 
 
