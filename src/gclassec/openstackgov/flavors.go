@@ -4,57 +4,57 @@ package openstackgov
 import (
 	"gclassec/structs/openstackInstance"
 	"gclassec/openstackgov/authenticationtoken"
-	"fmt"
 	"io/ioutil"
 	"gclassec/errorcodes/errcode"
 	"net/http"
 	"encoding/json"
+	"gclassec/loggers"
 )
 
 
 
 
 
-func ListFlavors() (openstackInstance.FlavorsListStruct, string){
-
+func ListFlavors() (openstackInstance.FlavorsListStruct, error){
+	logger := Loggers.New()
 	var computeEndpoint string
 	var authToken string
-	var authError string
+	var authError error
 	var endpointsStruct openstackInstance.OpenStackEndpoints
 	var jsonFlvStruct openstackInstance.FlavorsListStruct
-	//fmt.Println("=====================Unscoped Authentication Token====================")
+	//logger.Info("=====================Unscoped Authentication Token====================")
 	//authToken, endpointsStruct, authError = authenticationtoken.GetAuthToken(true)
-	//fmt.Println("authToken:==", authToken)
-	//fmt.Println("endpointsStruct:==",endpointsStruct)
-	//fmt.Println("authError:==",authError)
-	fmt.Println("=====================Scoped Authentication Token====================")
+	//logger.Info("authToken:==", authToken)
+	//logger.Info("endpointsStruct:==",endpointsStruct)
+	//logger.Info("authError:==",authError)
+	//logger.Info("=====================Scoped Authentication Token====================")
 	authToken, endpointsStruct, authError = authenticationtoken.GetAuthToken(false)
-	fmt.Println("authToken:==", authToken)
-	fmt.Println("endpointsStruct:==",endpointsStruct)
-	fmt.Println("authError:==",authError)
+	logger.Info("authToken:==", authToken)
+	logger.Info("endpointsStruct:==",endpointsStruct)
+	logger.Info("authError:==",authError)
 
-	if authError!="" {
-		fmt.Println("authError:==",authError)
+	if authError!= nil{
+		logger.Error("authError:==",authError)
 		return jsonFlvStruct,authError
 	}else{
-		fmt.Println("authToken:==", authToken)
-		fmt.Println("endpointsStruct:==", endpointsStruct)
+		logger.Info("authToken:==", authToken)
+		logger.Info("endpointsStruct:==", endpointsStruct)
 	}
 	for i := 0; i < len(endpointsStruct.ApiEndpoints); i++ {
 		if endpointsStruct.ApiEndpoints[i].EndpointType =="compute"{
 			computeEndpoint = endpointsStruct.ApiEndpoints[i].EndpointURL
-			fmt.Println("ComputeEndPoint:====",computeEndpoint)
+			logger.Info("ComputeEndPoint:====",computeEndpoint)
 			//https://120.120.120.4:8774/v2.1/cf5489c2c0d040c6907eeae1d7d2614c
 			}
 		}
 
 	var reqURL string =  computeEndpoint + "/flavors/detail"
-	fmt.Println("reqURL:====",reqURL)
+	logger.Info("reqURL:====",reqURL)
 	//var reqURL string = "https://120.120.120.4:8774/v2.1/cf5489c2c0d040c6907eeae1d7d2614c/flavors/detail"
 	req, errReq := http.NewRequest("GET", reqURL, nil)
 	if errReq != nil{
-		fmt.Println("HOS: ", errcode.ErrReq)
-		return jsonFlvStruct,errcode.ErrReq
+		logger.Error(errcode.ErrReq,":==  ", errReq)
+		return jsonFlvStruct,errReq
 	}
 
 	req.Header.Add("x-auth-token", authToken)
@@ -62,27 +62,28 @@ func ListFlavors() (openstackInstance.FlavorsListStruct, string){
 
 	res, errClient := http.DefaultClient.Do(req)
 	if errClient != nil{
-		fmt.Println("HOS: ", errcode.ErrReq)
-		return jsonFlvStruct, errcode.ErrReq
+		logger.Error(errcode.ErrReq,":==  ", errClient)
+		return jsonFlvStruct, errClient
 	}
 
-	fmt.Println("Status:======== ", res.Status)
+	logger.Info("Status:======== ", res.Status)
 	defer res.Body.Close()
 	respBody, errResp := ioutil.ReadAll(res.Body)
 	if errResp != nil{
-		fmt.Println("HOS: ", errcode.ErrResp)
-		return jsonFlvStruct, errcode.ErrResp
+		logger.Error(errcode.ErrResp,":==  ",errResp)
+		return jsonFlvStruct, errResp
 	}
 
 	respBodyInString:= string(respBody)
-	fmt.Println("\nrespBodyInString:==\n",respBodyInString)
+	logger.Info("\nrespBodyInString:==\n",respBodyInString)
 	unmError := json.Unmarshal(respBody, &jsonFlvStruct)
 	if unmError != nil {
-		fmt.Println("Error in Unmarshing:==", unmError)
+		logger.Error("Error in Unmarshing:==", unmError)
+		return	jsonFlvStruct,unmError
 	}
 
-	fmt.Println("%+v\n\n", jsonFlvStruct)
-	return jsonFlvStruct,""
+	logger.Info("jsonFlvStruct:====", jsonFlvStruct)
+	return jsonFlvStruct,nil
 }
 
 
