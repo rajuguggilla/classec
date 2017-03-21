@@ -13,7 +13,10 @@ import (
 	"gclassec/dbmanagement"
 	"gclassec/openstackgov"
 	"gclassec/confmanagement/readopenstackconfig"
+	"gclassec/openstackgov/ceilometer"
 )
+
+
 type (
     // UserController represents the controller for operating on the User resource
     UserController struct{}
@@ -145,4 +148,27 @@ func InsertInstances(){
               }*/
 	logger.Info("Successful in InsertInstances.")
 	tx.Commit()
+}
+
+
+
+func OSDynamicInsert() error{
+
+	dynamicDetails, err := ceilometer.DynamicDetails()
+
+	if err != nil{
+		return err
+	}
+	logger.Info(dynamicDetails)
+
+
+	// Inserting Dynamic Data into Database
+	for _, element := range dynamicDetails.Servers{
+		user := openstackInstance.DynamicInstances{Vm_Name:element.Vm_Name, InstanceID:element.InstanceID, Count:element.Count, DurationStart:element.DurationStart, Min:element.Min,DurationEnd:element.DurationEnd, Max:element.Max, Sum:element.Sum, Period:element.Period, PeriodEnd:element.PeriodEnd, Duration:element.Duration, PeriodStart:element.PeriodStart, Avg:element.Avg, Unit:element.Unit}
+		db.Create(&user)
+		//db.Model(&user).Updates(&user)
+	}
+
+	logger.Info("Successful in InsertHOSDynamicInstance")
+	return nil
 }

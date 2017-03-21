@@ -12,14 +12,21 @@ import(
 	"gclassec/dbmanagement"
 	"gclassec/confmanagement/readstructconf"
 	"gclassec/confmanagement/readopenstackconfig"
+	"github.com/gorilla/mux"
+	"fmt"
+	"gclassec/openstackgov/ceilometer"
 )
+
 type (
     // UserController represents the controller for operating on the User resource
     UserController struct{}
 )
+
 func NewUserController() *UserController {
     return &UserController{}
 }
+
+
 var dbtype string = dbmanagement.ENVdbtype
 var dbname  string = dbmanagement.ENVdbnamegodb
 var dbusername string = dbmanagement.ENVdbusername
@@ -82,4 +89,59 @@ func (uc UserController) GetDetailsOpenstack(w http.ResponseWriter, r *http.Requ
 
 	tx.Commit()
 	logger.Info("Successful in Fetching Data from Database.")
+}
+
+
+
+func (uc UserController) GetDynamicDetails(w http.ResponseWriter, r *http.Request){
+        vars := mux.Vars(r)
+        id := vars["id"]
+	fmt.Print("---------",id)
+        res, err := ceilometer.DynamicDetails()
+	if err != nil{
+		fmt.Println("Error:", err)
+		return
+	}
+
+	//logger.Info(res)
+	  _ = json.NewEncoder(w).Encode(&res)
+
+
+}
+
+
+
+func (uc UserController) GetOSDynamicDetail(w http.ResponseWriter, r *http.Request){
+
+	/*res, err := dynamicdetails.DynamicDetails()
+	_ = json.NewEncoder(w).Encode(&res)
+
+	if err != nil{
+		return
+	}*/
+
+
+	tx := db.Begin()
+	db.SingularTable(true)
+	logger := Loggers.New()
+	logger.Info("We are Fetching Static Data from Database.")
+	os_struct := []openstackInstance.DynamicInstances{}
+
+	errFind := db.Find(&os_struct).Error
+
+	if errFind != nil{
+		logger.Error("Error: ", errcode.ErrFindDB)
+		tx.Rollback()
+	}
+
+	_ = json.NewEncoder(w).Encode(db.Find(&os_struct))
+
+		if err != nil {
+			logger.Error("Error :", err)
+			println(err)
+		}
+
+	tx.Commit()
+	logger.Info("Successful in Fetching Data from Database.")
+
 }

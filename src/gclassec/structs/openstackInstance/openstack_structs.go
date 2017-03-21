@@ -203,3 +203,59 @@ type VolumesStruct struct{
 type MetadataStruct struct{
 
 }
+
+
+
+//----------------------------------------------CEILOMETER STRUCTS--------------------------------------------//
+type MeterStruct struct{
+	Count 		int 		`json:"Count"`
+        DurationStart 	string 		`json:"Duration_start"`
+        Min 		float64 	`json:"Min"`
+        DurationEnd 	string 		`json:"Duration_end"`
+        Max 		float64 	`json:"Max"`
+        Sum 		float64 	`json:"Sum"`
+        Period 		int 		`json:"Period"`
+        PeriodEnd 	string 		`json:"Period_end"`
+        Duration 	float64 	`json:"Duration"`
+        PeriodStart 	string 		`json:"Period_start"`
+        Avg 		float64 	`json:"Avg"`
+        Groupby 	string 		`json:"Groupby"`
+        Unit 		string 		`json:"Unit"`
+}
+type CompleteDynamicResponse struct {
+      Servers       []DynamicInstances_db    `json:"servers"`
+}
+type DynamicInstances_db struct {
+	Vm_Name		string			`json:"Vm_Name"`
+	InstanceID	string			`json:"InstanceId"`
+	Count         int              		`json:"Count"`
+	DurationStart string           		`json:"DurationStart"`
+	Min           float64         		`json:"Min"`
+	DurationEnd   string             	`json:"DurationEnd "`
+	Max           float64       		`json:"Max"`
+	Sum           float64        		`json:"Sum"`
+	Period        int              		`json:"Period "`
+	PeriodEnd     string             	`json:"PeriodEnd"`
+	Duration      float64       		`json:"Duration"`
+	PeriodStart   string              	`json:"PeriodStart"`
+	Avg           float64       	 	`json:"Avg"`
+	Groupby       string             	`json:"Groupby"`
+	Unit          string                	`json:"Unit"`
+}
+type DynamicInstances struct {
+	Vm_Name		string			`gorm:"column:Vm_Name"`
+	InstanceID	string			`gorm:"column:InstanceID"`
+	Count         int              		`gorm:"column:Count"`
+	DurationStart string           		`gorm:"column:DurationStart"`
+	Min           float64         		`gorm:"column:Min"`
+	DurationEnd   string             	`gorm:"column:DurationEnd"`
+	Max           float64       		`gorm:"column:Max"`
+	Sum           float64        		`gorm:"column:Sum"`
+	Period        int              		`gorm:"column:Period"`
+	PeriodEnd     string             	`gorm:"column:PeriodEnd"`
+	Duration      float64       		`gorm:"column:Duration"`
+	PeriodStart   string              	`gorm:"column:PeriodStart"`
+	Avg           float64       	 	`gorm:"column:Avg"`
+	Groupby       string             	`gorm:"column:Groupby"`
+	Unit          string                	`gorm:"column:Unit"`
+}

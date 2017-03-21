@@ -83,19 +83,23 @@ func main() {
         for {
             select {
                 case <- ticker.C:
+
                     errAzure,_,_ := azureinsert.AzureInsert()
                     if errAzure != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
                     openstackinsert.InsertInstances()
                     errVmware,_,_:= vmwareinsert.VmwareInsert()
                     if errVmware != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
                     hosinsert.HosInsert()
                 case <- ticker_dynamic.C:
+
                     err := azureinsert.AzureDynamicInsert()
                     if err != nil {
                         fmt.Println("Error : ", errcode.ErrInsert)
@@ -107,6 +111,13 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
+                    errOS := openstackinsert.OSDynamicInsert()
+                    if errOS != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+
                     errVmDynamic := vmwareinsert.VmwareDynamicInsert()
                     if errVmDynamic != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
@@ -161,6 +172,8 @@ func main() {
         mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")  // 'http://localhost:9009/dbaas/pricing'
 
         mx.HandleFunc(OPSROOT+"/instances/staticdata", opc.GetDetailsOpenstack).Methods("GET")
+        mx.HandleFunc(OPSROOT+"/instances/utilization/{id}", opc.GetDynamicDetails).Methods("GET")
+        mx.HandleFunc(OPSROOT+"/instances/dynamicdata", opc.GetOSDynamicDetail).Methods("GET")
         //TODO add openstack dynamic services for HOS
 
         mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
