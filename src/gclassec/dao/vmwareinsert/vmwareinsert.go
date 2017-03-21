@@ -177,7 +177,7 @@ func VmwareInsert() (error,int,int){
        tx := db.Begin()
        db.SingularTable(true)
 
-       tag := []tagstruct.Providers{}
+       tag := []tagstruct.Tags{}
 
        //create a regex `(?i)vmware` will match string contains "vmware" case insensitive
        reg := regexp.MustCompile("(?i)vmware")

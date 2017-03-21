@@ -40,7 +40,7 @@ func ComputeWithCPU() hosstruct.CompleteComputeResponse{
 	tx := db.Begin()
 	db.SingularTable(true)
 
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)hos` will match string contains "hos" case insensitive
 	reg := regexp.MustCompile("(?i)hos")

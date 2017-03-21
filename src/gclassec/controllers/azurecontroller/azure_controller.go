@@ -93,7 +93,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	db.SingularTable(true)
 
 	obj := &azurestruct.VirtualMachineStaticDynamic{}
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)azure` will match string contains "azure" case insensitive
 	reg := regexp.MustCompile("(?i)azure")

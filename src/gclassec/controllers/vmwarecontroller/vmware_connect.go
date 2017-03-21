@@ -173,7 +173,7 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
 	db.SingularTable(true)
 
 	output := vmwarestructs.StaticDynamicValues{}
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)vmware` will match string contains "vmware" case insensitive
 	reg := regexp.MustCompile("(?i)vmware")
