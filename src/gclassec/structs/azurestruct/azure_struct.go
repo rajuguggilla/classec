@@ -23,6 +23,7 @@ type AzureInstances struct{
 
 type AzureDynamic struct {
 	Name		string		`gorm:"column:name"`
+	VmId	string			`gorm:"column:vmid"`
 	Timestamp	string		`gorm:"column:timestamp"`
 	Minimum		float64		`sql:"type:varchar" gorm:"column:minimum"`
 	Maximum		float64		`sql:"type:varchar" gorm:"column:maximum"`
