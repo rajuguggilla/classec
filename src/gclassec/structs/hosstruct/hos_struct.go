@@ -38,6 +38,13 @@ type HosDynamicInstances struct {
 
 }
 
+type HOSCpu struct{
+	Name string `gorm:"column:name"`
+	Minimum float64 `gorm:"column:min"`
+	Maximum float64 `gorm:"column:max"`
+	Average float64 `gorm:"column:avg"`
+}
+
 
 //-------------------------------- Structure to get AuthToken-----------------------------------------//
 
