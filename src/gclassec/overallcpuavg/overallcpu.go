@@ -1,4 +1,4 @@
-package main
+package overallcpuavg
 
 import (
        "log"
@@ -36,14 +36,7 @@ name string
        maximum float64
        average float64
 )
-/*
-func main(){
-	//Azurecpu()
-	//HOScpu()
-	//VMwarecpu()
-	Openstackcpu()
-}
-*/
+
 
 func Azurecpu(){
 
