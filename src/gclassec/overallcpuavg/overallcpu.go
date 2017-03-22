@@ -11,6 +11,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"gclassec/structs/hosstruct"
 	"gclassec/structs/vmwarestructs"
+	"gclassec/structs/openstackInstance"
 )
 
 var dbtype string = dbmanagement.ENVdbtype
@@ -35,11 +36,14 @@ name string
        maximum float64
        average float64
 )
+/*
 func main(){
-	Azurecpu()
-	HOScpu()
-	VMwarecpu()
+	//Azurecpu()
+	//HOScpu()
+	//VMwarecpu()
+	Openstackcpu()
 }
+*/
 
 func Azurecpu(){
 
@@ -190,10 +194,10 @@ if err != nil {
 }
 func Openstackcpu(){
 
-dynamic := []azurestruct.AzureCpu{}
+dynamic := []openstackInstance.OpenstackCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select name,avg(minimum),avg(maximum) , avg(average) from azure_dynamic group by name;")
+       rows, err := db.Query("select Vm_Name,avg(Min),avg(Max) , avg(Avg) from dynamic_instances group by Vm_Name;")
 	if err != nil {
        log.Fatal(err)
 }
@@ -209,15 +213,15 @@ for rows.Next() {
 	fmt.Println(name)
 	fmt.Println(average)
 	if (len(dynamic)== 0){
-		dynamic := azurestruct.AzureCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+		dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
 	}
 	for _,element := range dynamic{
 		if name == element.Name{
-			dynamic := azurestruct.AzureCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+			dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Model(&dynamic).Where("name =?",element.Name).Updates(dynamic)
 		}else{
-			dynamic := azurestruct.AzureCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+			dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
 		}
 	}
