@@ -9,6 +9,7 @@ import(
 	"strings"
 	"os"
 	"gclassec/loggers"
+	"net/url"
 )
 const updatingFileName = "authmanagment/configurationupdater.go"
 const awsFileName = "conf/awscred.json"
@@ -23,6 +24,14 @@ var logger = Loggers.New()
 func MyFileWriter(data string, configFile string)(string){
 	logger.Debug("requestBody:==",data)
 	// Split on NewLine.
+	temp,err := url.QueryUnescape(data)
+	if err != nil {
+		fmt.Println("error:", err)
+		return("Failed")
+	}
+	fmt.Printf("New Decoded temp:=== %q\n", temp)
+	data= temp
+	fmt.Printf("New Decoded Data:=== %q\n", data)
     	tempVariableString := strings.Split(data, "&")
     	 //Display all elements.
 	logger.Info("TempVariable Length:",len(tempVariableString))
@@ -64,8 +73,10 @@ func AwsCredentials(w http.ResponseWriter, r *http.Request){
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	// Use the content
 	bodyString := string(bodyBytes)
-	//fmt.Println(bodyString)
+	fmt.Println("Encoded request Body:=== %q\n",bodyString)
+	//Body Eg:===  accessKeyID=NavindraKumarKushwaha&accessKeyValue=poiuytrewq%3Blkjhgfdsa.%2Cmnbvcxz%2F%3Boi1234567890-%3Bf%601%3D-09872132'%2F.%2C
 	//filename := "authmanagment/configurationupdater.go"
+
 	_, filePath, _, _ := runtime.Caller(0)
         logger.Debug("\nCurrentFilePath:==",filePath)
         ConfigFilePath :=(strings.Replace(filePath, updatingFileName, awsFileName, 1))

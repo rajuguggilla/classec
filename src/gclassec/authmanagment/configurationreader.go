@@ -23,15 +23,28 @@ const readerFileName = "authmanagment/configurationreader.go"
 
 
 
-func ReadAwsCredentials() awsstructs.Configuration{
+func ReadAwsCredentials() (awsstructs.Configuration){
 
-	_, filePath, _, _ := runtime.Caller(0)
+	var tempConfig = awsstructs.Configuration{}
+	_, filePath, _,ok := runtime.Caller(0)
+	if ok == false{
+		fmt.Println("Error in locating file.")
+		return	tempConfig
+	}
 	fmt.Println("CurrentFilePath:==",filePath)
 	absPath :=(strings.Replace(filePath, readerFileName, awsFileName, 1))
 	fmt.Println("HOSConfigurationFilePath:==",absPath)
-	file, _ := os.Open(absPath)
+	file, oerr := os.Open(absPath)
+	if oerr != nil{
+		if os.IsNotExist(oerr){
+			fmt.Println("File does not exist.")
+			return tempConfig
+		}else {
+			fmt.Println("Error in opening file.")
+			return tempConfig
+		}
+	}
 	decoder := json.NewDecoder(file)
-	tempConfig := awsstructs.Configuration{}
 	err := decoder.Decode(&tempConfig)
 	if err != nil{
 		logger.Error("ConfigurationError:", err)
@@ -40,7 +53,7 @@ func ReadAwsCredentials() awsstructs.Configuration{
 	fmt.Println("TempConfig:===")
 	fmt.Println("accessKeyID: ",tempConfig.AccessKeyID)
     	fmt.Println("accessKeyValue: ",tempConfig.AccessKeyValue)
-
+	//tempConfig.AccessKeyValue="XXXXXXXXXX"
 	return tempConfig
 
 
@@ -67,7 +80,7 @@ func ReadAzureCredentials() azurestruct.Configuration {
     	fmt.Println("Clientsecret: ",tempConfig.Clientsecret)
     	fmt.Println("Subscriptionid: ",tempConfig.Subscriptionid)
 	fmt.Println("Tenanatid: ",tempConfig.Tenantid)
-
+	tempConfig.Clientsecret="XXXXXXXXXX"
 	return tempConfig
 }
 
@@ -94,6 +107,7 @@ func ReadOpenstackCredentials() openstackInstance.Configuration{
     	fmt.Println("ProjectName: ",tempConfig.ProjectName)
 	fmt.Println("Controller: ",tempConfig.Controller)
 	fmt.Println("UserName: ",tempConfig.Username)
+	tempConfig.Password="XXXXXXXXXX"
 	return tempConfig
 }
 
@@ -116,6 +130,7 @@ func ReadVmwareCredentials() vmwarestructs.Configuration{
     	fmt.Println("UserName: ",tempConfig.EnvUserName)
     	fmt.Println("Password: ",tempConfig.EnvPassword)
 	fmt.Println("Insecure: ",tempConfig.EnvInsecure)
+	tempConfig.EnvPassword="XXXXXXXXXX"
     	return tempConfig
 
 }
@@ -145,5 +160,6 @@ func ReadHosCredentials() hosstruct.Configuration {
     	fmt.Println("ProjectName: ",tempConfig.ProjectName)
 	fmt.Println("Region: ",tempConfig.Region)
 	fmt.Println("UserName: ",tempConfig.UserName)
+	tempConfig.Password="XXXXXXXXXX"
 	return tempConfig
 }
