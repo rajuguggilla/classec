@@ -81,8 +81,7 @@ if err != nil {
 }
        if err != nil {
     log.Fatal(err)
-	       db.Close()
-	       db1.Close()
+
 }
 
 
@@ -92,7 +91,7 @@ func HOScpu(){
 dynamic := []hosstruct.HOSCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select name,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by name;")
+       rows, err := db.Query("select Name,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by Name;")
 	if err != nil {
        log.Fatal(err)
 }
@@ -130,8 +129,7 @@ if err != nil {
 }
        if err != nil {
     log.Fatal(err)
-	       db.Close()
-	       db1.Close()
+
 }
 
 
@@ -141,7 +139,7 @@ func VMwarecpu(){
 dynamic := []vmwarestructs.VMwareCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select name,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by name;")
+       rows, err := db.Query("select Name,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by Name;")
 	if err != nil {
        log.Fatal(err)
 }
@@ -161,14 +159,14 @@ for rows.Next() {
    			db1.Create(&dynamic)
 	}else{
 		for _,element := range dynamic{
-			db1.Where("name = ?",name).Find(&dynamic)
+			db1.Where("Name = ?",name).Find(&dynamic)
 			if(len(dynamic) ==0){
 				dynamic := vmwarestructs.VMwareCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
 				db1.Create(&dynamic)
 
 			}else{
 				dynamic := vmwarestructs.VMwareCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
-				db1.Model(&dynamic).Where("name =?",element.Name).Updates(dynamic)
+				db1.Model(&dynamic).Where("Name =?",element.Name).Updates(dynamic)
 			}
 		}
 	}
@@ -179,8 +177,7 @@ if err != nil {
 }
        if err != nil {
     log.Fatal(err)
-	       db.Close()
-	       db1.Close()
+
 }
 
 
@@ -208,14 +205,15 @@ for rows.Next() {
 	if (len(dynamic)== 0){
 		dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
-	}
-	for _,element := range dynamic{
-		if name == element.Name{
-			dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
-   			db1.Model(&dynamic).Where("name =?",element.Name).Updates(dynamic)
-		}else{
-			dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
-   			db1.Create(&dynamic)
+	}else {
+		for _, element := range dynamic {
+			if name == element.Name {
+				dynamic := openstackInstance.OpenstackCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
+				db1.Model(&dynamic).Where("name =?", element.Name).Updates(dynamic)
+			} else {
+				dynamic := openstackInstance.OpenstackCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
+				db1.Create(&dynamic)
+			}
 		}
 	}
 }
@@ -227,8 +225,4 @@ if err != nil {
     log.Fatal(err)
 
 }
-	db.Close()
-	db1.Close()
-
-
 }
