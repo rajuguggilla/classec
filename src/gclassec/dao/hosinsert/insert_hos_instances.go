@@ -11,6 +11,7 @@ import (
 	"gclassec/dbmanagement"
 	"gclassec/goclienthos/dynamicdetails"
 	"gclassec/confmanagement/readhosconf"
+	"fmt"
 )
 
 var logger = Loggers.New()
@@ -85,14 +86,21 @@ func HosInsert() (int,int){
 	db.Find(&hos_compute)
 
 	for _, element := range hos_compute {
-              for _, ele := range computeDetails.Servers{
-                     if element.Vm_Name != ele.Vm_Name {
-                     continue
+              fmt.Println("inside delete")
+             for i:=0;i<len(computeDetails.Servers);i++{
+                     if element.Vm_Name != computeDetails.Servers[i].Vm_Name {
+                            if(i == len(computeDetails.Servers)-1) {
+                                   fmt.Println("hello")
+                                   db.Table("hos_instances").Where("Name = ?",element.Vm_Name ).Update("deleted", true)
+			    }
+                            continue
                      }else{
-                            db.Table("hos_instances").Where("Name = ?",element.Vm_Name).Update("deleted", false)
+                            db.Table("hos_instances").Where("Name = ?",element.Vm_Name ).Update("deleted", false)
+                            break
               }
-              }
-              }
+
+             }
+       }
 	logger.Info("Successful in InsertHOSInstance.")
 	tx.Commit()
 	return poweredoncount,poweredoffcount
