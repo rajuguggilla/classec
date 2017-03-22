@@ -1,4 +1,4 @@
-package overallcpuavg
+package main
 
 import (
        "log"
@@ -37,7 +37,12 @@ name string
        average float64
 )
 
-
+func main(){
+	Azurecpu()
+	HOScpu()
+	Openstackcpu()
+	//VMwarecpu()
+}
 func Azurecpu(){
 
 dynamic := []azurestruct.AzureCpu{}
@@ -92,7 +97,7 @@ func HOScpu(){
 dynamic := []hosstruct.HOSCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select name,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by name;")
+       rows, err := db.Query("select Name,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by Name;")
 	if err != nil {
        log.Fatal(err)
 }
@@ -141,7 +146,7 @@ func VMwarecpu(){
 dynamic := []vmwarestructs.VMwareCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select name,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by name;")
+       rows, err := db.Query("select Name,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by name;")
 	if err != nil {
        log.Fatal(err)
 }
