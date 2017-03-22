@@ -79,12 +79,12 @@ func main() {
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
     ticker_dynamic := time.NewTicker(time.Duration(configuration.DynamicInterval) * configuration.DynamicTimespec)
+    //ticker_avg := time.NewTicker(time.Duration(configuration.DynamicInterval) * configuration.DynamicTimespec)
     go func() {
         defer wg.Done()
         for {
             select {
                 case <- ticker.C:
-
                     errAzure,_,_ := azureinsert.AzureInsert()
                     if errAzure != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
@@ -121,6 +121,26 @@ func main() {
 
                     errVmDynamic := vmwareinsert.VmwareDynamicInsert()
                     if errVmDynamic != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errAzuAvg :=overallcpuavg.Azurecpu()
+                    if errAzuAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errHosAvg := overallcpuavg.HOScpu()
+                    if errHosAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errVmAvg :=overallcpuavg.VMwarecpu()
+                    if errVmAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errOSAvg := overallcpuavg.Openstackcpu()
+                    if errOSAvg != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
@@ -224,12 +244,6 @@ func main() {
         mx.HandleFunc(OPSROOT+"/v1.0/servers", openstackgov.Getserver).Methods("GET")
         mx.HandleFunc("/instances/countonoff",instancestatus.Getinstancestatus).Methods("GET")
 	    mx.HandleFunc("/utilization/cpu/{provider}/{name}",overallcpuavg.Getoverallcpubyname).Methods("GET")
-
-
-
-
-
-
 
         http.Handle("/", mx)
         // Fire up the server

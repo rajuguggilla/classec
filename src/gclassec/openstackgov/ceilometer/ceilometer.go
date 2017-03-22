@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"gclassec/loggers"
 	"gclassec/openstackgov/authenticationtoken"
+	"time"
+	"strconv"
 )
 
 func GetCeilometerDetail(id string) ([]openstackInstance.MeterStruct,error) {
@@ -38,7 +40,11 @@ func GetCeilometerDetail(id string) ([]openstackInstance.MeterStruct,error) {
 			//https://120.120.120.4:8774/v2.1/cf5489c2c0d040c6907eeae1d7d2614c
 			}
 		}
-	var reqURL string = MeteringEndpoint+ "/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
+	t := time.Now()
+
+	var reqURL string =  MeteringEndpoint + "/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value="+strconv.Itoa(t.Year())+"-"+strconv.Itoa(int(t.Month()))+"-"+strconv.Itoa(t.Day())
+
+	//var reqURL string = meteringEndpoint+ "/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value="+id+"&q.value=2017-01-18T08%3A55%3A00"
 	//http://110.110.112.10:8777/v2/meters/cpu_util/statistics?q.field=resource_id&q.field=timestamp&q.op=eq&q.op=gt&q.type=&q.type=&q.value=06b49c3e-3e80-4a22-82ac-20d43f1b9009&q.value=2017-01-18T08%3A55%3A00
 	fmt.Println("reqURL:====",reqURL)
 
