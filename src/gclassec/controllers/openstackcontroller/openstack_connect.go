@@ -154,7 +154,7 @@ func (uc UserController) GetDynamicDetails(w http.ResponseWriter, r *http.Reques
         vars := mux.Vars(r)
         id := vars["id"]
 	fmt.Print("---------",id)
-        res, err := ceilometer.DynamicDetails()
+        res, err := ceilometer.GetCeilometerDetail(id)
 	if err != nil{
 		fmt.Println("Error:", err)
 		return
