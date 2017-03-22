@@ -224,6 +224,7 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 						response.Tagname = "Nil"
 					}else {
 						response.Tagname = el.Tagname
+						break
 					}
 				}
 			}
@@ -259,6 +260,7 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 						response.Tagname = "Nil"
 					}else {
 						response.Tagname = el.Tagname
+						break
 					}
 				}
 			}
