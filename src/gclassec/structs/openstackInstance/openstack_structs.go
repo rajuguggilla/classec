@@ -18,7 +18,6 @@ type Instances struct{
 	ImageName string 	`gorm:"column:image_name"`
 	//Volumes string 		`gorm:"column:volumes"`
 	InsertionDate string 	`sql:"type:date" gorm:"column:insertion_date"`
-	Tagname string		`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 	Classifier	string	`gorm:"column:classifier"`
 
@@ -90,6 +89,31 @@ type Configuration struct {
     Container   string		`json:"Container"`
     ImageRegion string		`json:"ImageRegion"`
     Controller string		`json:"Controller"`
+}
+
+//--------------------------Response struct------------------------------------//
+type OpenstackResponse struct{
+	//Id int 			`gorm:"column:id"`
+	Name string 		`json:"Name"`
+	InstanceID string 	`json:"InstanceID"`
+	Status string 		`json:"Status"`
+	AvailabilityZone string `json:"AvailabilityZone"`
+	Flavor string            `json:"Flavor"`
+	CreationTime string 	`json:"CreationTime"`
+	FlavorID string 		`json:"FlavorID"`
+	RAM int64 		`json:"RAM"`
+	VCPU int64 		`json:"VCPU"`
+	Storage int64 		`json:"Storage"`
+	IPAddress string	`json:"IPAddress"`
+	SecurityGroup string 	`json:"SecurityGroup"`
+	KeyPairName string 	`json:"KeyPairName"`
+	ImageName string 	`json:"ImageName"`
+	//Volumes string 		`gorm:"column:volumes"`
+	InsertionDate string 	`json:"InsertionDate"`
+	Tagname string		`json:"Tagname"`
+	Deleted bool     `json:"Deleted"`
+	Classifier	string	`json:"Classifier"`
+
 }
 
 //--------------------------Standardized struct------------------------------------//
@@ -202,4 +226,60 @@ type VolumesStruct struct{
 
 type MetadataStruct struct{
 
+}
+
+
+
+//----------------------------------------------CEILOMETER STRUCTS--------------------------------------------//
+type MeterStruct struct{
+	Count 		int 		`json:"Count"`
+        DurationStart 	string 		`json:"Duration_start"`
+        Min 		float64 	`json:"Min"`
+        DurationEnd 	string 		`json:"Duration_end"`
+        Max 		float64 	`json:"Max"`
+        Sum 		float64 	`json:"Sum"`
+        Period 		int 		`json:"Period"`
+        PeriodEnd 	string 		`json:"Period_end"`
+        Duration 	float64 	`json:"Duration"`
+        PeriodStart 	string 		`json:"Period_start"`
+        Avg 		float64 	`json:"Avg"`
+        Groupby 	string 		`json:"Groupby"`
+        Unit 		string 		`json:"Unit"`
+}
+type CompleteDynamicResponse struct {
+      Servers       []DynamicInstances_db    `json:"servers"`
+}
+type DynamicInstances_db struct {
+	Vm_Name		string			`json:"Vm_Name"`
+	InstanceID	string			`json:"InstanceId"`
+	Count         int              		`json:"Count"`
+	DurationStart string           		`json:"DurationStart"`
+	Min           float64         		`json:"Min"`
+	DurationEnd   string             	`json:"DurationEnd "`
+	Max           float64       		`json:"Max"`
+	Sum           float64        		`json:"Sum"`
+	Period        int              		`json:"Period "`
+	PeriodEnd     string             	`json:"PeriodEnd"`
+	Duration      float64       		`json:"Duration"`
+	PeriodStart   string              	`json:"PeriodStart"`
+	Avg           float64       	 	`json:"Avg"`
+	Groupby       string             	`json:"Groupby"`
+	Unit          string                	`json:"Unit"`
+}
+type DynamicInstances struct {
+	Vm_Name		string			`gorm:"column:Vm_Name"`
+	InstanceID	string			`gorm:"column:InstanceID"`
+	Count         int              		`gorm:"column:Count"`
+	DurationStart string           		`gorm:"column:DurationStart"`
+	Min           float64         		`gorm:"column:Min"`
+	DurationEnd   string             	`gorm:"column:DurationEnd"`
+	Max           float64       		`gorm:"column:Max"`
+	Sum           float64        		`gorm:"column:Sum"`
+	Period        int              		`gorm:"column:Period"`
+	PeriodEnd     string             	`gorm:"column:PeriodEnd"`
+	Duration      float64       		`gorm:"column:Duration"`
+	PeriodStart   string              	`gorm:"column:PeriodStart"`
+	Avg           float64       	 	`gorm:"column:Avg"`
+	Groupby       string             	`gorm:"column:Groupby"`
+	Unit          string                	`gorm:"column:Unit"`
 }
