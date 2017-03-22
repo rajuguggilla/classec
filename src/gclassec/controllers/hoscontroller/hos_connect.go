@@ -120,6 +120,7 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 						response.Tagname = "Nil"
 					}else {
 						response.Tagname = el.Tagname
+						break
 					}
 				}
 			}
@@ -154,6 +155,7 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 						response.Tagname = "Nil"
 					}else {
 						response.Tagname = el.Tagname
+						break
 					}
 				}
 			}

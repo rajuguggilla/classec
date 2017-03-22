@@ -23,6 +23,13 @@ type Instances struct{
 
 }
 
+type OpenstackCpu struct{
+	Name string `gorm:"column:name"`
+	Minimum float64 `gorm:"column:min"`
+	Maximum float64 `gorm:"column:max"`
+	Average float64 `gorm:"column:avg"`
+}
+
 type ComputeResponse struct {
 	Servers       []ServerResponse      `json:"servers"`
 }

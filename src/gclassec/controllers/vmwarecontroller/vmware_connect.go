@@ -288,6 +288,7 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 						response.Tagname = "Nil"
 					}else {
 						response.Tagname = el.Tagname
+						break
 					}
 				}
 			}
@@ -317,6 +318,7 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 						response.Tagname = "Nil"
 					}else {
 						response.Tagname = el.Tagname
+						break
 					}
 				}
 			}
