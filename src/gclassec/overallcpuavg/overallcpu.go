@@ -1,7 +1,7 @@
 package overallcpuavg
 
 import (
-       "log"
+     //  "log"
        "gclassec/dbmanagement"
        "strings"
         "database/sql"
@@ -12,6 +12,8 @@ import (
 	"gclassec/structs/hosstruct"
 	"gclassec/structs/vmwarestructs"
 	"gclassec/structs/openstackInstance"
+	"gclassec/errorcodes/errcode"
+	"gclassec/loggers"
 )
 
 var dbtype string = dbmanagement.ENVdbtype
@@ -37,27 +39,38 @@ name string
        average float64
 )
 
+var logger = Loggers.New()
 
-func Azurecpu(){
+func Azurecpu() error{
 
 dynamic := []azurestruct.AzureCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
        rows, err := db.Query("select name,avg(minimum),avg(maximum) , avg(average) from azure_dynamic group by name;")
 	if err != nil {
-       log.Fatal(err)
-}
+           logger.Error(err)
+	   logger.Error(errcode.ErrFindDB)
+	   fmt.Println("Error:",errcode.ErrFindDB)
+	   return err
+        }
+
+
 defer rows.Close()
 for rows.Next() {
        err := rows.Scan(&name,&minimum,&maximum,&average)
 
        if err != nil {
-              log.Fatal(err)
+              logger.Error(err)
+	       logger.Error(err)
+	       fmt.Println("Error:",errcode.ErrFindDB)
+	       return err
        }
+
        fmt.Println(minimum)
         fmt.Println(maximum)
 	fmt.Println(name)
 	fmt.Println(average)
+
 	if (len(dynamic)== 0){
 		dynamic := azurestruct.AzureCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
@@ -77,30 +90,42 @@ for rows.Next() {
 }
 	err = rows.Err()
 if err != nil {
-       log.Fatal(err)
+       logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 }
        if err != nil {
-    log.Fatal(err)
+       logger.Error(err)
+	fmt.Println("error:",err)
+	return err
+}
 
+	return nil
 }
 
 
-}
-func HOScpu(){
+
+func HOScpu() error{
 
 dynamic := []hosstruct.HOSCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
        rows, err := db.Query("select Name,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by Name;")
 	if err != nil {
-       log.Fatal(err)
+		logger.Error(errcode.ErrFindDB)
+		fmt.Println("Error:",errcode.ErrFindDB)
+		//log.Println(err)
+		return err
 }
+
 defer rows.Close()
 for rows.Next() {
        err := rows.Scan(&name,&minimum,&maximum,&average)
 
        if err != nil {
-              log.Fatal(err)
+              logger.Error("error:", errcode.ErrFindDB)
+	       fmt.Println("error:", errcode.ErrFindDB)
+	       return err
        }
        fmt.Println(minimum)
         fmt.Println(maximum)
@@ -125,30 +150,41 @@ for rows.Next() {
 }
 	err = rows.Err()
 if err != nil {
-       log.Fatal(err)
+       logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 }
        if err != nil {
-    log.Fatal(err)
+        logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 
+}
+	return nil
 }
 
 
-}
-func VMwarecpu(){
+func VMwarecpu() error{
 
 dynamic := []vmwarestructs.VMwareCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
        rows, err := db.Query("select Name,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by Name;")
 	if err != nil {
-       log.Fatal(err)
+       		logger.Error(errcode.ErrFindDB)
+		fmt.Println("Error:",errcode.ErrFindDB)
+		//log.Println(err)
+		return err
 }
 defer rows.Close()
 for rows.Next() {
        err := rows.Scan(&name,&minimum,&maximum,&average)
 
        if err != nil {
-              log.Fatal(err)
+	       logger.Error(errcode.ErrFindDB)
+		fmt.Println("Error:",errcode.ErrFindDB)
+		//log.Println(err)
+		return err
        }
        fmt.Println(minimum)
         fmt.Println(maximum)
@@ -173,30 +209,42 @@ for rows.Next() {
 }
 	err = rows.Err()
 if err != nil {
-       log.Fatal(err)
+        logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 }
        if err != nil {
-    log.Fatal(err)
+       logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 
+}
+	return nil
 }
 
 
-}
-func Openstackcpu(){
+
+func Openstackcpu() error{
 
 dynamic := []openstackInstance.OpenstackCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
        rows, err := db.Query("select Vm_Name,avg(Min),avg(Max) , avg(Avg) from dynamic_instances group by Vm_Name;")
 	if err != nil {
-       log.Fatal(err)
+       		logger.Error(errcode.ErrFindDB)
+		fmt.Println("Error:",errcode.ErrFindDB)
+		//log.Println(err)
+		return err
 }
 defer rows.Close()
 for rows.Next() {
        err := rows.Scan(&name,&minimum,&maximum,&average)
 
        if err != nil {
-              log.Fatal(err)
+	       logger.Error(errcode.ErrFindDB)
+		fmt.Println("Error:",errcode.ErrFindDB)
+		//log.Println(err)
+		return err
        }
        fmt.Println(minimum)
         fmt.Println(maximum)
@@ -219,10 +267,14 @@ for rows.Next() {
 }
 	err = rows.Err()
 if err != nil {
-       log.Fatal(err)
+        logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 }
        if err != nil {
-    log.Fatal(err)
-
+       logger.Error(err)
+	fmt.Println("error:",err)
+	return err
 }
+	return nil
 }

@@ -124,10 +124,26 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
-                    overallcpuavg.Azurecpu()
-                    overallcpuavg.HOScpu()
-                    overallcpuavg.VMwarecpu()
-                    overallcpuavg.Openstackcpu()
+                    errAzuAvg :=overallcpuavg.Azurecpu()
+                    if errAzuAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errHosAvg := overallcpuavg.HOScpu()
+                    if errHosAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errVmAvg :=overallcpuavg.VMwarecpu()
+                    if errVmAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errOSAvg := overallcpuavg.Openstackcpu()
+                    if errOSAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
                 case <- quit:
                     ticker.Stop()
                     return
