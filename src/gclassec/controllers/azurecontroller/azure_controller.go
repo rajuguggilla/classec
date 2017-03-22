@@ -93,7 +93,7 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	db.SingularTable(true)
 
 	obj := &azurestruct.VirtualMachineStaticDynamic{}
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)azure` will match string contains "azure" case insensitive
 	reg := regexp.MustCompile("(?i)azure")
@@ -116,6 +116,9 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 		vmId := *(element.VMID)
 		fmt.Println(*(element.VMID))
 
+		//Get current Status of instance
+		instanceView, _ := ac.GetInstanceView(vmName,rsgroup)
+
 		dc := goclientazure.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
 		dc.Authorizer = spt
 
@@ -127,10 +130,10 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 			if len(tag) == 0 {
 				fmt.Println("In if loop")
 				if element1.Data[len(element1.Data) - 1].Average == nil{
-					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Tagname:"Nil"}
+					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Unit:*element1.Unit, Tagname:"Nil"}
 					_ = json.NewEncoder(w).Encode(&obj)
 				}else {
-					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Tagname:"Nil"}
+					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Unit:*element1.Unit, Tagname:"Nil"}
 					_ = json.NewEncoder(w).Encode(&obj)
 				}
 
@@ -140,9 +143,9 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 					for _, el := range tag {
 						fmt.Println("In tag loop")
 						if vmId != el.InstanceId {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Tagname:"Nil"}
+							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Unit:*element1.Unit, Tagname:"Nil"}
 						} else {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Tagname:el.Tagname}
+							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Unit:*element1.Unit, Tagname:el.Tagname}
 						}
 						_ = json.NewEncoder(w).Encode(&obj)
 					}
@@ -150,9 +153,9 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 					for _, el := range tag {
 						fmt.Println("In tag loop")
 						if vmId != el.InstanceId {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Tagname:"Nil"}
+							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Unit:*element1.Unit, Tagname:"Nil"}
 						} else {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Tagname:el.Tagname}
+							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Unit:*element1.Unit, Tagname:el.Tagname}
 						}
 						_ = json.NewEncoder(w).Encode(&obj)
 					}
@@ -178,6 +181,19 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 	db.SingularTable(true)
 
 	azure_struct := []azurestruct.AzureInstances{}
+	response_struct := []azurestruct.AzureResponse{}
+	tag := []tagstruct.Tags{}
+
+	//create a regex `(?i)azure` will match string contains "azure" case insensitive
+	reg := regexp.MustCompile("(?i)azure")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag)
 
 	errFind := db.Find(&azure_struct).Error
 
@@ -198,15 +214,59 @@ func   (uc UserController) GetAzureDetails(w http.ResponseWriter, r *http.Reques
 			response.RAM = azure_struct[i].RAM
 			response.NumCPU = azure_struct[i].NumCPU
 			response.Storage = azure_struct[i].Storage
-			response.Tagname = azure_struct[i].Tagname
+			//response.Tagname = azure_struct[i].Tagname
 			response.VmSize = azure_struct[i].VmSize
-
+			if len(tag) == 0 {
+				response.Tagname = "Nil"
+			}else {
+				for _, el := range tag {
+					if azure_struct[i].VmId != el.InstanceId {
+						response.Tagname = "Nil"
+					}else {
+						response.Tagname = el.Tagname
+						break
+					}
+				}
+			}
 			standardresponse = append(standardresponse, response)
 		}
-
 		_ = json.NewEncoder(w).Encode(&standardresponse)
 	}else {
-		_ = json.NewEncoder(w).Encode(&azure_struct)
+		for i:=0; i<len(azure_struct);i++ {
+			response := azurestruct.AzureResponse{}
+			response.VmName = azure_struct[i].VmName
+			response.VmId = azure_struct[i].VmId
+			response.Status = azure_struct[i].Status
+			response.RAM = azure_struct[i].RAM
+			response.NumCPU = azure_struct[i].NumCPU
+			response.Storage = azure_struct[i].Storage
+			response.VmSize = azure_struct[i].VmSize
+			response.Deleted = azure_struct[i].Deleted
+			response.AvailabilitySetName = azure_struct[i].AvailabilitySetName
+			response.Location = azure_struct[i].Location
+			response.Offer = azure_struct[i].Offer
+			response.Provisioningstate = azure_struct[i].Provisioningstate
+			response.Publisher = azure_struct[i].Publisher
+			response.ResourcegroupName = azure_struct[i].ResourcegroupName
+			response.SKU = azure_struct[i].SKU
+			response.SubscriptionId = azure_struct[i].SubscriptionId
+			response.Type = azure_struct[i].Type
+
+			if len(tag) == 0 {
+				response.Tagname = "Nil"
+			}else {
+				for _, el := range tag {
+					if azure_struct[i].VmId != el.InstanceId {
+						response.Tagname = "Nil"
+					}else {
+						response.Tagname = el.Tagname
+						break
+					}
+				}
+			}
+			response_struct = append(response_struct, response)
+		}
+		_ = json.NewEncoder(w).Encode(&response_struct)
 	}
 
 	//_ = json.NewEncoder(w).Encode(db.Where("subscriptionid =?",azurecreds.SubscriptionId).Find(&azure_struct))

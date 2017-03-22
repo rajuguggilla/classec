@@ -1,59 +1,62 @@
 package authenticationtoken
 
 import (
-	"fmt"
 	"strings"
 	"encoding/json"
 	"runtime"
 	"os"
 	"gclassec/structs/openstackInstance"
+	"gclassec/errorcodes/errcode"
+	"errors"
+	"gclassec/loggers"
 )
 
 
 
 
-func UnscopedAuthToken() (string, openstackInstance.OpenStackEndpoints, string){
+func UnscopedAuthToken() (string, openstackInstance.OpenStackEndpoints, error){
+	logger := Loggers.New()
 	var usAuthToken string
-	var usAuthError string
+	var usAuthError error
 	var usApiEndpointsStruct openstackInstance.OpenStackEndpoints
 	var filename string = "openstackgov/authenticationtoken/unscopedauthtoken.go"
 	_, filePath, _,ok := runtime.Caller(0)
 	if ok == false{
-		fmt.Println("Error in locating file.")
-		return	usAuthToken, usApiEndpointsStruct, "Error in locating file."
+		logger.Error("Error in locating file.")
+		return	usAuthToken, usApiEndpointsStruct, errors.New(errcode.ErrFileLocate)
 	}
-	fmt.Println("CurrentFilePath:==", filePath)
+	logger.Info("CurrentFilePath:==", filePath)
 	absPath := (strings.Replace(filePath, filename, "conf/openstackconfig.json", 1))
-	fmt.Println("OpenStackConfigurationFilePath:==", absPath)
+	logger.Info("OpenStackConfigurationFilePath:==", absPath)
 	file, oerr := os.Open(absPath)
 	if oerr != nil{
 		if os.IsNotExist(oerr){
-			fmt.Println("File does not exist.")
-			return usAuthToken, usApiEndpointsStruct, "File does not exist."
+			logger.Error(errcode.ErrFileNotExist)
+			return usAuthToken, usApiEndpointsStruct, oerr
 		}else {
-			fmt.Println("Error in opening file.")
-			return usAuthToken, usApiEndpointsStruct, "Error in opening file."
+			logger.Error(errcode.ErrFileOpen)
+			return usAuthToken, usApiEndpointsStruct, oerr
 		}
 	}
 	tempConfig := new(openstackInstance.OpenStackUserConfig)
 	decoder := json.NewDecoder(file)
 	decErr := decoder.Decode(&tempConfig)
 	if decErr != nil {
-		fmt.Println("Error in reading configuration:==", decErr)
-		return usAuthToken, usApiEndpointsStruct, "Error in reading configuration."
+		logger.Error("Error in reading configuration:==", decErr)
+		return usAuthToken, usApiEndpointsStruct, decErr
 	}
-	fmt.Println("TempConfig:===")
-	fmt.Println("IdentityEndPoint: ", tempConfig.IdentityEndpoint)
-	fmt.Println("Container: ", tempConfig.Container)
-	fmt.Println("Password: ", tempConfig.Password)
-	fmt.Println("Tenanat_id: ", tempConfig.TenantId)
-	fmt.Println("TenantName: ", tempConfig.TenantName)
-	fmt.Println("Project_id: ", tempConfig.ProjectId)
-	fmt.Println("ProjectName: ", tempConfig.ProjectName)
-	fmt.Println("Region: ", tempConfig.Region)
-	fmt.Println("UserName: ", tempConfig.UserName)
-	fmt.Println("Domain: ", tempConfig.Domain)
-	fmt.Println("Controller: ", tempConfig.Controller)
+	logger.Info("TempConfig:===")
+	logger.Info("IdentityEndPoint: ", tempConfig.IdentityEndpoint)
+	logger.Info("Container: ", tempConfig.Container)
+	logger.Info("Password: ", tempConfig.Password)
+	logger.Info("Tenanat_id: ", tempConfig.TenantId)
+	logger.Info("TenantName: ", tempConfig.TenantName)
+	logger.Info("Project_id: ", tempConfig.ProjectId)
+	logger.Info("ProjectName: ", tempConfig.ProjectName)
+	logger.Info("Region: ", tempConfig.Region)
+	logger.Info("UserName: ", tempConfig.UserName)
+	logger.Info("Domain: ", tempConfig.Domain)
+	logger.Info("Controller: ", tempConfig.Controller)
 
 	var reqBody, reqURL string
 	tempConfig.IdentityEndpoint = (strings.Replace(tempConfig.IdentityEndpoint, "controller", tempConfig.Controller, 1))
@@ -61,29 +64,26 @@ func UnscopedAuthToken() (string, openstackInstance.OpenStackEndpoints, string){
 		//Un-scoped
 		reqURL = tempConfig.IdentityEndpoint + "auth/tokens"
 		reqBody = `{"auth":{"identity":{"methods": ["password"], "password": {"user":{"name": "` + tempConfig.UserName + `","domain": { "name": "` + tempConfig.Domain + `"}, "password": "` + tempConfig.Password + `"}}}}}`
-		fmt.Println("Request Body:==", reqBody)
-		fmt.Println("\nRequest URL:==", reqURL)
+		logger.Info("Request Body:==", reqBody)
+		logger.Info("\nRequest URL:==", reqURL)
 		usAuthToken ,usApiEndpointsStruct, usAuthError = GetOpenStackAuthToken_v3(reqURL, reqBody)
 	}else if (strings.Contains(tempConfig.IdentityEndpoint, "v2.0")){
 		//Un-Scoped
 		reqURL = tempConfig.IdentityEndpoint + "/tokens"
 		reqBody = `{"auth":{"passwordCredentials":{"username": "` + tempConfig.UserName +`", "password": "`+ tempConfig.Password +`"}}}`
-		fmt.Println("Request Body:==", reqBody)
-		fmt.Println("\nRequest URL:==", reqURL)
+		logger.Info("Request Body:==", reqBody)
+		logger.Info("\nRequest URL:==", reqURL)
 		usAuthToken ,usApiEndpointsStruct, usAuthError = GetOpenStackAuthToken_v2(reqURL, reqBody)
 	}else{
-		return usAuthToken, usApiEndpointsStruct, "Please provide a valid IdentityEndPoint of type v3 or v2.0"
+		return usAuthToken, usApiEndpointsStruct, errors.New(errcode.ErrAuthEndpoint)
 	}
 
-	if usAuthError != "" {
+	if usAuthError != nil {
 		for i := 0; i < len(usApiEndpointsStruct.ApiEndpoints); i++ {
 			usApiEndpointsStruct.ApiEndpoints[i].EndpointURL = strings.Replace(usApiEndpointsStruct.ApiEndpoints[i].EndpointURL, "controller", tempConfig.Controller, -1)
 			usApiEndpointsStruct.ApiEndpoints[i].EndpointURL = strings.Replace(usApiEndpointsStruct.ApiEndpoints[i].EndpointURL, "monasca", tempConfig.Controller, -1)
 		}
 	}
 	return  usAuthToken, usApiEndpointsStruct, usAuthError
-
-
-
 
 }

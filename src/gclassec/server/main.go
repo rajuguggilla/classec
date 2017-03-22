@@ -29,6 +29,7 @@ import (
     "gclassec/dao/hosinsert"
     "gclassec/structs/configurationstruct"
     "gclassec/instancestatus"
+	"gclassec/overallcpuavg"
 )
 
 //type Configuration struct {
@@ -78,6 +79,7 @@ func main() {
     ticker := time.NewTicker(time.Duration(configuration.Interval) * configuration.Timespec)
     quit := make(chan struct{})
     ticker_dynamic := time.NewTicker(time.Duration(configuration.DynamicInterval) * configuration.DynamicTimespec)
+    //ticker_avg := time.NewTicker(time.Duration(configuration.DynamicInterval) * configuration.DynamicTimespec)
     go func() {
         defer wg.Done()
         for {
@@ -88,14 +90,17 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
                     openstackinsert.InsertInstances()
                     errVmware,_,_:= vmwareinsert.VmwareInsert()
                     if errVmware != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
                     hosinsert.HosInsert()
                 case <- ticker_dynamic.C:
+
                     err := azureinsert.AzureDynamicInsert()
                     if err != nil {
                         fmt.Println("Error : ", errcode.ErrInsert)
@@ -107,8 +112,35 @@ func main() {
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
+
+                    errOS := openstackinsert.OSDynamicInsert()
+                    if errOS != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+
                     errVmDynamic := vmwareinsert.VmwareDynamicInsert()
                     if errVmDynamic != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errAzuAvg :=overallcpuavg.Azurecpu()
+                    if errAzuAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errHosAvg := overallcpuavg.HOScpu()
+                    if errHosAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errVmAvg :=overallcpuavg.VMwarecpu()
+                    if errVmAvg != nil{
+                        fmt.Println("Error : ", errcode.ErrInsert)
+                        logger.Error("Error : ",errcode.ErrInsert)
+                    }
+                    errOSAvg := overallcpuavg.Openstackcpu()
+                    if errOSAvg != nil{
                         fmt.Println("Error : ", errcode.ErrInsert)
                         logger.Error("Error : ",errcode.ErrInsert)
                     }
@@ -151,9 +183,12 @@ func main() {
         mx.HandleFunc(HOSROOT+"/instances/staticdynamic",hoc.GetCompleteDetail).Methods("GET")
         //mux.HandleFunc(HOSROOT+"/ceilometerstatitics",GetCeilometerStatitics).Methods("GET")
 	//mux.HandleFunc(HOSROOT+"/ceilometerdetails",GetCeilometerDetails).Methods("GET")
-        mx.HandleFunc(HOSROOT+"/test/index",hoc.Index).Methods("GET")
+        mx.HandleFunc(HOSROOT+"/overallcpuavg/index",hoc.Index).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/staticdata",hoc.Compute).Methods("GET")
         mx.HandleFunc(HOSROOT+"/instances/dynamicdata",hoc.GetCompleteDynamicDetail).Methods("GET")
+	    mx.HandleFunc(HOSROOT+"/utilization/cpu",overallcpuavg.Gethosoverallcpu).Methods("GET")
+
+
 
         mx.HandleFunc(AWSROOT+"/instances/staticdata", awc.GetDetails).Methods("GET")  // 'http://localhost:9009/dbaas/list'
         mx.HandleFunc(AWSROOT+"/instances/staticdata/{id}", awc.GetDetailsById).Methods("GET")  // 'http://localhost:9009/dbaas/list/dev01-a-tky-customerorderpf'
@@ -161,17 +196,25 @@ func main() {
         mx.HandleFunc(AWSROOT+"/instances/pricing", awc.GetPrice).Methods("GET")  // 'http://localhost:9009/dbaas/pricing'
 
         mx.HandleFunc(OPSROOT+"/instances/staticdata", opc.GetDetailsOpenstack).Methods("GET")
+        mx.HandleFunc(OPSROOT+"/instances/utilization/{id}", opc.GetDynamicDetails).Methods("GET")
+        mx.HandleFunc(OPSROOT+"/instances/dynamicdata", opc.GetOSDynamicDetail).Methods("GET")
+	     mx.HandleFunc(OPSROOT+"/utilization/cpu",overallcpuavg.Getopenstackoverallcpu).Methods("GET")
+
         //TODO add openstack dynamic services for HOS
 
         mx.HandleFunc(AZUROOT+"/instances/staticdata", azc.GetAzureDetails).Methods("GET") // http://localhost:9009/dbaas/azureDetail
         mx.HandleFunc(AZUROOT+"/instances/utilization/{resourceGroup}/{name}", azc.GetDynamicAzureDetails).Methods("GET")
         mx.HandleFunc(AZUROOT+"/instances/staticdynamic", azc.GetAzureStaticDynamic).Methods("GET")
 	mx.HandleFunc(AZUROOT+"/instances/dynamicdata", azc.GetAzureDynamic).Methods("GET") // get azure dynamic details from database
+	     mx.HandleFunc(AZUROOT+"/utilization/cpu",overallcpuavg.Getazureoverallcpu).Methods("GET")
+
 
         mx.HandleFunc(VMWROOT+"/instances/utilization", vwc.GetDynamicVcenterDetails).Methods("GET")
         mx.HandleFunc(VMWROOT+"/instances/staticdata", vwc.GetVcenterDetails).Methods("GET")
-        mx.HandleFunc(VMWROOT+"/vcenterDetail/staticdynamic", vwc.GetStaticDynamicVcenterDetails).Methods("GET")
-        mx.HandleFunc(VMWROOT+"/vcenterDetail/dynamicupdate", vwc.GetDynamicVcenterUpdateDetails).Methods("GET")
+        mx.HandleFunc(VMWROOT+"/instances/staticdynamic", vwc.GetStaticDynamicVcenterDetails).Methods("GET")
+        mx.HandleFunc(VMWROOT+"/instances/dynamicdata", vwc.GetDynamicVcenterUpdateDetails).Methods("GET")
+	     mx.HandleFunc(VMWROOT+"/utilization/cpu",overallcpuavg.Getvmwareoverallcpu).Methods("GET")
+
 
         mx.HandleFunc("/selectProvider", usrc.SelectProvider)
         mx.HandleFunc("/selectedOs", usrc.OpenstackCreds)
@@ -200,6 +243,7 @@ func main() {
         mx.HandleFunc(OPSROOT+"/v1.0/servers/{instancename}", openstackgov.Createserver).Methods("POST")
         mx.HandleFunc(OPSROOT+"/v1.0/servers", openstackgov.Getserver).Methods("GET")
         mx.HandleFunc("/instances/countonoff",instancestatus.Getinstancestatus).Methods("GET")
+	    mx.HandleFunc("/utilization/cpu/{provider}/{name}",overallcpuavg.Getoverallcpubyname).Methods("GET")
 
         http.Handle("/", mx)
         // Fire up the server

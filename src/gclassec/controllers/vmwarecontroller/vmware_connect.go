@@ -173,7 +173,7 @@ func   (uc UserController) GetStaticDynamicVcenterDetails(w http.ResponseWriter,
 	db.SingularTable(true)
 
 	output := vmwarestructs.StaticDynamicValues{}
-	tag := []tagstruct.Providers{}
+	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)vmware` will match string contains "vmware" case insensitive
 	reg := regexp.MustCompile("(?i)vmware")
@@ -242,6 +242,21 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 	tx := db.Begin()
 	db.SingularTable(true)
 	vmware_struct := []vmwarestructs.VmwareInstances{}
+	response_struct := []vmwarestructs.VmwareResponse{}
+
+	tag := []tagstruct.Tags{}
+
+       //create a regex `(?i)vmware` will match string contains "vmware" case insensitive
+       reg := regexp.MustCompile("(?i)vmware")
+
+       //Do the match operation using FindString() function
+       er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
+       if er1 != nil{
+              logger.Error("Error: ",errcode.ErrFindDB)
+              tx.Rollback()
+       }
+       db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
+
 	errFind := db.Find(&vmware_struct).Error
 	if errFind != nil {
 		logger.Error("Error: ",errcode.ErrFindDB)
@@ -261,15 +276,56 @@ func   (uc UserController) GetVcenterDetails(w http.ResponseWriter, r *http.Requ
 			response.Uuid = vmware_struct[i].Uuid
 			response.PowerState = vmware_struct[i].PowerState
 			response.MemorySizeMB = vmware_struct[i].MemorySizeMB
-			response.Tagname = vmware_struct[i].Tagname
+			//response.Tagname = vmware_struct[i].Tagname
 			response.NumofCPU = vmware_struct[i].NumofCPU
 			response.StorageCommitted = vmware_struct[i].StorageCommitted
+
+			if len(tag) == 0 {
+				response.Tagname = "Nil"
+			}else {
+				for _, el := range tag {
+					if vmware_struct[i].Uuid != el.InstanceId {
+						response.Tagname = "Nil"
+					}else {
+						response.Tagname = el.Tagname
+						break
+					}
+				}
+			}
 
 			standardresponse = append(standardresponse, response)
 		}
 		_ = json.NewEncoder(w).Encode(&standardresponse)
 	}else {
-		_ = json.NewEncoder(w).Encode(&vmware_struct)
+		for i:=0; i<len(vmware_struct);i++ {
+			response := vmwarestructs.VmwareResponse{}
+			response.Name = vmware_struct[i].Name
+			response.Uuid = vmware_struct[i].Uuid
+			response.PowerState = vmware_struct[i].PowerState
+			response.MemorySizeMB = vmware_struct[i].MemorySizeMB
+			response.NumofCPU = vmware_struct[i].NumofCPU
+			response.StorageCommitted = vmware_struct[i].StorageCommitted
+			response.Deleted = vmware_struct[i].Deleted
+			response.Classifier = vmware_struct[i].Classifier
+			response.GuestFullName = vmware_struct[i].GuestFullName
+			response.IPaddress = vmware_struct[i].IPaddress
+
+			if len(tag) == 0 {
+				response.Tagname = "Nil"
+			}else {
+				for _, el := range tag {
+					if vmware_struct[i].Uuid != el.InstanceId {
+						response.Tagname = "Nil"
+					}else {
+						response.Tagname = el.Tagname
+						break
+					}
+				}
+			}
+
+			response_struct = append(response_struct, response)
+		}
+		_ = json.NewEncoder(w).Encode(&response_struct)
 	}
 
 	if err != nil {

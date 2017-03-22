@@ -847,8 +847,10 @@ type VirtualMachineStaticDynamic struct{
 	AvailabilitySetName string 	`json:"AvailabilitySetName,omitempty"`
 	Provisioningstate string	`json:"Provisioningstate,omitempty"`
 	ResourcegroupName string	`json:"ResourcegroupName,omitempty"`
+	Status string			`json:"Status,omitempty"`
 	TimeStamp    string   	`json:"TimeStamp,omitempty"`
-	Average      float64     	`json:"Average,omitempty"`
+	Average      float64     	`json:"AvgCpuUtil,omitempty"`
+	Unit	string			`json:"CpuUtilUnit,omitempty"`
 	Tagname string			`json:"Tagname,omitempty"`
 	/*autorest.Response `json:"-"`
 	Value             *VirtualMachineListResult `json:"value,omitempty"`

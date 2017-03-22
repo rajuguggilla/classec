@@ -22,10 +22,9 @@ import (
        "gclassec/loggers"
 
        "gclassec/errorcodes/errcode"
-       "gclassec/structs/tagstruct"
-       "regexp"
        "gclassec/dbmanagement"
        //"github.com/vmware/govmomi/govc/vm"
+      // "github.com/vmware/govmomi/govc/vm"
 )
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
@@ -177,21 +176,6 @@ func VmwareInsert() (error,int,int){
        tx := db.Begin()
        db.SingularTable(true)
 
-       tag := []tagstruct.Providers{}
-
-       //create a regex `(?i)vmware` will match string contains "vmware" case insensitive
-       reg := regexp.MustCompile("(?i)vmware")
-
-       //Do the match operation using FindString() function
-       er1 := db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag).Error
-       if er1 != nil{
-              logger.Error("Error: ",errcode.ErrFindDB)
-              //tx.Rollback()
-              return er1,0,0
-       }
-       db.Where("Cloud = ?", reg.FindString("VMWARE")).Find(&tag)
-
-       fmt.Println("Tag : ", tag)
 	count:=0
 	count2:=0
 	for _,element1:=range vmt{
@@ -215,17 +199,17 @@ func VmwareInsert() (error,int,int){
        db.Find(&vmware_struct)
        if (len(vmware_struct) == 0) {
               for _, vm := range vmt {
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Deleted:false, Classifier:vmwarecreds.EnvUserName}
                      db.Create(&user)
               }
        }else{
               for _, vm := range vmt {
               db.Where("Name = ?",vm.Summary.Config.Name).Find(&vmware_struct)
               if (len(vmware_struct)==0) {
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Deleted:false, Classifier:vmwarecreds.EnvUserName}
                      db.Create(&user)
               }else{
-                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Tagname:"Nil", Deleted:false, Classifier:vmwarecreds.EnvUserName}
+                     user := vmwarestructs.VmwareInstances{Name:vm.Summary.Config.Name, Uuid:vm.Summary.Config.Uuid, MemorySizeMB:vm.Summary.Config.MemorySizeMB, PowerState:string(vm.Summary.Runtime.PowerState), NumofCPU:vm.Summary.Config.NumCpu, GuestFullName:vm.Summary.Guest.GuestFullName, IPaddress:vm.Summary.Guest.IpAddress,StorageCommitted:float32(vm.Summary.Storage.Committed)/float32(1024*1024*1024), Deleted:false, Classifier:vmwarecreds.EnvUserName}
                      db.Model(&user).Where("Name =?", vm.Summary.Config.Name).Updates(user)
               }
        }
@@ -235,31 +219,34 @@ func VmwareInsert() (error,int,int){
 
        logger.Info("Virtual machines found:", len(vmt))
        db.Find(&vmware_struct)
-       for _, i := range vmware_struct {
-              if len(tag) != 0 {
-                     for _, el := range tag {
-                            if i.Uuid == el.InstanceId{
-                                   fmt.Println("----Update Tag for this instance----")
-                                   fmt.Println("el.InstanceId: ", el.InstanceId)
-                                   db.Model(vmwarestructs.VmwareInstances{}).Where("Name = ?", i.Name).Update("tagname",el.Tagname)
-                                   //db.Table("vmware_instances").Where("Name = ?", i.Name).Update("tagname",el.Tagname)
-                            }
-                     }
 
-              }
-       }
        for _, element := range vmware_struct {
               fmt.Println("inside delete")
-              for _, ele := range vmt{
-                     if element.Name != ele.Summary.Config.Name {
-                            fmt.Println("insdie  continue")
-                          continue
-
+             for i:=0;i<len(vmt);i++{
+                     if element.Name != vmt[i].Summary.Config.Name {
+                            fmt.Println("i  ",i)
+                            fmt.Println("length   ",len(vmt))
+                            if(i == len(vmt)-1) {
+                                   fmt.Println("hello")
+                                   db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", true)
+                                   fmt.Println("insdie  continue")
+                            }
+                            continue
                      }else{
                             db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", false)
+                            break
               }
+
              }
        }
+      /* for _, element := range vmware_struct {
+              for _, element := range vmt {
+                     db.Where("Name = ?", element.Summary.Config.Name).Find(&vmware_struct)
+                     if (len(vmware_struct) == 0) {
+                            db.Model(&vmware_struct).Where("Name =?", )
+                     }
+              }
+       }*/
        logger.Info("Successful in VmWareInsert.")
        tw.Flush()
        tx.Commit()

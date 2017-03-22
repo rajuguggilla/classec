@@ -10,6 +10,7 @@ import (
 	"strings"
 	"github.com/jinzhu/gorm"
 	"gclassec/dbmanagement"
+	"github.com/gorilla/mux"
 )
 
 var logger = Loggers.New()
@@ -27,6 +28,7 @@ var db,err  = gorm.Open(dbtype, c)
 
 type InstanceTag struct {
 	InstanceId string
+	InstanceName string
 	Cloud string
 	Tagname string
 }
@@ -44,10 +46,30 @@ func InstanceProvider(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Type of res : %T", res)
 	res.Decode(&inst)
 	fmt.Printf("instance",inst)
-	for _,r := range inst{
-		fmt.Println(r.InstanceId)
-		user := tagstruct.Providers{InstanceId:r.InstanceId, Cloud:r.Cloud, Tagname:r.Tagname}
-		db.Create(&user)
-		db.Model(&user).Updates(&user)
+
+	vars := mux.Vars(r)
+      	instanceId := vars["instanceid"]
+
+	dbresponse := []tagstruct.Tags{}
+	user := tagstruct.Tags{}
+	db.Find(&dbresponse)
+	for _,element := range  dbresponse{
+		for _,r := range inst{
+			fmt.Println("instanceId: ", instanceId)
+			fmt.Println("r.InstanceId: ", element.InstanceId)
+			if r.InstanceName != "" {
+				user = tagstruct.Tags{InstanceId:instanceId, InstanceName:r.InstanceName, Cloud:r.Cloud, Tagname:r.Tagname}
+
+			}else {
+				user = tagstruct.Tags{InstanceId:instanceId, Cloud:r.Cloud, Tagname:r.Tagname}
+
+			}
+			if element.InstanceId == instanceId{
+					db.Model(&user).Where("InstanceId = ?",element.InstanceId).Updates(user)
+			}else {
+				db.Create(&user)
+			}
+
+		}
 	}
 }

@@ -15,7 +15,6 @@ type HosInstances struct {
 	VCPU	int32	`gorm:"column:vcpu"`
 	Disk	int32	`gorm:"column:disk"`
 	//Volumes_Attached	string	`gorm:"column:volumes_attached"`
-	Tagname	string	`gorm:"column:tagname"`
 	Deleted bool     `sql:"type:varchar" gorm:"column:deleted"`
 	Classifier string	`gorm:"column:classifier"`
 }
@@ -37,6 +36,13 @@ type HosDynamicInstances struct {
         Avg float64 `gorm:"column:Avg"`
         Unit string `gorm:"column:Unit"`
 
+}
+
+type HOSCpu struct{
+	Name string `gorm:"column:name"`
+	Minimum float64 `gorm:"column:min"`
+	Maximum float64 `gorm:"column:max"`
+	Average float64 `gorm:"column:avg"`
 }
 
 
@@ -311,6 +317,28 @@ type LatestDynamicData struct {
         Groupby Group `json:"Groupby"`
         Unit string `json:"Unit"`
  }
+
+//--------------------------Response struct------------------------------------//
+type HosResponse struct {
+	Vm_Name	string		`json:"Vm_Name"`
+	InstanceID	string	`json:"InstanceID"`
+	FlavorID	string	`json:"FlavorID"`
+	FlavorName	string	`json:"FlavorName"`
+	Status	string		`json:"Status"`
+	Image	string		`json:"Image"`
+	SecurityGroups	string	`json:"SecurityGroups"`
+	AvailabilityZone	string	`json:"AvailabilityZone"`
+	//IPAddress	string	`gorm:"column:ip_address"`
+	KeypairName	string	`json:"KeypairName"`
+	Ram	int32	`json:"Ram"`
+	VCPU	int32	`json:"VCPU"`
+	Disk	int32	`json:"Disk"`
+	//Volumes_Attached	string	`gorm:"column:volumes_attached"`
+	Tagname	string		`json:"Tagname"`
+	Deleted bool     `json:"Deleted"`
+	Classifier string	`json:"Classifier"`
+}
+
 
 
 //--------------------------Standardized struct------------------------------------//

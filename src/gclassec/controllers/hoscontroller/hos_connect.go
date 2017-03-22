@@ -19,6 +19,8 @@ import (
 	"gclassec/errorcodes/errcode"
 	"gclassec/confmanagement/readstructconf"
 	"gclassec/confmanagement/readhosconf"
+	"gclassec/structs/tagstruct"
+	"regexp"
 )
 
 type (
@@ -74,6 +76,19 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 	db.SingularTable(true)
 
 	hos_compute := []hosstruct.HosInstances{}
+	response_struct := []hosstruct.HosResponse{}
+
+	tag := []tagstruct.Tags{}
+	//create a regex `(?i)hos` will match string contains "hos" case insensitive
+	reg := regexp.MustCompile("(?i)hos")
+
+	//Do the match operation using FindString() function
+	er1 := db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag).Error
+	if er1 != nil{
+		logger.Error("Error: ",errcode.ErrFindDB)
+		tx.Rollback()
+	}
+	db.Where("Cloud = ?", reg.FindString("hos")).Find(&tag)
 
 	err := db.Find(&hos_compute).Error
 	if err != nil{
@@ -94,15 +109,60 @@ func (uc UserController) Compute(w http.ResponseWriter, r *http.Request){
 			response.Disk = hos_compute[i].Disk
 			response.Ram = hos_compute[i].Ram
 			response.VCPU = hos_compute[i].VCPU
-			response.Tagname = hos_compute[i].Tagname
+			//response.Tagname = hos_compute[i].Tagname
 			response.Status = hos_compute[i].Status
+
+			if len(tag) == 0 {
+				response.Tagname = "Nil"
+			}else {
+				for _, el := range tag {
+					if hos_compute[i].InstanceID != el.InstanceId {
+						response.Tagname = "Nil"
+					}else {
+						response.Tagname = el.Tagname
+						break
+					}
+				}
+			}
 
 			standardresponse = append(standardresponse, response)
 		}
 
 		_ = json.NewEncoder(w).Encode(&standardresponse)
 	}else {
-		_ = json.NewEncoder(w).Encode(&hos_compute)
+		for i:=0; i<len(hos_compute);i++ {
+			response := hosstruct.HosResponse{}
+			response.Vm_Name = hos_compute[i].Vm_Name
+			response.InstanceID = hos_compute[i].InstanceID
+			response.FlavorName = hos_compute[i].FlavorName
+			response.Disk = hos_compute[i].Disk
+			response.Ram = hos_compute[i].Ram
+			response.VCPU = hos_compute[i].VCPU
+			response.FlavorID = hos_compute[i].FlavorID
+			response.Status = hos_compute[i].Status
+			response.Image = hos_compute[i].Image
+			response.AvailabilityZone = hos_compute[i].AvailabilityZone
+			response.Classifier = hos_compute[i].Classifier
+			response.Deleted = hos_compute[i].Deleted
+			response.KeypairName = hos_compute[i].KeypairName
+			response.SecurityGroups = hos_compute[i].SecurityGroups
+
+			if len(tag) == 0 {
+				response.Tagname = "Nil"
+			}else {
+				for _, el := range tag {
+					if hos_compute[i].InstanceID != el.InstanceId {
+						response.Tagname = "Nil"
+					}else {
+						response.Tagname = el.Tagname
+						break
+					}
+				}
+			}
+
+			response_struct = append(response_struct, response)
+		}
+		_ = json.NewEncoder(w).Encode(&response_struct)
 	}
 
 	//_ = json.NewEncoder(w).Encode(db.Find(&hos_compute))
