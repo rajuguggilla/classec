@@ -1,4 +1,4 @@
-package main
+package overallcpuavg
 
 import (
        "log"
@@ -37,12 +37,12 @@ name string
        average float64
 )
 
-func main(){
+/*func main(){
 	Azurecpu()
 	HOScpu()
 	Openstackcpu()
 	//VMwarecpu()
-}
+}*/
 func Azurecpu(){
 
 dynamic := []azurestruct.AzureCpu{}
