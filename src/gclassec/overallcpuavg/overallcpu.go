@@ -33,20 +33,30 @@ var db1,err1  = gorm.Open(dbtype, c1)
 
 
 var (
+	vmid string
 name string
        minimum float64
        maximum float64
        average float64
 )
 
+
+
 var logger = Loggers.New()
 
+/*func main(){
+Azurecpu()
+	Openstackcpu()
+	VMwarecpu()
+	HOScpu()
+
+}*/
 func Azurecpu() error{
 
 dynamic := []azurestruct.AzureCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select name,avg(minimum),avg(maximum) , avg(average) from azure_dynamic group by name;")
+       rows, err := db.Query("select name,vmid,avg(minimum),avg(maximum) , avg(average) from azure_dynamic group by vmid;")
 	if err != nil {
            logger.Error(err)
 	   logger.Error(errcode.ErrFindDB)
@@ -57,7 +67,7 @@ dynamic := []azurestruct.AzureCpu{}
 
 defer rows.Close()
 for rows.Next() {
-       err := rows.Scan(&name,&minimum,&maximum,&average)
+       err := rows.Scan(&name,&vmid,&minimum,&maximum,&average)
 
        if err != nil {
               logger.Error(err)
@@ -68,21 +78,21 @@ for rows.Next() {
 
        fmt.Println(minimum)
         fmt.Println(maximum)
-	fmt.Println(name)
+	fmt.Println(vmid)
 	fmt.Println(average)
 
 	if (len(dynamic)== 0){
-		dynamic := azurestruct.AzureCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+		dynamic := azurestruct.AzureCpu{Name:name,VmID:vmid,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
 	}else {
 		for _, element := range dynamic {
-				db1.Where("name = ?",name).Find(&dynamic)
+				db1.Where("vmid = ?",vmid).Find(&dynamic)
 			if(len(dynamic)==0){
-				dynamic := azurestruct.AzureCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
+				dynamic := azurestruct.AzureCpu{Name:name,VmID:vmid, Minimum:minimum, Maximum:maximum, Average:average}
 				db1.Create(&dynamic)
 			} else {
-			dynamic := azurestruct.AzureCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
-				db1.Model(&dynamic).Where("name =?", element.Name).Updates(dynamic)
+			dynamic := azurestruct.AzureCpu{Name:name,VmID:vmid, Minimum:minimum, Maximum:maximum, Average:average}
+				db1.Model(&dynamic).Where("vmid =?", element.VmID).Updates(dynamic)
 
 			}
 		}
@@ -110,7 +120,7 @@ func HOScpu() error{
 dynamic := []hosstruct.HOSCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select Name,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by Name;")
+       rows, err := db.Query("select Name,Instance_id,avg(Min),avg(Max) , avg(Avg) from hos_dynamic_instances group by Instance_id;")
 	if err != nil {
 		logger.Error(errcode.ErrFindDB)
 		fmt.Println("Error:",errcode.ErrFindDB)
@@ -120,7 +130,7 @@ dynamic := []hosstruct.HOSCpu{}
 
 defer rows.Close()
 for rows.Next() {
-       err := rows.Scan(&name,&minimum,&maximum,&average)
+       err := rows.Scan(&name,&vmid,&minimum,&maximum,&average)
 
        if err != nil {
               logger.Error("error:", errcode.ErrFindDB)
@@ -132,18 +142,18 @@ for rows.Next() {
 	fmt.Println(name)
 	fmt.Println(average)
 	if (len(dynamic)== 0){
-		dynamic := hosstruct.HOSCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+		dynamic := hosstruct.HOSCpu{Name:name,Vmid:vmid,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
 	}else {
 		for _, element := range dynamic {
-			db1.Where("name = ?",name).Find(&dynamic)
+			db1.Where("vmid = ?",vmid).Find(&dynamic)
 			if(len(dynamic)==0){
-				dynamic := hosstruct.HOSCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
+				dynamic := hosstruct.HOSCpu{Name:name,Vmid:vmid, Minimum:minimum, Maximum:maximum, Average:average}
 				db1.Create(&dynamic)
 
 			} else {
-				dynamic := hosstruct.HOSCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
-				db1.Model(&dynamic).Where("name =?", element.Name).Updates(dynamic)
+				dynamic := hosstruct.HOSCpu{Name:name,Vmid:vmid, Minimum:minimum, Maximum:maximum, Average:average}
+				db1.Model(&dynamic).Where("vmid =?", element.Vmid).Updates(dynamic)
 			}
 		}
 	}
@@ -169,7 +179,7 @@ func VMwarecpu() error{
 dynamic := []vmwarestructs.VMwareCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select Name,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by Name;")
+       rows, err := db.Query("select Name,Uuid,avg(MinCpuUsage),avg(MaxCpuUsage) , avg(AvgCpuUsage) from vmware_dynamic_details group by Uuid;")
 	if err != nil {
        		logger.Error(errcode.ErrFindDB)
 		fmt.Println("Error:",errcode.ErrFindDB)
@@ -178,7 +188,7 @@ dynamic := []vmwarestructs.VMwareCpu{}
 }
 defer rows.Close()
 for rows.Next() {
-       err := rows.Scan(&name,&minimum,&maximum,&average)
+       err := rows.Scan(&name,&vmid,&minimum,&maximum,&average)
 
        if err != nil {
 	       logger.Error(errcode.ErrFindDB)
@@ -191,18 +201,18 @@ for rows.Next() {
 	fmt.Println(name)
 	fmt.Println(average)
 	if (len(dynamic)== 0){
-		dynamic := vmwarestructs.VMwareCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+		dynamic := vmwarestructs.VMwareCpu{Name:name,Vmid:vmid,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
 	}else{
 		for _,element := range dynamic{
-			db1.Where("Name = ?",name).Find(&dynamic)
+			db1.Where("vmid = ?",vmid).Find(&dynamic)
 			if(len(dynamic) ==0){
-				dynamic := vmwarestructs.VMwareCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+				dynamic := vmwarestructs.VMwareCpu{Name:name,Vmid:vmid,Minimum:minimum,Maximum:maximum,Average:average}
 				db1.Create(&dynamic)
 
 			}else{
-				dynamic := vmwarestructs.VMwareCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
-				db1.Model(&dynamic).Where("Name =?",element.Name).Updates(dynamic)
+				dynamic := vmwarestructs.VMwareCpu{Name:name,Vmid:vmid,Minimum:minimum,Maximum:maximum,Average:average}
+				db1.Model(&dynamic).Where("vmid =?",element.Vmid).Updates(dynamic)
 			}
 		}
 	}
@@ -229,7 +239,7 @@ func Openstackcpu() error{
 dynamic := []openstackInstance.OpenstackCpu{}
 	db1.SingularTable(true)
 	db1.Find(&dynamic)
-       rows, err := db.Query("select Vm_Name,avg(Min),avg(Max) , avg(Avg) from dynamic_instances group by Vm_Name;")
+       rows, err := db.Query("select Vm_Name,InstanceID,avg(Min),avg(Max),avg(Avg) from dynamic_instances group by InstanceID;")
 	if err != nil {
        		logger.Error(errcode.ErrFindDB)
 		fmt.Println("Error:",errcode.ErrFindDB)
@@ -238,7 +248,7 @@ dynamic := []openstackInstance.OpenstackCpu{}
 }
 defer rows.Close()
 for rows.Next() {
-       err := rows.Scan(&name,&minimum,&maximum,&average)
+       err := rows.Scan(&name,&vmid,&minimum,&maximum,&average)
 
        if err != nil {
 	       logger.Error(errcode.ErrFindDB)
@@ -251,16 +261,18 @@ for rows.Next() {
 	fmt.Println(name)
 	fmt.Println(average)
 	if (len(dynamic)== 0){
-		dynamic := openstackInstance.OpenstackCpu{Name:name,Minimum:minimum,Maximum:maximum,Average:average}
+		dynamic := openstackInstance.OpenstackCpu{Name:name,Vmid:vmid,Minimum:minimum,Maximum:maximum,Average:average}
    			db1.Create(&dynamic)
 	}else {
 		for _, element := range dynamic {
-			if name == element.Name {
-				dynamic := openstackInstance.OpenstackCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
-				db1.Model(&dynamic).Where("name =?", element.Name).Updates(dynamic)
-			} else {
-				dynamic := openstackInstance.OpenstackCpu{Name:name, Minimum:minimum, Maximum:maximum, Average:average}
+			db1.Where("vmid = ?",vmid).Find(&dynamic)
+			if(len(dynamic) ==0) {
+				dynamic := openstackInstance.OpenstackCpu{Name:name,Vmid:vmid, Minimum:minimum, Maximum:maximum, Average:average}
 				db1.Create(&dynamic)
+			} else {
+				dynamic := openstackInstance.OpenstackCpu{Name:name,Vmid:vmid, Minimum:minimum, Maximum:maximum, Average:average}
+				db1.Model(&dynamic).Where("vmid =?", element.Vmid).Updates(dynamic)
+
 			}
 		}
 	}
