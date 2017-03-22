@@ -30,6 +30,14 @@ type AzureDynamic struct {
 	Unit	string			`gorm:"column:unit"`
 }
 
+type AzureCpu struct{
+	Name string                `gorm:"column:name"`
+	Minimum		float64		`sql:"type:varchar" gorm:"column:minimum"`
+	Maximum		float64		`sql:"type:varchar" gorm:"column:maximum"`
+	Average		float64		`sql:"type:varchar" gorm:"column:average"`
+
+
+}
 
 //---------------------------------Structure for Configuration File in Azure------------------------------------//
 type Configuration struct {
