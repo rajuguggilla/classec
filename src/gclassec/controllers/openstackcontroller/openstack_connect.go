@@ -115,7 +115,7 @@ func (uc UserController) GetOSDynamicDetail(w http.ResponseWriter, r *http.Reque
 	db.SingularTable(true)
 	logger := Loggers.New()
 	logger.Info("We are Fetching Static Data from Database.")
-	os_struct := []openstackInstance.MeterStruct{}
+	os_struct := []openstackInstance.DynamicInstances{}
 
 	errFind := db.Find(&os_struct).Error
 
