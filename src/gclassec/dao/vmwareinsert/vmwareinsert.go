@@ -24,6 +24,7 @@ import (
        "gclassec/errorcodes/errcode"
        "gclassec/dbmanagement"
        //"github.com/vmware/govmomi/govc/vm"
+      // "github.com/vmware/govmomi/govc/vm"
 )
 var vmwarecreds = vmwareconf.Configurtion()
 var EnvURL string = vmwarecreds.EnvURL
@@ -221,16 +222,31 @@ func VmwareInsert() (error,int,int){
 
        for _, element := range vmware_struct {
               fmt.Println("inside delete")
-              for _, ele := range vmt{
-                     if element.Name != ele.Summary.Config.Name {
-                            fmt.Println("insdie  continue")
-                          continue
-
+             for i:=0;i<len(vmt);i++{
+                     if element.Name != vmt[i].Summary.Config.Name {
+                            fmt.Println("i  ",i)
+                            fmt.Println("length   ",len(vmt))
+                            if(i == len(vmt)-1) {
+                                   fmt.Println("hello")
+                                   db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", true)
+                                   fmt.Println("insdie  continue")
+                            }
+                            continue
                      }else{
                             db.Table("vmware_instances").Where("Name = ?",element.Name ).Update("deleted", false)
+                            break
               }
+
              }
        }
+      /* for _, element := range vmware_struct {
+              for _, element := range vmt {
+                     db.Where("Name = ?", element.Summary.Config.Name).Find(&vmware_struct)
+                     if (len(vmware_struct) == 0) {
+                            db.Model(&vmware_struct).Where("Name =?", )
+                     }
+              }
+       }*/
        logger.Info("Successful in VmWareInsert.")
        tw.Flush()
        tx.Commit()

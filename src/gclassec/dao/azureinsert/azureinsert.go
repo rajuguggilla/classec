@@ -181,16 +181,27 @@ func AzureInsert() (error,int,int){
 	/*for _, element := range azure_struct {
               db.Table("azure_instances").Where("Name = ?",element.VmName).Update("deleted", true)
        }*/
+	//i:=0
 	db.Find(&azure_struct)
 	for _, element := range azure_struct {
-                     for _, ele := range *ls.Value {
-                            if element.VmName != *ele.Name {
-                                   continue
-                            }else{
-                                   db.Table("azure_instances").Where("name = ?",element.VmName).Update("deleted", false)
+             i:=0
+              fmt.Println("inside delete")
+             for _,element1 := range *ls.Value{
+                     if element.VmName !=  *element1.Name {
+			     if(i == len(*ls.Value)-1) {
+                                   fmt.Println("hello")
+                                   db.Table("azure_instances").Where("name = ?",element.VmName ).Update("deleted", true)
+                                   fmt.Println("insdie  continue")
                             }
-                     }
-                     }
+			     i++
+                            continue
+                     }else{
+                            db.Table("azure_instances").Where("name = ?",element.VmName ).Update("deleted", false)
+                            break
+              }
+
+             }
+       }
 
 	tx.Commit()
 	return nil,poweredoncount,poweredoffcount

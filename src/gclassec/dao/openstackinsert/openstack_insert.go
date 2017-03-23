@@ -12,6 +12,7 @@ import (
 	"gclassec/openstackgov"
 	"gclassec/confmanagement/readopenstackconfig"
 	"gclassec/openstackgov/ceilometer"
+//	"github.com/vmware/govmomi/govc/ls"
 )
 
 
@@ -68,11 +69,11 @@ func InsertInstances(){
 
 	db.Find(&openstack_struct)
 
-	for _, element := range computeDetails.Servers {
+	/*for _, element := range computeDetails.Servers {
 			user := openstackInstance.Instances{Name:element.ServerName, InstanceID:element.ServerId, Status:element.Status, RAM:element.Flavor.Ram, VCPU:element.Flavor.VCPUS, Flavor:element.Flavor.FlavorName, Storage:element.Flavor.Disk, AvailabilityZone:element.AvailabilityZone, CreationTime:element.CreatedAt,
                             FlavorID:element.Flavor.FlavorID, IPAddress:element.AccessIPv4, KeyPairName:element.KeyName, ImageName:element.Image.ImageID, Deleted:false, Classifier: temp.ProjectName }
                     db.Create(&user)
-		}
+		}*/
 
 
 
@@ -96,28 +97,32 @@ func InsertInstances(){
 		}
 }
 	}
+	fmt.Println("hellloooooooooooooooooooooooo")
 	//ENVcount:= 0
-	for _,element1 := range computeDetails.Servers{
-		if element1.Status =="ACTIVE"{
-			ENVcount++
-		}
-	}
+
 
 	/*for _, element := range openstack_struct {
        db.Table("instances").Where("name = ?",element.Name).Update("deleted", true)
 }*/
-
 	db.Find(&openstack_struct)
+	fmt.Println(openstack_struct)
 	for _, element := range openstack_struct {
-              for _, ele := range computeDetails.Servers{
-                     if element.Name != ele.ServerName {
-                     continue
-                     fmt.Println("insdie  continue")
+              fmt.Println("inside openstack delete")
+             for i:=0;i<len(computeDetails.Servers);i++{
+                     if element.Name != computeDetails.Servers[i].ServerName {
+			     if(i == len(computeDetails.Servers)-1) {
+                                   fmt.Println("hello")
+                                   db.Table("instances").Where("name = ?",element.Name ).Update("deleted", true)
+                                   fmt.Println("insdie  continue")
+                            }
+                            continue
                      }else{
-                            db.Table("instances").Where("name = ?",element.Name).Update("deleted", false)
+                            db.Table("instances").Where("name = ?",element.Name ).Update("deleted", false)
+                            break
               }
-              }
-              }
+
+             }
+       }
 	logger.Info("Successful in InsertInstances.")
 	tx.Commit()
 }
