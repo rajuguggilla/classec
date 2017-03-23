@@ -46,7 +46,6 @@ var db,err  = gorm.Open(dbtype, c)
 var azurecreds = readazurecreds.Configurtion()
 
 func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Request)(){
-	counter := 0
 	var azureCreds = readazurecreds.Configurtion()
 	os.Setenv("AZURE_CLIENT_ID", azureCreds.ClientId)
 	os.Setenv("AZURE_CLIENT_SECRET", azureCreds.ClientSecret)
@@ -92,7 +91,8 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	tx := db.Begin()
 	db.SingularTable(true)
 
-	obj := &azurestruct.VirtualMachineStaticDynamic{}
+	//obj := &azurestruct.VirtualMachineStaticDynamic{}
+	obj := []azurestruct.VirtualMachineStaticDynamic{}
 	tag := []tagstruct.Tags{}
 
 	//create a regex `(?i)azure` will match string contains "azure" case insensitive
@@ -106,72 +106,55 @@ func (uc UserController) GetAzureStaticDynamic(w http.ResponseWriter, r *http.Re
 	}
 	db.Where("Cloud = ?", reg.FindString("Azure")).Find(&tag)
 
-	fmt.Fprintf(w, "{\"Value\":[")
+	fmt.Println(obj)
+	logger.Info(obj)
+
 	for _, element := range *ls.Value {
-		counter++
 		rgroup := *(element.AvailabilitySet.ID)
 		resourcegroupname := strings.Split(rgroup, "/")
 		rsgroup := resourcegroupname[4]
 		vmName := *(element.Name)
 		vmId := *(element.VMID)
-		fmt.Println(*(element.VMID))
-
-		//Get current Status of instance
-		instanceView, _ := ac.GetInstanceView(vmName,rsgroup)
 
 		dc := goclientazure.NewDynamicUsageOperationsClient(c["AZURE_SUBSCRIPTION_ID"])
 		dc.Authorizer = spt
 
 		dlist, _ := dc.ListDynamic(vmName, rsgroup)
-		fmt.Println(dlist)
-		logger.Info(dlist)
 		for _, element1 := range *dlist.Value {
-			fmt.Println("Tag : ", tag)
+			res := azurestruct.VirtualMachineStaticDynamic{}
 			if len(tag) == 0 {
-				fmt.Println("In if loop")
-				if element1.Data[len(element1.Data) - 1].Average == nil{
-					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Unit:*element1.Unit, Tagname:"Nil"}
-					_ = json.NewEncoder(w).Encode(&obj)
-				}else {
-					obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Unit:*element1.Unit, Tagname:"Nil"}
-					_ = json.NewEncoder(w).Encode(&obj)
-				}
-
+				res.Tagname = "Nil"
 			}else {
-				fmt.Println("In else loop")
-				if element1.Data[len(element1.Data) - 1].Average == nil {
-					for _, el := range tag {
-						fmt.Println("In tag loop")
-						if vmId != el.InstanceId {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Unit:*element1.Unit, Tagname:"Nil"}
-						} else {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:0.0, Unit:*element1.Unit, Tagname:el.Tagname}
-						}
-						_ = json.NewEncoder(w).Encode(&obj)
-					}
-				}else{
-					for _, el := range tag {
-						fmt.Println("In tag loop")
-						if vmId != el.InstanceId {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Unit:*element1.Unit, Tagname:"Nil"}
-						} else {
-							obj = &azurestruct.VirtualMachineStaticDynamic{VmName:*element.Name, Type:*element.Type, Location:*element.Location, VmSize:element.VirtualMachineProperties.HardwareProfile.VMSize, VmId:*element.VMID, Publisher:*element.StorageProfile.ImageReference.Publisher, Offer:*element.StorageProfile.ImageReference.Offer, SKU:*element.StorageProfile.ImageReference.Sku, AvailabilitySetName:*element.AvailabilitySet.ID, Provisioningstate:*element.ProvisioningState, ResourcegroupName:rsgroup, Status:*instanceView.Statuses[len(instanceView.Statuses) - 1].DisplayStatus, TimeStamp:*(element1.Data[len(element1.Data) - 2].TimeStamp), Average:*(element1.Data[len(element1.Data) - 2].Average), Unit:*element1.Unit, Tagname:el.Tagname}
-						}
-						_ = json.NewEncoder(w).Encode(&obj)
+				for _, el := range tag {
+					if vmId != el.InstanceId {
+						res.Tagname = "Nil"
+					}else {
+						res.Tagname = el.Tagname
 					}
 				}
 			}
+			res.VmName = *element.Name
+			res.VmId = *element.VMID
+			res.Location = *element.Location
+			res.Offer = *element.StorageProfile.ImageReference.Offer
+			res.Publisher = *element.StorageProfile.ImageReference.Publisher
+			res.SKU = *element.StorageProfile.ImageReference.Sku
+			res.AvailabilitySetName = *element.AvailabilitySet.ID
+			res.Provisioningstate = *element.ProvisioningState
+			res.ResourcegroupName = rsgroup
+			res.Type = *element.Type
+			res.VmSize = element.VirtualMachineProperties.HardwareProfile.VMSize
+			res.TimeStamp = *(element1.Data[len(element1.Data) - 2].TimeStamp)
+			res.Unit = *element1.Unit
+			if element1.Data[len(element1.Data) - 1].Average == nil{
+				res.Average = 0.0
+			}else {
+				res.Average = *(element1.Data[len(element1.Data) - 2].Average)
+			}
+			obj = append(obj, res)
 		}
-		if counter < len(*ls.Value){
-		     logger.Info(",")
-		     fmt.Fprintf(w, ",")
-
-	     }else {counter=0}
 	}
-	fmt.Println(obj)
-	logger.Info(obj)
-	//_ = json.NewEncoder(w).Encode(&obj)
-	fmt.Fprintf(w, "]}")
+	_ = json.NewEncoder(w).Encode(&obj)
 	tx.Commit()
 }
 

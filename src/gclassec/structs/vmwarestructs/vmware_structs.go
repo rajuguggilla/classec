@@ -17,6 +17,7 @@ type VmwareInstances struct{
 }
 type VMwareCpu struct{
 	Name string `gorm:"column:name"`
+	Vmid string  `gorm:"column:vmid"`
 	Minimum float64 `gorm:"column:min"`
 	Maximum float64 `gorm:"column:max"`
 	Average float64 `gorm:"column:avg"`
