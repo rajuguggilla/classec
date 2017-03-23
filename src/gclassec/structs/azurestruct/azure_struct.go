@@ -32,6 +32,7 @@ type AzureDynamic struct {
 }
 
 type AzureCpu struct{
+	VmID string  			`gorm:"column:vmid"`
 	Name string                `gorm:"column:name"`
 	Minimum		float64		`sql:"type:varchar" gorm:"column:minimum"`
 	Maximum		float64		`sql:"type:varchar" gorm:"column:maximum"`
